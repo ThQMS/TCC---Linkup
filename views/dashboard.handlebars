@@ -1,0 +1,270 @@
+<div style="padding-top:80px;padding-bottom:60px;">
+  <div class="container" style="max-width:1000px;">
+
+    <!-- HEADER -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+      <div>
+        <h2 style="font-weight:700;margin-bottom:4px;">
+          <i class="bi bi-speedometer2 me-2" style="color:#f03e3e;"></i>Dashboard
+        </h2>
+        <p style="color:#888;margin:0;">Visão geral das suas vagas e candidaturas.</p>
+      </div>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        {{#if jobsData.length}}
+        <a href="/profile/dashboard/pdf" target="_blank"
+          style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:7px 16px;text-decoration:none;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:6px;"
+          onmouseover="this.style.background='#f03e3e';this.style.color='white'"
+          onmouseout="this.style.background='transparent';this.style.color='#f03e3e'">
+          <i class="bi bi-file-earmark-pdf"></i> Exportar Relatório
+        </a>
+        {{/if}}
+        <a href="/profile" style="color:#aaa;text-decoration:none;font-size:0.9rem;">
+          <i class="bi bi-arrow-left me-1"></i> Perfil
+        </a>
+      </div>
+    </div>
+
+    <!-- CARDS KPI PRINCIPAIS -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div style="font-size:2rem;font-weight:700;color:#f03e3e;">{{jobsCount}}</div>
+          <div style="font-size:0.85rem;color:#888;">Vagas</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div style="font-size:2rem;font-weight:700;color:#f03e3e;">{{totalCandidaturas}}</div>
+          <div style="font-size:0.85rem;color:#888;">Total Candidaturas</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div style="font-size:2rem;font-weight:700;color:#4caf50;">{{totalAceitos}}</div>
+          <div style="font-size:0.85rem;color:#888;">Aceitos</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div style="font-size:2rem;font-weight:700;color:#ffc107;">{{totalPendentes}}</div>
+          <div style="font-size:0.85rem;color:#888;">Pendentes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS RESPONSIVIDADE -->
+    <div class="row g-3 mb-4">
+
+      <!-- Taxa de Resposta -->
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid {{#if (gte taxaResposta 80)}}#4caf50{{else if (gte taxaResposta 50)}}#ffc107{{else}}#f03e3e{{/if}};border-radius:12px;padding:20px;text-align:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:{{#if (gte taxaResposta 80)}}#4caf50{{else if (gte taxaResposta 50)}}#ffc107{{else}}#f03e3e{{/if}};"></div>
+          <div style="font-size:2rem;font-weight:700;color:{{#if (gte taxaResposta 80)}}#4caf50{{else if (gte taxaResposta 50)}}#ffc107{{else}}#f03e3e{{/if}};">{{taxaResposta}}%</div>
+          <div style="font-size:0.85rem;color:#888;">Taxa de Resposta</div>
+        </div>
+      </div>
+
+      <!-- Tempo Médio de Resposta -->
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid {{#if (lte tempoMedioResposta 7)}}#4caf50{{else if (lte tempoMedioResposta 14)}}#ffc107{{else}}#f03e3e{{/if}};border-radius:12px;padding:20px;text-align:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:{{#if (lte tempoMedioResposta 7)}}#4caf50{{else if (lte tempoMedioResposta 14)}}#ffc107{{else}}#f03e3e{{/if}};"></div>
+          <div style="font-size:2rem;font-weight:700;color:{{#if (lte tempoMedioResposta 7)}}#4caf50{{else if (lte tempoMedioResposta 14)}}#ffc107{{else}}#f03e3e{{/if}};">{{tempoMedioResposta}}d</div>
+          <div style="font-size:0.85rem;color:#888;">Tempo Médio Resposta</div>
+        </div>
+      </div>
+
+      <!-- Candidaturas Expiradas -->
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid {{#if totalExpirados}}#f57c00{{else}}#2a2a2a{{/if}};border-radius:12px;padding:20px;text-align:center;position:relative;overflow:hidden;">
+          {{#if totalExpirados}}
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f57c00;"></div>
+          {{/if}}
+          <div style="font-size:2rem;font-weight:700;color:{{#if totalExpirados}}#f57c00{{else}}#888{{/if}};">{{totalExpirados}}</div>
+          <div style="font-size:0.85rem;color:#888;">Expiradas s/ Retorno</div>
+          {{#if totalExpirados}}
+          <div style="font-size:0.72rem;color:#f57c00;margin-top:4px;">Candidatos sem feedback</div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- Selo Empresa Responsiva -->
+      <div class="col-6 col-md-3">
+        <div style="background:#1e1e1e;border:1px solid {{#if empresaResponsiva}}#4caf50{{else}}#2a2a2a{{/if}};border-radius:12px;padding:20px;text-align:center;position:relative;overflow:hidden;">
+          {{#if empresaResponsiva}}
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#4caf50;"></div>
+          {{/if}}
+          <div style="font-size:1.8rem;margin-bottom:4px;">{{#if empresaResponsiva}}<i class="bi bi-award" style="color:#4caf50;"></i>{{else}}<i class="bi bi-hourglass-split" style="color:#888;"></i>{{/if}}</div>
+          <div style="font-size:0.85rem;font-weight:600;color:{{#if empresaResponsiva}}#4caf50{{else}}#888{{/if}};">
+            {{#if empresaResponsiva}}Empresa Responsiva{{else}}Em construção{{/if}}
+          </div>
+          <div style="font-size:0.72rem;color:#666;margin-top:4px;">
+            {{#if empresaResponsiva}}Responde rápido e sempre{{else}}Ainda construindo histórico{{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS INTELIGÊNCIA DE TALENTOS -->
+    {{#if (gt (add talentosRedescobertos similarContatados) 0)}}
+    <div class="row g-3 mb-4">
+      {{#if talentosRedescobertos}}
+      <div class="col-6 col-md-4">
+        <div style="background:#1e1e1e;border:1px solid #a855f7;border-radius:12px;padding:20px;text-align:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#a855f7;"></div>
+          <div style="font-size:2rem;font-weight:700;color:#a855f7;">{{talentosRedescobertos}}</div>
+          <div style="font-size:0.85rem;color:#888;">Talentos Redescobertos</div>
+          <div style="font-size:0.72rem;color:#a855f7;margin-top:4px;">Contatos reativados</div>
+        </div>
+      </div>
+      {{/if}}
+      {{#if similarContatados}}
+      <div class="col-6 col-md-4">
+        <div style="background:#1e1e1e;border:1px solid #06b6d4;border-radius:12px;padding:20px;text-align:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#06b6d4;"></div>
+          <div style="font-size:2rem;font-weight:700;color:#06b6d4;">{{similarContatados}}</div>
+          <div style="font-size:0.85rem;color:#888;">Similares Contatados</div>
+          <div style="font-size:0.72rem;color:#06b6d4;margin-top:4px;">Perfis sugeridos convidados</div>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+    {{/if}}
+
+    <!-- GRÁFICO -->
+    {{#if jobsData.length}}
+    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:24px;">
+      <h5 style="color:#f03e3e;font-weight:700;margin-bottom:20px;">
+        <i class="bi bi-bar-chart me-2"></i>Candidaturas por Vaga
+      </h5>
+      <canvas id="jobsChart" height="100"></canvas>
+    </div>
+    {{/if}}
+
+    <!-- TABELA DE VAGAS -->
+    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h5 style="color:#f03e3e;font-weight:700;margin:0;">
+          <i class="bi bi-briefcase me-2"></i>Suas Vagas
+        </h5>
+        {{#if jobsData.length}}
+        <span style="color:#666;font-size:0.82rem;">{{jobsData.length}} vaga(s) no total</span>
+        {{/if}}
+      </div>
+
+      {{#if jobsData.length}}
+        {{#each jobsData}}
+        <div class="dash-job-row {{#if (gt @index 4)}}dash-job-extra{{/if}}" style="border:1px solid #2a2a2a;border-radius:10px;padding:16px;margin-bottom:12px;{{#if (gt @index 4)}}display:none;{{/if}}">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+            <div style="flex:1;min-width:0;">
+              <p style="font-weight:700;font-size:1rem;margin-bottom:4px;">{{this.title}}</p>
+              <div class="d-flex gap-2 flex-wrap">
+                {{#if this.modality}}
+                  <span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.75rem;">{{this.modality}}</span>
+                {{/if}}
+                <span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.75rem;">
+                  <i class="bi bi-people me-1"></i>{{this.total}} candidatura(s)
+                </span>
+                <span style="background:#2a2a2a;border:1px solid #333;color:#666;border-radius:20px;padding:2px 10px;font-size:0.75rem;">
+                  <i class="bi bi-eye me-1"></i>{{this.views}} visualização(ões)
+                </span>
+              </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap align-items-center mt-2 mt-md-0">
+              <span style="background:#1a3a1a;color:#4caf50;border:1px solid #4caf50;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-check-circle-fill me-1"></i>{{this.aprovado}}</span>
+              <span style="background:#2a2a1a;color:#ffc107;border:1px solid #ffc107;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-hourglass-split me-1"></i>{{this.pendente}}</span>
+              <span style="background:#3a1a1a;color:#f03e3e;border:1px solid #f03e3e;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-x-circle-fill me-1"></i>{{this.rejeitado}}</span>
+              {{#if this.expirado}}
+              <span style="background:#2a1a00;color:#f57c00;border:1px solid #f57c00;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{this.expirado}} exp.</span>
+              {{/if}}
+              <a href="/jobs/applications/{{this.id}}"
+                style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:6px 14px;text-decoration:none;font-size:0.85rem;font-weight:600;white-space:nowrap;">
+                Ver Candidatos
+              </a>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+        {{#if (gt jobsData.length 5)}}
+        <div style="text-align:center;margin-top:8px;">
+          <button id="dash-show-all-btn" onclick="toggleAllJobs()" style="background:transparent;border:1px solid #333;color:#aaa;border-radius:8px;padding:7px 20px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;"
+            onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+            onmouseout="this.style.borderColor='#333';this.style.color='#aaa'">
+            <i class="bi bi-chevron-down me-1"></i>Ver todas ({{jobsData.length}})
+          </button>
+        </div>
+        {{/if}}
+      {{else}}
+        <div style="text-align:center;padding:40px 0;">
+          <div style="width:64px;height:64px;border-radius:50%;background:rgba(240,62,62,0.08);border:1px solid rgba(240,62,62,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <i class="bi bi-briefcase" style="font-size:1.6rem;color:#f03e3e;"></i>
+          </div>
+          <h5 style="margin-bottom:8px;">Nenhuma vaga aberta ainda</h5>
+          <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Abra sua primeira vaga e comece a receber candidaturas!</p>
+          <a href="/jobs/add" style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:9px 22px;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:6px;">
+            <i class="bi bi-plus-lg"></i> Abrir Vaga
+          </a>
+        </div>
+      {{/if}}
+    </div>
+
+  </div>
+  
+
+<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;margin-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="width:42px;height:42px;border-radius:10px;background:rgba(240,62,62,0.1);border:1px solid rgba(240,62,62,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <i class="bi bi-cpu" style="color:#f03e3e;font-size:1.1rem;"></i>
+    </div>
+    <div>
+      <div style="font-weight:700;font-size:0.9rem;">Métricas de IA</div>
+      <div style="color:#666;font-size:0.78rem;">Veja o uso das features de inteligência artificial</div>
+    </div>
+  </div>
+  <a href="/ai-metrics"
+    style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:7px 16px;text-decoration:none;font-size:0.85rem;font-weight:600;white-space:nowrap;transition:all 0.2s;"
+    onmouseover="this.style.background='#f03e3e';this.style.color='white'"
+    onmouseout="this.style.background='transparent';this.style.color='#f03e3e'">
+    <i class="bi bi-graph-up-arrow me-1"></i> Ver Métricas
+  </a>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+/* ── TOGGLE VAGAS ── */
+let allJobsVisible = false;
+function toggleAllJobs() {
+  allJobsVisible = !allJobsVisible;
+  document.querySelectorAll('.dash-job-extra').forEach(el => el.style.display = allJobsVisible ? 'block' : 'none');
+  const btn = document.getElementById('dash-show-all-btn');
+  if (btn) btn.innerHTML = allJobsVisible
+    ? '<i class="bi bi-chevron-up me-1"></i>Recolher'
+    : '<i class="bi bi-chevron-down me-1"></i>Ver todas ({{jobsData.length}})';
+}
+
+const chartData = {{{chartData}}};
+
+if (chartData.length > 0) {
+    const ctx = document.getElementById('jobsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.map(j => j.title.length > 22 ? j.title.substring(0, 22) + '...' : j.title),
+            datasets: [
+                { label: 'Pendentes',  data: chartData.map(j => j.pendente),  backgroundColor: '#ffeb3b', borderRadius: 4 }, <!-- ← Amarelo claro -->
+                { label: 'Aceitos',    data: chartData.map(j => j.aprovado),  backgroundColor: '#4caf50', borderRadius: 4 },
+                { label: 'Rejeitados', data: chartData.map(j => j.rejeitado), backgroundColor: '#f03e3e', borderRadius: 4 },
+                { label: 'Expirados',  data: chartData.map(j => j.expirado),  backgroundColor: '#f57c00', borderRadius: 4 } <!-- ← Laranja forte -->
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#e0e0e0' } } },
+            scales: {
+                x: { stacked: true, ticks: { color: '#aaa' }, grid: { color: '#2a2a2a' } },
+                y: { stacked: true, ticks: { color: '#aaa', stepSize: 1 }, grid: { color: '#2a2a2a' } }
+            }
+        }
+    });
+}
+</script>

@@ -1,0 +1,375 @@
+<style>
+/* ===== pf- (profile) design system ===== */
+.pf-wrapper        { padding-top: 70px; }
+
+/* Hero band */
+.pf-hero           { background: #141414; border-bottom: 1px solid #222; padding: 28px 0; }
+.pf-avatar-outer   { position: relative; flex-shrink: 0; }
+.pf-avatar         { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #141414; background: #1e1e1e; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; color: #f03e3e; overflow: hidden; box-shadow: 0 0 0 2px #f03e3e; }
+.pf-avatar img     { width: 100%; height: 100%; object-fit: cover; }
+.pf-cam-btn        { position: absolute; bottom: 4px; right: 4px; width: 30px; height: 30px; background: #f03e3e; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #141414; }
+.pf-cam-btn i      { font-size: 0.72rem; color: white; }
+
+.pf-hero-meta      { padding-top: 0; }
+.pf-name           { font-size: 1.7rem; font-weight: 700; margin-bottom: 4px; line-height: 1.4; }
+.pf-tagline        { color: #999; font-size: 0.95rem; margin-bottom: 10px; max-width: 480px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: clip; overflow-clip-margin: 8px; line-height: 1.8; }
+.pf-badges         { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pf-badge-empresa  { background: #f03e3e; color: white; font-size: 0.72rem; padding: 3px 11px; border-radius: 20px; font-weight: 600; }
+.pf-badge-sector   { background: #1e1e1e; color: #aaa; font-size: 0.72rem; padding: 3px 11px; border-radius: 20px; border: 1px solid #333; }
+.pf-badge-city     { color: #888; font-size: 0.85rem; margin-top: 6px; }
+
+/* Stats row */
+.pf-stats          { display: flex; gap: 12px; margin-top: 20px; }
+.pf-stat           { flex: 1; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 14px 12px; text-align: center; position: relative; overflow: hidden; }
+.pf-stat::before   { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.pf-stat-jobs::before  { background: #f03e3e; }
+.pf-stat-size::before  { background: #06b6d4; }
+.pf-stat-resp::before  { background: #4caf50; }
+.pf-stat-num       { font-size: 1.7rem; font-weight: 700; line-height: 1; }
+.pf-stat-lbl       { font-size: 0.75rem; color: #888; margin-top: 4px; }
+.pf-stat-jobs .pf-stat-num  { color: #f03e3e; }
+.pf-stat-size .pf-stat-num  { color: #06b6d4; }
+.pf-stat-resp .pf-stat-num  { color: #4caf50; }
+
+/* Action buttons */
+.pf-actions        { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+.pf-btn-edit       { background: transparent; border: 1px solid #f03e3e; color: #f03e3e; border-radius: 8px; padding: 7px 18px; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+.pf-btn-edit:hover { background: #f03e3e; color: white; }
+.pf-btn-add        { background: #f03e3e; border: none; color: white; border-radius: 8px; padding: 7px 18px; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.pf-btn-add:hover  { background: #c92a2a; color: white; }
+
+/* Sidebar cards */
+.pf-card           { background: #1a1a1a; border: 1px solid #222; border-radius: 12px; padding: 22px; margin-bottom: 16px; }
+.pf-card-title     { color: #f03e3e; font-size: 0.9rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.pf-link-item      { display: flex; align-items: center; gap: 10px; background: #222; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 14px; color: #ddd; text-decoration: none; margin-bottom: 10px; transition: border-color 0.2s; }
+.pf-link-item:hover { border-color: #555; color: #fff; }
+.pf-link-item:last-child { margin-bottom: 0; }
+.pf-link-empty     { display: flex; align-items: center; gap: 10px; background: #1e1e1e; border: 1px dashed #333; border-radius: 8px; padding: 10px 14px; color: #666; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; font-size: 0.88rem; }
+.pf-link-empty:hover { border-color: #555; color: #aaa; }
+.pf-info-row       { margin-bottom: 14px; }
+.pf-info-label     { font-size: 0.75rem; color: #666; margin-bottom: 2px; }
+.pf-info-value     { font-size: 0.9rem; color: #ddd; }
+
+/* Custom tabs */
+.pf-tabs           { display: flex; border-bottom: 1px solid #222; margin-bottom: 20px; }
+.pf-tab            { padding: 10px 20px; color: #888; font-size: 0.92rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; user-select: none; }
+.pf-tab.active     { color: #f03e3e; border-bottom-color: #f03e3e; font-weight: 600; }
+.pf-tab-pane       { display: none; }
+.pf-tab-pane.active { display: block; }
+
+/* Job rows */
+.pf-job-row        { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #222; }
+.pf-job-row:last-child { border-bottom: none; }
+.pf-job-title      { font-weight: 600; margin-bottom: 2px; font-size: 0.95rem; }
+.pf-job-meta       { font-size: 0.8rem; color: #888; }
+.pf-job-status     { font-size: 0.75rem; padding: 2px 9px; border-radius: 20px; font-weight: 600; }
+.pf-status-aberta  { background: rgba(76,175,80,0.15); color: #4caf50; }
+.pf-status-fechada { background: rgba(240,62,62,0.12); color: #f03e3e; }
+
+/* Modal */
+.pf-modal-overlay  { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center; }
+.pf-modal-box      { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 14px; padding: 32px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; }
+.pf-modal-hdr      { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.pf-modal-title    { font-size: 1.05rem; font-weight: 700; }
+.pf-modal-close    { background: transparent; border: none; color: #888; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+.pf-modal-close:hover { color: #fff; }
+.pf-modal-label    { color: #888; font-size: 0.82rem; margin-bottom: 4px; display: block; }
+.pf-modal-input    { background: #1e1e1e; border: 1px solid #2a2a2a; color: #e0e0e0; border-radius: 8px; padding: 9px 12px; width: 100%; font-size: 0.9rem; transition: border-color 0.2s; }
+.pf-modal-input:focus { outline: none; border-color: #f03e3e; }
+</style>
+
+<div class="pf-wrapper">
+
+  <!-- HERO -->
+  <div class="pf-hero">
+    <div class="container">
+      <div class="row g-4 align-items-end">
+
+        <!-- Left: avatar + meta -->
+        <div class="col-lg-7">
+          <div class="d-flex align-items-end gap-4">
+
+            <!-- Avatar -->
+            <div class="pf-avatar-outer">
+              <div class="pf-avatar">
+                {{#if user.avatar}}
+                  <img src="{{user.avatar}}" alt="Avatar" />
+                {{else}}
+                  <i class="bi bi-building"></i>
+                {{/if}}
+              </div>
+              <label for="avatarInput" class="pf-cam-btn" title="Alterar foto">
+                <i class="bi bi-camera-fill"></i>
+              </label>
+              <form id="avatarForm" action="/profile/avatar" method="POST" enctype="multipart/form-data" style="display:none;">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                <input type="file" id="avatarInput" name="avatar" accept="image/jpeg,image/png,image/webp"
+                  onchange="document.getElementById('avatarForm').submit();" />
+              </form>
+            </div>
+
+            <!-- Name + badges -->
+            <div class="pf-hero-meta">
+              <h1 class="pf-name">{{user.name}}</h1>
+              <p class="pf-tagline">{{#if user.bio}}{{user.bio}}{{else}}Sem descrição ainda.{{/if}}</p>
+              <div class="pf-badges">
+                <span class="pf-badge-empresa"><i class="bi bi-building me-1"></i>Empresa</span>
+                {{#if user.sector}}<span class="pf-badge-sector">{{user.sector}}</span>{{/if}}
+              </div>
+              {{#if user.city}}<p class="pf-badge-city"><i class="bi bi-geo-alt me-1"></i>{{user.city}}</p>{{/if}}
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="pf-stats mt-3">
+            <div class="pf-stat pf-stat-jobs">
+              <div class="pf-stat-num">{{jobsCount}}</div>
+              <div class="pf-stat-lbl">Vagas Abertas</div>
+            </div>
+            <div class="pf-stat pf-stat-size">
+              <div class="pf-stat-num">{{#if user.companySize}}{{user.companySize}}{{else}}—{{/if}}</div>
+              <div class="pf-stat-lbl">Funcionários</div>
+            </div>
+            <div class="pf-stat pf-stat-resp">
+              <div class="pf-stat-num">{{applicationsCount}}</div>
+              <div class="pf-stat-lbl">Candidatos Recebidos</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: actions -->
+        <div class="col-lg-5 d-flex align-items-end">
+          <div class="pf-actions">
+            <button class="pf-btn-edit" onclick="document.getElementById('editModal').style.display='flex'">
+              <i class="bi bi-pencil me-1"></i>Editar Perfil
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST DE ONBOARDING -->
+  <div class="container mt-3">
+    {{> onboarding-checklist}}
+  </div>
+
+  <!-- CONTENT -->
+  <div class="container mt-2 pb-5">
+    <div class="row g-4">
+
+      <!-- SIDEBAR -->
+      <div class="col-lg-4">
+
+        <!-- Links -->
+        <div class="pf-card">
+          <div class="pf-card-title"><i class="bi bi-link-45deg"></i>Links</div>
+
+          {{#if user.website}}
+            <a href="{{user.website}}" target="_blank" class="pf-link-item">
+              <i class="bi bi-globe" style="color:#06b6d4;"></i>
+              <span class="flex-grow-1">Site oficial</span>
+              <i class="bi bi-arrow-up-right" style="color:#555;font-size:0.8rem;"></i>
+            </a>
+          {{else}}
+            <div class="pf-link-empty" onclick="document.getElementById('editModal').style.display='flex'">
+              <i class="bi bi-globe" style="color:#444;"></i>
+              <span>Adicionar site</span>
+              <i class="bi bi-plus ms-auto" style="color:#555;"></i>
+            </div>
+          {{/if}}
+
+          {{#if user.linkedinCompany}}
+            <a href="{{user.linkedinCompany}}" target="_blank" class="pf-link-item">
+              <i class="bi bi-linkedin" style="color:#0a66c2;"></i>
+              <span class="flex-grow-1">LinkedIn</span>
+              <i class="bi bi-arrow-up-right" style="color:#555;font-size:0.8rem;"></i>
+            </a>
+          {{else}}
+            <div class="pf-link-empty" onclick="document.getElementById('editModal').style.display='flex'">
+              <i class="bi bi-linkedin" style="color:#444;"></i>
+              <span>Adicionar LinkedIn</span>
+              <i class="bi bi-plus ms-auto" style="color:#555;"></i>
+            </div>
+          {{/if}}
+        </div>
+
+        <!-- Conta -->
+        <div class="pf-card">
+          <div class="pf-card-title"><i class="bi bi-info-circle"></i>Informações</div>
+          <div class="pf-info-row">
+            <div class="pf-info-label">E-mail</div>
+            <div class="pf-info-value">{{user.email}}</div>
+          </div>
+          <div class="pf-info-row">
+            <div class="pf-info-label">Setor</div>
+            <div class="pf-info-value">{{#if user.sector}}{{user.sector}}{{else}}<span style="color:#555;">Não informado</span>{{/if}}</div>
+          </div>
+          <div class="pf-info-row">
+            <div class="pf-info-label">Tamanho</div>
+            <div class="pf-info-value">{{#if user.companySize}}{{user.companySize}} funcionários{{else}}<span style="color:#555;">Não informado</span>{{/if}}</div>
+          </div>
+          <div class="pf-info-row" style="margin-bottom:0;">
+            <div class="pf-info-label">Membro desde</div>
+            <div class="pf-info-value">{{formatDate user.createdAt}}</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MAIN -->
+      <div class="col-lg-8">
+
+        <!-- Tabs -->
+        <div class="pf-tabs">
+          <div class="pf-tab active" onclick="switchTab('sobre', this)">
+            <i class="bi bi-building me-1"></i>Sobre
+          </div>
+          <div class="pf-tab" onclick="switchTab('vagas', this)">
+            <i class="bi bi-briefcase me-1"></i>Vagas Abertas
+            {{#if jobsCount}}<span style="background:#f03e3e;color:white;font-size:0.7rem;padding:1px 7px;border-radius:20px;margin-left:6px;">{{jobsCount}}</span>{{/if}}
+          </div>
+        </div>
+
+        <!-- Aba: Sobre -->
+        <div class="pf-tab-pane active" id="pf-sobre">
+          <div class="pf-card">
+            <div class="pf-card-title"><i class="bi bi-building"></i>Sobre a empresa</div>
+            {{#if user.bio}}
+              <p style="color:#ccc;line-height:1.7;margin:0;">{{user.bio}}</p>
+            {{else}}
+              <div style="text-align:center;padding:32px 0;">
+                <i class="bi bi-pencil-square" style="font-size:2rem;color:#333;display:block;margin-bottom:12px;"></i>
+                <p style="color:#555;margin-bottom:16px;">Nenhuma descrição cadastrada ainda.</p>
+                <button class="pf-btn-edit" onclick="document.getElementById('editModal').style.display='flex'">
+                  <i class="bi bi-pencil me-1"></i>Adicionar descrição
+                </button>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+
+        <!-- Aba: Vagas -->
+        <div class="pf-tab-pane" id="pf-vagas">
+          <div class="pf-card">
+            <div class="pf-card-title d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-briefcase"></i>Vagas que abri</span>
+              <a href="/jobs/add" class="pf-btn-add" style="padding:4px 14px;font-size:0.8rem;">
+                <i class="bi bi-plus-lg"></i>Nova Vaga
+              </a>
+            </div>
+            {{#if myJobs}}
+              {{#each myJobs}}
+                <div class="pf-job-row">
+                  <div style="flex:1;min-width:0;">
+                    <div class="pf-job-title">{{this.title}}</div>
+                    <div class="pf-job-meta">
+                      {{this.company}}
+                      {{#if this.salary}} · <i class="bi bi-cash-coin me-1"></i>{{this.salary}}{{/if}}
+                      {{#if this.modality}} · {{this.modality}}{{/if}}
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2 ms-3">
+                    <span class="pf-job-status {{#if (eq this.status 'aberta')}}pf-status-aberta{{else}}pf-status-fechada{{/if}}" style="text-transform:capitalize;">
+                      {{this.status}}
+                    </span>
+                    <a href="/jobs/view/{{this.id}}" class="pf-btn-dash" style="padding:4px 14px;font-size:0.78rem;">
+                      <i class="bi bi-eye me-1"></i>Ver
+                    </a>
+                    <a href="/jobs/edit/{{this.id}}" class="pf-btn-dash" style="padding:4px 14px;font-size:0.78rem;">
+                      <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
+                  </div>
+                </div>
+              {{/each}}
+            {{else}}
+              <div style="text-align:center;padding:32px 0;">
+                <i class="bi bi-briefcase" style="font-size:2rem;color:#333;display:block;margin-bottom:12px;"></i>
+                <p style="color:#555;margin-bottom:16px;">Nenhuma vaga aberta ainda.</p>
+                <a href="/jobs/add" class="pf-btn-add">
+                  <i class="bi bi-plus-lg me-1"></i>Abrir primeira vaga
+                </a>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL EDITAR EMPRESA -->
+<div id="editModal" class="pf-modal-overlay">
+  <div class="pf-modal-box">
+    <div class="pf-modal-hdr">
+      <span class="pf-modal-title"><i class="bi bi-pencil-square me-2" style="color:#f03e3e;"></i>Editar Perfil</span>
+      <button class="pf-modal-close" onclick="document.getElementById('editModal').style.display='none'">&times;</button>
+    </div>
+    <form action="/profile/update" method="POST">
+      <input type="hidden" name="_csrf" value="{{csrfToken}}">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="pf-modal-label">Nome da empresa</label>
+          <input type="text" class="pf-modal-input" name="name" value="{{user.name}}" required />
+        </div>
+        <div class="col-md-6">
+          <label class="pf-modal-label">Cidade</label>
+          <input type="text" class="pf-modal-input" name="city" value="{{user.city}}" placeholder="Ex: São Paulo, SP" />
+        </div>
+        <div class="col-md-6">
+          <label class="pf-modal-label">Setor</label>
+          <input type="text" class="pf-modal-input" name="sector" value="{{user.sector}}" placeholder="Ex: Tecnologia, Saúde..." />
+        </div>
+        <div class="col-md-6">
+          <label class="pf-modal-label">Nº de funcionários</label>
+          <input type="number" class="pf-modal-input" name="companySize" value="{{user.companySize}}" placeholder="Ex: 50" />
+        </div>
+        <div class="col-12">
+          <label class="pf-modal-label">Descrição da empresa</label>
+          <textarea class="pf-modal-input" name="bio" rows="4" placeholder="Fale sobre a empresa, cultura, missão..." style="resize:none;">{{user.bio}}</textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="pf-modal-label"><i class="bi bi-globe me-1"></i>Site</label>
+          <input type="url" class="pf-modal-input" name="website" value="{{user.website}}" placeholder="https://empresa.com.br" />
+        </div>
+        <div class="col-md-6">
+          <label class="pf-modal-label"><i class="bi bi-linkedin me-1"></i>LinkedIn</label>
+          <input type="url" class="pf-modal-input" name="linkedinCompany" value="{{user.linkedinCompany}}" placeholder="https://linkedin.com/company/..." />
+        </div>
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="pf-btn-dash"
+          onclick="document.getElementById('editModal').style.display='none'">Cancelar</button>
+        <button type="submit" class="pf-btn-add">
+          <i class="bi bi-check-lg me-1"></i>Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.pf-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pf-tab-pane').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pf-' + id).classList.add('active');
+}
+
+// Close modal on overlay click
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
+
+// Auto-ativa aba se vier via ?tab=vagas
+(function() {
+  const param = new URLSearchParams(window.location.search).get('tab');
+  if (param === 'vagas') {
+    const tabEl = document.querySelector('.pf-tab[onclick*="vagas"]');
+    if (tabEl) switchTab('vagas', tabEl);
+  }
+})();
+</script>

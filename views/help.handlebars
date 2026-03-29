@@ -1,0 +1,350 @@
+<style>
+.help-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:#666;padding:10px 20px;cursor:pointer;font-weight:600;font-size:0.88rem;white-space:nowrap;margin-bottom:-2px;transition:all 0.2s;}
+.help-tab:hover{color:#ccc;}
+.help-tab.active{border-bottom-color:#e63946;color:#f0f0f0;}
+.help-contact-input{width:100%;background:#1e1e1e;border:1px solid #2a2a2a;color:#e0e0e0;border-radius:8px;padding:10px 14px;outline:none;font-size:0.88rem;transition:border-color 0.2s;}
+.help-contact-input:focus{border-color:#e63946;}
+.help-contact-input::placeholder{color:#444;}
+.help-submit{background:#e63946;border:none;color:white;border-radius:8px;padding:10px 28px;font-weight:700;cursor:pointer;font-size:0.9rem;transition:background 0.2s;}
+.help-submit:hover{background:#c62828;}
+.help-submit:active{background:#b71c1c;}
+@media(max-width:576px){
+  .help-tab{padding:9px 14px;font-size:0.82rem;}
+  [id^="faq-"] [style*="grid-template-columns"]{grid-template-columns:1fr !important;}
+}
+.guia-cols { display:flex; gap:0; align-items:stretch; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:14px; overflow:hidden; }
+.guia-col  { flex:1; min-width:0; padding:22px 18px; }
+.guia-col + .guia-col { border-left:1px solid #242424; }
+.guia-feat { background:#111; border:1px solid #222; border-radius:10px; padding:16px; margin-bottom:10px; transition:border-color 0.2s, transform 0.2s; }
+.guia-feat:last-child { margin-bottom:0; }
+.guia-feat:hover { transform:translateY(-1px); }
+.col-geral   .guia-feat:hover { border-color:rgba(230,57,70,0.45); }
+.col-cand    .guia-feat:hover { border-color:rgba(6,182,212,0.45); }
+.col-emp     .guia-feat:hover { border-color:rgba(168,85,247,0.45); }
+@media(max-width:700px){
+  .guia-cols { flex-direction:column; }
+  .guia-col + .guia-col { border-left:none; border-top:1px solid #242424; }
+}
+</style>
+
+<div style="padding-top:90px;padding-bottom:80px;">
+  <div class="container" style="max-width:880px;">
+
+    <!-- HEADER -->
+    <div class="text-center mb-5">
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);margin-bottom:16px;">
+        <i class="bi bi-question-circle-fill" style="font-size:1.5rem;color:#e63946;"></i>
+      </div>
+      <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.9rem;margin-bottom:8px;letter-spacing:-0.5px;">Ajuda &amp; Guia</h1>
+      <p style="color:#666;font-size:0.92rem;max-width:480px;margin:0 auto;">Encontre respostas, aprenda a usar cada feature e tire suas dúvidas.</p>
+    </div>
+
+    <!-- TABS NAV -->
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:32px;">
+      <div style="display:flex;gap:2px;border-bottom:2px solid #1e1e1e;padding-bottom:0;min-width:max-content;">
+        <button onclick="showTab('candidato')" id="tab-candidato" class="help-tab active">
+          <i class="bi bi-person me-1"></i>Candidatos
+        </button>
+        <button onclick="showTab('empresa')" id="tab-empresa" class="help-tab">
+          <i class="bi bi-building me-1"></i>Empresas
+        </button>
+        <button onclick="showTab('conta')" id="tab-conta" class="help-tab">
+          <i class="bi bi-gear me-1"></i>Conta
+        </button>
+        <button onclick="showTab('guia')" id="tab-guia" class="help-tab">
+          <i class="bi bi-book me-1"></i>Guia de Features
+        </button>
+      </div>
+    </div>
+
+    <!-- FAQ CANDIDATOS -->
+    <div id="faq-candidato">
+      {{> faq-item question="Como crio meu currículo na plataforma?" answer="Após criar sua conta, acesse 'Meu Currículo' no menu. Você pode preencher manualmente ou fazer upload de um PDF — a IA extrai e preenche todos os campos automaticamente."}}
+      {{> faq-item question="O que é o ATS Score?" answer="É uma pontuação de compatibilidade entre o seu perfil e a vaga. Calculada localmente comparando suas skills e experiências com os requisitos da vaga. Quanto maior, mais alinhado seu perfil está."}}
+      {{> faq-item question="Como funciona o Chat com IA?" answer="Em cada vaga há um botão de chat. A IA conhece o conteúdo da vaga e o seu currículo e pode responder perguntas sobre requisitos, sua compatibilidade, o que estudar e como se preparar."}}
+      {{> faq-item question="O que é 'Aberto para oportunidades'?" answer="É um status no seu perfil que sinaliza para recrutadores que você está buscando emprego ativamente. Pode ser ativado e desativado a qualquer momento."}}
+      {{> faq-item question="Como funciona a carta de apresentação automática?" answer="Ao se candidatar, a IA gera uma carta personalizada com base no seu perfil e na vaga. Você pode editar antes de enviar."}}
+      {{> faq-item question="Posso bloquear vagas de uma empresa?" answer="Sim. Na página de qualquer vaga há a opção 'Não ver vagas desta empresa'. Vagas dessa empresa não aparecerão mais na listagem."}}
+      {{> faq-item question="Recebo alertas de novas vagas?" answer="Sim. Todo início de semana enviamos um email com as melhores vagas novas compatíveis com seu perfil."}}
+    </div>
+
+    <!-- FAQ EMPRESAS -->
+    <div id="faq-empresa" style="display:none;">
+      {{> faq-item question="Como publico uma vaga?" answer="Clique em 'Abrir Vaga' no menu. Preencha os dados e use o botão 'Melhorar com IA' para aprimorar a descrição, requisitos e benefícios automaticamente."}}
+      {{> faq-item question="O que é o Bias Auditor?" answer="Ao publicar ou editar uma vaga, a IA escaneia o texto procurando linguagem potencialmente enviesada por gênero, idade ou cultura, e sugere reescritas mais inclusivas."}}
+      {{> faq-item question="Como funciona o ranking de candidatos?" answer="No painel de candidatos de cada vaga, a IA analisa os perfis e gera um ranking de compatibilidade com análise individual de cada candidato."}}
+      {{> faq-item question="Posso criar testes para os candidatos?" answer="Sim. Ao criar uma vaga, você pode adicionar até 3 perguntas (abertas, situacionais ou múltipla escolha). A IA avalia as respostas abertas e gera um score."}}
+      {{> faq-item question="Como funciona o feedback de rejeição?" answer="Ao rejeitar um candidato, você pode solicitar um feedback gerado pela IA — construtivo e personalizado — que é enviado por email ao candidato."}}
+      {{> faq-item question="Posso exportar um relatório das vagas?" answer="Sim. No dashboard da empresa há um botão de exportar PDF com capa, KPIs, gráficos de funil e ranking de vagas."}}
+    </div>
+
+    <!-- FAQ CONTA -->
+    <div id="faq-conta" style="display:none;">
+      {{> faq-item question="Como verifico minha conta?" answer="Após o cadastro, enviamos um código de 6 dígitos para o seu email. O código expira em 15 minutos. Se não receber, solicite um novo na tela de verificação."}}
+      {{> faq-item question="Esqueci minha senha. O que faço?" answer="Clique em 'Esqueceu a senha?' na tela de login. Insira seu email e você receberá um código para redefinir a senha. O código expira em 15 minutos."}}
+      {{> faq-item question="Como altero meu avatar?" answer="Acesse seu perfil e clique na foto de perfil ou no botão de editar. Formatos aceitos: JPG, PNG, WEBP. Tamanho máximo: 2MB."}}
+      {{> faq-item question="Meus dados são seguros?" answer="Sim. Senhas são armazenadas com bcrypt, sessões têm proteção CSRF, uploads são validados por conteúdo real e todas as ações críticas são registradas em audit log."}}
+    </div>
+
+    <!-- GUIA DE FEATURES -->
+    <div id="faq-guia" style="display:none;">
+      <p style="color:#888;font-size:0.88rem;margin-bottom:20px;">Todas as features do LinkUp — organizadas por tipo de usuário.</p>
+
+      <div class="guia-cols">
+
+        <!-- ── GERAL ── -->
+        <div class="guia-col col-geral">
+          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:6px;padding:4px 10px;margin-bottom:14px;">
+            <i class="bi bi-globe2" style="color:#e63946;font-size:0.75rem;"></i>
+            <span style="color:#e63946;font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Geral</span>
+          </div>
+          <div style="font-weight:700;font-size:0.88rem;color:#bbb;margin-bottom:14px;">Para todos os usuários</div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-search-heart" style="color:#e63946;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Busca Semântica</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Descreva em linguagem natural o que procura — a IA entende o significado sem precisar acertar a palavra exata.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-bell-fill" style="color:#e63946;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Notificações em Tempo Real</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Alertas instantâneos sobre status, candidaturas e oportunidades via Socket.io — sem recarregar a página.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-graph-up-arrow" style="color:#e63946;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Métricas de IA</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Dashboard com histórico de uso de cada feature de IA, tempo médio e retorno das ferramentas.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-chat-dots-fill" style="color:#e63946;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Chat com IA na Vaga</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Converse com a IA dentro de qualquer vaga para tirar dúvidas sobre requisitos, cultura ou preparo.</p>
+          </div>
+        </div>
+
+        <!-- ── CANDIDATOS ── -->
+        <div class="guia-col col-cand">
+          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:6px;padding:4px 10px;margin-bottom:14px;">
+            <i class="bi bi-person-fill" style="color:#06b6d4;font-size:0.75rem;"></i>
+            <span style="color:#06b6d4;font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Candidatos</span>
+          </div>
+          <div style="font-weight:700;font-size:0.88rem;color:#bbb;margin-bottom:14px;">Para quem busca emprego</div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-bullseye" style="color:#06b6d4;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Score de Compatibilidade</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">A IA analisa seu currículo versus os requisitos da vaga e retorna uma pontuação com dicas personalizadas.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-mic-fill" style="color:#06b6d4;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Simulação de Entrevista</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Pratique com perguntas geradas pela IA com base nos requisitos da vaga. Receba feedback antes do dia D.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-scissors" style="color:#06b6d4;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Tailoring de Currículo</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">A IA reescreve seções do currículo especificamente para uma vaga, aumentando relevância e score ATS.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-file-earmark-person-fill" style="color:#06b6d4;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Currículo Digital + PDF</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Crie seu currículo na plataforma. Enviado automaticamente nas candidaturas e exportável como PDF.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-pen-fill" style="color:#06b6d4;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Carta de Apresentação por IA</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Ao se candidatar, a IA gera automaticamente uma carta personalizada usando seu perfil como base.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-arrow-repeat" style="color:#06b6d4;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Oportunidades Revisitadas</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Quando uma empresa reabre uma vaga compatível, você recebe notificação em tempo real — sem precisar voltar a procurar.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-envelope-check-fill" style="color:#06b6d4;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Feedback Automático</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Ao ser recusado, você recebe automaticamente um feedback construtivo gerado por IA — sem ghosting.</p>
+          </div>
+        </div>
+
+        <!-- ── EMPRESAS ── -->
+        <div class="guia-col col-emp">
+          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:6px;padding:4px 10px;margin-bottom:14px;">
+            <i class="bi bi-buildings-fill" style="color:#a855f7;font-size:0.75rem;"></i>
+            <span style="color:#a855f7;font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Empresas</span>
+          </div>
+          <div style="font-weight:700;font-size:0.88rem;color:#bbb;margin-bottom:14px;">Para recrutadores</div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-shield-check" style="color:#a855f7;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Bias Audit</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">A IA analisa o texto das vagas em busca de linguagem tendenciosa e sugere versões mais inclusivas.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-trophy-fill" style="color:#a855f7;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Ranking de Candidatos por IA</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Ordena automaticamente os candidatos do mais ao menos compatível com a vaga com um clique.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-kanban-fill" style="color:#a855f7;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Pipeline de Etapas</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Defina etapas customizadas — triagem, técnico, cultural fit — e mova candidatos pelo funil seletivo.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-people-fill" style="color:#a855f7;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Redescoberta de Talentos</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Ao abrir uma vaga, o sistema busca candidatos anteriores com fit ≥ 88% ainda disponíveis e os notifica automaticamente.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-person-plus-fill" style="color:#a855f7;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Candidatos Similares</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">O sistema sugere perfis fora do pool de inscritos com alto fit — você entra em contato proativamente.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-award-fill" style="color:#a855f7;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Selo Empresa Responsiva</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Atualize os status dos candidatos para conquistar o selo público de empresa responsiva e atrair mais talentos.</p>
+          </div>
+
+          <div class="guia-feat">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-magic" style="color:#a855f7;font-size:0.85rem;"></i>
+              </div>
+              <span style="font-weight:700;font-size:0.85rem;">Melhorar Vaga com IA</span>
+            </div>
+            <p style="color:#666;font-size:0.8rem;line-height:1.6;margin:0;">Refina automaticamente descrição, requisitos e benefícios da vaga ao criar ou editar.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONTATO -->
+    <div style="background:#1a1a1a;border:1px solid #252525;border-radius:16px;padding:36px;margin-top:48px;">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(240,62,62,0.08);border:1px solid rgba(240,62,62,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="bi bi-chat-dots-fill" style="color:#f03e3e;"></i>
+        </div>
+        <div>
+          <h4 style="font-weight:700;margin:0;font-size:1.05rem;">Não encontrou sua resposta?</h4>
+          <p style="color:#666;margin:2px 0 0;font-size:0.85rem;">Envie sua dúvida e responderemos em até 24 horas.</p>
+        </div>
+      </div>
+      <form action="/help/contact" method="POST">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <div class="row g-3 mt-1">
+          <div class="col-md-6">
+            <input type="text" name="name" placeholder="Seu nome" required class="help-contact-input">
+          </div>
+          <div class="col-md-6">
+            <input type="email" name="email" placeholder="Seu email" required class="help-contact-input">
+          </div>
+          <div class="col-12">
+            <textarea name="message" rows="4" placeholder="Descreva sua dúvida..." required
+              class="help-contact-input" style="resize:none;"></textarea>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="help-submit">
+              <i class="bi bi-send me-2"></i>Enviar Mensagem
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(tab) {
+  ['candidato','empresa','conta','guia'].forEach(function(t) {
+    document.getElementById('faq-' + t).style.display = t === tab ? 'block' : 'none';
+    var btn = document.getElementById('tab-' + t);
+    btn.classList.toggle('active', t === tab);
+  });
+}
+if (window.location.hash === '#guia') showTab('guia');
+</script>

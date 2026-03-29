@@ -1,0 +1,122 @@
+<style>
+.appl-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:20px 24px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;transition:border-color 0.2s,box-shadow 0.2s;border-left-width:3px;border-left-style:solid;}
+.appl-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+.appl-card.s-contratado{border-left-color:#4caf50;}
+.appl-card.s-aprovado   {border-left-color:#66bb6a;}
+.appl-card.s-rejeitado  {border-left-color:#f03e3e;}
+.appl-card.s-expirado   {border-left-color:#444;}
+.appl-card.s-analise    {border-left-color:#06b6d4;}
+.appl-card.s-pendente   {border-left-color:#ffc107;}
+.appl-logo{width:46px;height:46px;border-radius:10px;border:1px solid #2a2a2a;background:#111;display:flex;align-items:center;justify-content:center;color:#555;flex-shrink:0;}
+.appl-pill{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:0.72rem;}
+.appl-status{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:5px 14px;font-size:0.8rem;font-weight:700;}
+.appl-link{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1px solid #2a2a2a;color:#888;border-radius:8px;padding:7px 14px;text-decoration:none;font-size:0.84rem;white-space:nowrap;transition:all 0.2s;}
+.appl-link:hover{border-color:#f03e3e;color:#f03e3e;}
+.appl-back{display:inline-flex;align-items:center;gap:6px;color:#888;text-decoration:none;font-size:0.87rem;border:1px solid #2a2a2a;border-radius:8px;padding:7px 14px;transition:all 0.2s;}
+.appl-back:hover{border-color:#f03e3e;color:#f03e3e;}
+@media(max-width:576px){
+  .appl-card{padding:16px;}
+  .appl-card>div:last-child{width:100%;justify-content:space-between;}
+  .appl-status{font-size:0.74rem;padding:4px 10px;}
+  .appl-pill{font-size:0.68rem;}
+}
+</style>
+
+<div style="padding-top:90px;padding-bottom:72px;">
+  <div class="container" style="max-width:860px;">
+
+    <!-- HEADER -->
+    <div class="d-flex align-items-start justify-content-between mb-5 flex-wrap gap-3">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-0.5px;margin:0;">Minhas Candidaturas</h2>
+          {{#if applications.length}}
+          <span style="background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);color:#e63946;border-radius:20px;padding:2px 10px;font-size:0.8rem;font-weight:700;">{{applications.length}}</span>
+          {{/if}}
+        </div>
+        <p style="color:#666;margin:0;font-size:0.88rem;">Acompanhe o andamento de cada processo seletivo.</p>
+      </div>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        {{#if applications.length}}
+        <a href="/jobs/my-applications/pdf" target="_blank"
+          style="display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid #2a2a2a;color:#888;border-radius:8px;padding:7px 14px;text-decoration:none;font-size:0.84rem;font-weight:600;transition:all 0.2s;"
+          onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'" onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#888'">
+          <i class="bi bi-file-earmark-pdf"></i>Exportar PDF
+        </a>
+        {{/if}}
+        <a href="/" class="appl-back"><i class="bi bi-arrow-left"></i>Ver Vagas</a>
+      </div>
+    </div>
+
+    {{#if applications.length}}
+      {{#each applications}}
+        {{#if this.job}}
+        <div class="appl-card
+          {{#if (eq this.status 'contratado')}}s-contratado
+          {{else if (eq this.status 'aprovado')}}s-aprovado
+          {{else if (eq this.status 'rejeitado')}}s-rejeitado
+          {{else if (eq this.status 'expirado')}}s-expirado
+          {{else if (eq this.status 'em análise')}}s-analise
+          {{else}}s-pendente{{/if}}">
+
+          <div class="d-flex align-items-center gap-3 flex-wrap" style="flex:1;min-width:0;">
+            <div class="appl-logo">
+              <i class="bi bi-building"></i>
+            </div>
+            <div style="min-width:0;">
+              <p style="font-weight:700;font-size:1rem;margin-bottom:2px;color:#f1f1f1;overflow:clip;overflow-clip-margin:6px;text-overflow:ellipsis;white-space:nowrap;line-height:1.45;">{{this.job.title}}</p>
+              <p style="color:#777;font-size:0.82rem;margin-bottom:8px;">{{this.job.company}}</p>
+              <div class="d-flex gap-2 flex-wrap">
+                {{#if this.job.modality}}
+                  <span class="appl-pill" style="background:#1e1e1e;border:1px solid #2a2a2a;color:#aaa;">
+                    <i class="bi bi-geo-alt"></i>{{this.job.modality}}
+                  </span>
+                {{/if}}
+                {{#if this.job.salary}}
+                  <span class="appl-pill" style="background:rgba(76,175,80,0.06);border:1px solid rgba(76,175,80,0.2);color:#4caf50;font-weight:600;">
+                    R$ {{this.job.salary}}
+                  </span>
+                {{/if}}
+                {{#if this.currentStage}}
+                  <span class="appl-pill" style="background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.2);color:#06b6d4;">
+                    <i class="bi bi-layers"></i>{{this.currentStage}}
+                  </span>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-3 flex-shrink-0 flex-wrap">
+            <span class="appl-status
+              {{#if (eq this.status 'contratado')}}   " style="background:rgba(76,175,80,0.12);color:#4caf50;border:1px solid rgba(76,175,80,0.3);">  <i class="bi bi-award-fill"></i>Contratado(a)
+              {{else if (eq this.status 'aprovado')}} " style="background:rgba(76,175,80,0.1);color:#66bb6a;border:1px solid rgba(76,175,80,0.25);">  <i class="bi bi-check-circle-fill"></i>Aprovado
+              {{else if (eq this.status 'rejeitado')}} " style="background:rgba(240,62,62,0.08);color:#f03e3e;border:1px solid rgba(240,62,62,0.25);">  <i class="bi bi-x-circle-fill"></i>Não selecionado
+              {{else if (eq this.status 'expirado')}} " style="background:#1e1e1e;color:#555;border:1px solid #333;">  <i class="bi bi-dash-circle"></i>Encerrada
+              {{else if (eq this.status 'em análise')}} " style="background:rgba(6,182,212,0.07);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);">  <i class="bi bi-search"></i>Em análise
+              {{else}} " style="background:rgba(255,193,7,0.07);color:#ffc107;border:1px solid rgba(255,193,7,0.25);">  <i class="bi bi-hourglass-split"></i>Aguardando
+              {{/if}}
+            </span>
+            <a href="/jobs/view/{{this.job.id}}" class="appl-link">Ver Vaga</a>
+          </div>
+
+        </div>
+        {{/if}}
+      {{/each}}
+
+    {{else}}
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:80px 40px;text-align:center;">
+        <div style="width:72px;height:72px;border-radius:50%;background:rgba(230,57,70,0.06);border:1px solid rgba(230,57,70,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <i class="bi bi-send" style="font-size:1.8rem;color:#e63946;"></i>
+        </div>
+        <h5 style="font-weight:700;margin-bottom:8px;">Nenhuma candidatura ainda</h5>
+        <p style="color:#555;font-size:0.88rem;max-width:320px;margin:0 auto 24px;line-height:1.7;">
+          Explore vagas compatíveis com seu perfil e candidate-se com um clique.
+        </p>
+        <a href="/" style="background:#e63946;color:white;border-radius:8px;padding:10px 28px;text-decoration:none;font-weight:600;font-size:0.9rem;display:inline-flex;align-items:center;gap:8px;">
+          <i class="bi bi-search"></i>Explorar Vagas
+        </a>
+      </div>
+    {{/if}}
+
+  </div>
+</div>

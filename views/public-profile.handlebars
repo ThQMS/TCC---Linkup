@@ -1,0 +1,145 @@
+<div style="padding-top:90px;padding-bottom:60px;">
+  <div class="container" style="max-width:800px;">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1a1a1a,#2c2c2c);border:1px solid #2a2a2a;border-radius:16px;padding:36px 40px;margin-bottom:24px;">
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div style="width:88px;height:88px;border-radius:50%;border:3px solid #f03e3e;overflow:hidden;flex-shrink:0;background:#2a2a2a;display:flex;align-items:center;justify-content:center;">
+          {{#if candidate.avatar}}
+            <img src="{{candidate.avatar}}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">
+          {{else}}
+            <i class="bi bi-person-fill" style="font-size:2.5rem;color:#555;"></i>
+          {{/if}}
+        </div>
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+            <h1 style="font-size:1.6rem;font-weight:800;margin:0;">{{candidate.name}}</h1>
+            {{#if candidate.openToWork}}
+              <span style="background:#1a3a1a;border:1px solid #4caf50;color:#4caf50;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">
+                💼 Aberto para oportunidades
+              </span>
+            {{/if}}
+          </div>
+
+          {{#if fromJob}}
+          <div style="margin-top:14px;padding:14px 18px;background:rgba(6,182,212,0.05);border:1px solid rgba(6,182,212,0.3);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <p style="font-size:0.82rem;color:#06b6d4;font-weight:700;margin:0 0 2px;"><i class="bi bi-briefcase me-1"></i>Vaga de interesse</p>
+              <p style="font-size:0.88rem;color:#e0e0e0;margin:0;">{{fromJob.title}} <span style="color:#888;">· {{fromJob.company}}</span></p>
+            </div>
+            <button id="contact-btn" onclick="entrarEmContato()"
+              style="background:#06b6d4;border:none;color:white;border-radius:8px;padding:9px 20px;cursor:pointer;font-size:0.87rem;font-weight:700;white-space:nowrap;transition:opacity 0.2s;">
+              <i class="bi bi-envelope-fill me-1"></i>Entrar em Contato
+            </button>
+          </div>
+          <div id="contact-feedback" style="display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:0.85rem;"></div>
+          {{/if}}
+          {{#if resume.summary}}
+            <p style="color:#aaa;font-size:0.9rem;margin:0;line-height:1.6;">{{resume.summary}}</p>
+          {{/if}}
+          <div class="d-flex gap-3 flex-wrap mt-2">
+            {{#if resume.city}}
+              <span style="color:#888;font-size:0.82rem;"><i class="bi bi-geo-alt me-1"></i>{{resume.city}}</span>
+            {{/if}}
+            {{#if resume.linkedin}}
+              <a href="{{resume.linkedin}}" target="_blank" style="color:#0077b5;font-size:0.82rem;text-decoration:none;"><i class="bi bi-linkedin me-1"></i>LinkedIn</a>
+            {{/if}}
+            {{#if resume.github}}
+              <a href="{{resume.github}}" target="_blank" style="color:#aaa;font-size:0.82rem;text-decoration:none;"><i class="bi bi-github me-1"></i>GitHub</a>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    {{#if resume.skills.length}}
+    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:16px;">
+      <h5 style="color:#f03e3e;font-weight:700;margin-bottom:16px;"><i class="bi bi-lightning me-2"></i>Habilidades</h5>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        {{#each resume.skills}}
+          <span style="background:#2a2a2a;border:1px solid #333;color:#e0e0e0;border-radius:20px;padding:4px 14px;font-size:0.82rem;">{{this}}</span>
+        {{/each}}
+      </div>
+    </div>
+    {{/if}}
+
+    <!-- Experiências -->
+    {{#if resume.experiences.length}}
+    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:16px;">
+      <h5 style="color:#f03e3e;font-weight:700;margin-bottom:16px;"><i class="bi bi-briefcase me-2"></i>Experiências</h5>
+      {{#each resume.experiences}}
+      <div style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #2a2a2a;">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+          <div>
+            <p style="font-weight:700;margin:0;">{{role}}</p>
+            <p style="color:#f03e3e;font-size:0.85rem;margin:2px 0;">{{company}}</p>
+          </div>
+          {{#if period}}<span style="color:#666;font-size:0.8rem;">{{period}}</span>{{/if}}
+        </div>
+        {{#if description}}<p style="color:#aaa;font-size:0.875rem;margin-top:8px;line-height:1.7;">{{description}}</p>{{/if}}
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    <!-- Formação -->
+    {{#if resume.education.length}}
+    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;">
+      <h5 style="color:#f03e3e;font-weight:700;margin-bottom:16px;"><i class="bi bi-mortarboard me-2"></i>Formação</h5>
+      {{#each resume.education}}
+      <div style="padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #2a2a2a;">
+        <p style="font-weight:700;margin:0;">{{course}}</p>
+        <p style="color:#aaa;font-size:0.85rem;margin:2px 0;">{{institution}}</p>
+        {{#if period}}<span style="color:#666;font-size:0.8rem;">{{period}}</span>{{/if}}
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+  </div>
+</div>
+
+{{#if fromJob}}
+<script>
+async function entrarEmContato() {
+    const btn      = document.getElementById('contact-btn');
+    const feedback = document.getElementById('contact-feedback');
+    btn.disabled   = true;
+    btn.innerHTML  = '<i class="bi bi-hourglass-split me-1"></i>Enviando...';
+    btn.style.opacity = '0.6';
+
+    try {
+        const res  = await fetch('/jobs/contact-suggested/{{fromJob.id}}/{{candidate.id}}', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{csrfToken}}' }
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            btn.innerHTML     = '<i class="bi bi-check-circle-fill me-1"></i>Contato enviado!';
+            btn.style.background = '#4caf50';
+            btn.style.opacity = '1';
+            feedback.style.display = 'block';
+            feedback.style.background = 'rgba(76,175,80,0.08)';
+            feedback.style.border = '1px solid rgba(76,175,80,0.3)';
+            feedback.style.color = '#4caf50';
+            feedback.innerHTML = '<i class="bi bi-check-circle me-1"></i>Email enviado para <strong>{{candidate.name}}</strong> com o convite para a vaga <strong>{{fromJob.title}}</strong>.';
+        } else {
+            btn.disabled      = false;
+            btn.innerHTML     = '<i class="bi bi-envelope-fill me-1"></i>Entrar em Contato';
+            btn.style.opacity = '1';
+            feedback.style.display = 'block';
+            feedback.style.background = 'rgba(240,62,62,0.08)';
+            feedback.style.border = '1px solid rgba(240,62,62,0.3)';
+            feedback.style.color = '#f03e3e';
+            feedback.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>' + (data.error || 'Erro ao enviar contato.');
+        }
+    } catch (e) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-envelope-fill me-1"></i>Entrar em Contato';
+        btn.style.opacity = '1';
+    }
+}
+</script>
+{{/if}}

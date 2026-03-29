@@ -1,0 +1,19 @@
+<div style="border:1px solid #2a2a2a;border-radius:10px;margin-bottom:8px;overflow:hidden;">
+  <button type="button" onclick="toggleFaq(this)"
+    style="width:100%;background:#1e1e1e;border:none;color:#e0e0e0;padding:16px 20px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:0.92rem;font-weight:600;">
+    {{question}}
+    <i class="bi bi-chevron-down" style="font-size:0.8rem;transition:transform 0.2s;flex-shrink:0;"></i>
+  </button>
+  <div style="display:none;padding:14px 20px;background:#1a1a1a;color:#aaa;font-size:0.88rem;line-height:1.7;border-top:1px solid #2a2a2a;">
+    {{answer}}
+  </div>
+</div>
+<script>
+function toggleFaq(btn) {
+    const content = btn.nextElementSibling;
+    const icon    = btn.querySelector('i');
+    const open    = content.style.display === 'none';
+    content.style.display = open ? 'block' : 'none';
+    icon.style.transform  = open ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+</script>

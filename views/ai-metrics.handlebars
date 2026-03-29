@@ -1,0 +1,265 @@
+<style>
+.metric-card {
+    background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:20px;
+    transition:border-color 0.2s,transform 0.2s;position:relative;overflow:hidden;
+}
+.metric-card:hover { border-color:#f03e3e; transform:translateY(-2px); }
+.metric-card .accent { position:absolute;top:0;left:0;right:0;height:3px; }
+.kpi-value { font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums; }
+.kpi-label { font-size:0.78rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-top:4px; }
+.kpi-sub { font-size:0.78rem;color:#555;margin-top:6px; }
+.feature-row { display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1e1e1e; }
+.feature-row:last-child { border-bottom:none; }
+.feature-icon { width:36px;height:36px;border-radius:8px;background:rgba(240,62,62,0.1);border:1px solid rgba(240,62,62,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#f03e3e;font-size:0.9rem; }
+.progress-bar-custom { height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;margin-top:4px; }
+.progress-fill { height:100%;border-radius:2px;transition:width 1s ease; }
+.growth-badge { display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:600;padding:2px 8px;border-radius:20px; }
+.growth-pos { background:rgba(76,175,80,0.1);color:#4caf50;border:1px solid rgba(76,175,80,0.2); }
+.growth-neg { background:rgba(240,62,62,0.1);color:#f03e3e;border:1px solid rgba(240,62,62,0.2); }
+.section-title { font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#444;margin-bottom:16px; }
+</style>
+
+<div style="padding-top:90px;padding-bottom:60px;">
+<div class="container" style="max-width:1000px;">
+
+    <!-- HEADER -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f03e3e,#c0392b);display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-graph-up-arrow text-white fs-5"></i>
+            </div>
+            <div>
+                <h4 style="font-weight:800;margin:0;">Métricas de IA</h4>
+                <small style="color:#555;">Groq / LLaMA 3.3 70B · Última atividade: {{lastActivity}}</small>
+            </div>
+        </div>
+        {{#if callsGrowth}}
+        <span class="growth-badge {{#if (gte callsGrowth 0)}}growth-pos{{else}}growth-neg{{/if}}">
+            <i class="bi bi-{{#if (gte callsGrowth 0)}}arrow-up{{else}}arrow-down{{/if}}"></i>
+            {{callsGrowth}}% vs mês anterior
+        </span>
+        {{/if}}
+    </div>
+
+    <!-- KPIs BASE -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="accent" style="background:#f03e3e;"></div>
+                <div class="kpi-value" style="color:#f03e3e;">{{totalCalls}}</div>
+                <div class="kpi-label">📊 Total chamadas</div>
+                <div class="kpi-sub">{{callsThisMonth}} nos últimos 30d</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="accent" style="background:#4caf50;"></div>
+                <div class="kpi-value" style="color:#4caf50;">{{successRate}}%</div>
+                <div class="kpi-label">✅ Taxa de sucesso</div>
+                <div class="kpi-sub">{{successCalls}} processadas com êxito</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="accent" style="background:#06b6d4;"></div>
+                <div class="kpi-value" style="color:#06b6d4;">{{avgDuration}}s</div>
+                <div class="kpi-label">⏱️ Tempo médio</div>
+                <div class="kpi-sub">por chamada à IA</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="accent" style="background:{{#if totalErrors}}#f59e0b{{else}}#4caf50{{/if}};"></div>
+                <div class="kpi-value" style="color:{{#if totalErrors}}#f59e0b{{else}}#4caf50{{/if}};">{{totalErrors}}</div>
+                <div class="kpi-label">⚠️ Erros</div>
+                <div class="kpi-sub">{{#if totalErrors}}requer atenção{{else}}tudo funcionando{{/if}}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs CANDIDATO -->
+    {{#if kpiCandidato}}
+    <div style="margin-bottom:32px;">
+        <p class="section-title">🎯 Impacto no seu perfil</p>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#a855f7;"></div>
+                    <div class="kpi-value" style="color:#a855f7;">{{kpiCandidato.tailoringCalls}}x</div>
+                    <div class="kpi-label">✂️ Currículos adaptados</div>
+                    <div class="kpi-sub">~{{kpiCandidato.horasEconomizadas}}h economizadas</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#f59e0b;"></div>
+                    <div class="kpi-value" style="color:#f59e0b;">{{kpiCandidato.compatCalls}}x</div>
+                    <div class="kpi-label">🤖 Fits analisados</div>
+                    <div class="kpi-sub">compatibilidade verificada</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#4caf50;"></div>
+                    <div class="kpi-value" style="color:#4caf50;">{{kpiCandidato.taxaResposta}}%</div>
+                    <div class="kpi-label">📈 Taxa de aprovação</div>
+                    <div class="kpi-sub">{{kpiCandidato.aprovados}} de {{kpiCandidato.totalApps}} candidaturas</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#06b6d4;"></div>
+                    <div class="kpi-value" style="color:#06b6d4;font-size:1.2rem;padding-top:6px;">{{#if kpiCandidato.focoModalidade}}{{kpiCandidato.focoModalidade}}{{else}}—{{/if}}</div>
+                    <div class="kpi-label">🎯 Foco estratégico</div>
+                    <div class="kpi-sub">modalidade com mais fit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
+    <!-- KPIs EMPRESA -->
+    {{#if kpiEmpresa}}
+    <div style="margin-bottom:32px;">
+        <p class="section-title">💼 ROI do recrutamento com IA</p>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#4caf50;"></div>
+                    <div class="kpi-value" style="color:#4caf50;">{{kpiEmpresa.horasTriagem}}h</div>
+                    <div class="kpi-label">💰 Triagem economizada</div>
+                    <div class="kpi-sub">{{kpiEmpresa.totalCandidatos}} candidatos × 3min</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#a855f7;"></div>
+                    <div class="kpi-value" style="color:#a855f7;">{{kpiEmpresa.biasCalls}}x</div>
+                    <div class="kpi-label">⚖️ Bias neutralizados</div>
+                    <div class="kpi-sub">auditorias realizadas</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#f59e0b;"></div>
+                    <div class="kpi-value" style="color:#f59e0b;">{{kpiEmpresa.talentosReutilizados}}</div>
+                    <div class="kpi-label">🪙 Talentos reutilizados</div>
+                    <div class="kpi-sub">da sua base de candidatos</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="accent" style="background:#06b6d4;"></div>
+                    <div class="kpi-value" style="color:#06b6d4;font-size:1.4rem;padding-top:4px;">R$ {{kpiEmpresa.economiaEstimada}}</div>
+                    <div class="kpi-label">📊 Economia estimada</div>
+                    <div class="kpi-sub">em postagens e triagem</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
+    <!-- GRÁFICO 30 DIAS -->
+    <div class="metric-card mb-4" style="padding:24px;">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <div style="font-weight:700;font-size:0.95rem;">Volume de chamadas — últimos 30 dias</div>
+                <small style="color:#555;">{{callsThisMonth}} chamadas · {{#if callsGrowth}}{{callsGrowth}}% vs mês anterior{{else}}primeiro mês{{/if}}</small>
+            </div>
+            {{#if topFeature}}
+            <div style="text-align:right;">
+                <div style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:1px;">Top feature</div>
+                <div style="font-size:0.85rem;font-weight:700;color:#f03e3e;">{{topFeature.label}}</div>
+                <div style="font-size:0.72rem;color:#555;">{{topFeature.total}} chamadas</div>
+            </div>
+            {{/if}}
+        </div>
+        <canvas id="lineChart" height="80"></canvas>
+    </div>
+
+    <!-- TABELA POR FEATURE -->
+    <div class="metric-card" style="padding:24px;">
+        <p class="section-title">Detalhamento por feature</p>
+        {{#if features}}
+        {{#each features}}
+        <div class="feature-row">
+            <div class="feature-icon"><i class="bi {{this.icon}}"></i></div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:0.88rem;">{{this.label}}</div>
+                <div class="progress-bar-custom">
+                    <div class="progress-fill" style="width:{{this.successPct}}%;background:{{#if (gte this.successPct 80)}}#4caf50{{else if (gte this.successPct 50)}}#f59e0b{{else}}#f03e3e{{/if}};"></div>
+                </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+                <div style="font-weight:700;font-size:0.9rem;">{{this.total}} <span style="color:#555;font-weight:400;font-size:0.75rem;">calls</span></div>
+                <div style="font-size:0.75rem;color:{{#if (gte this.successPct 80)}}#4caf50{{else if (gte this.successPct 50)}}#f59e0b{{else}}#f03e3e{{/if}};">{{this.successPct}}% sucesso</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;min-width:50px;">
+                {{#if this.errors}}
+                <span style="background:rgba(240,62,62,0.1);color:#f03e3e;border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:600;">⚠️ {{this.errors}}</span>
+                {{else}}
+                <span style="color:#4caf50;font-size:0.72rem;">✓</span>
+                {{/if}}
+            </div>
+            <div style="color:#555;font-size:0.75rem;flex-shrink:0;min-width:50px;text-align:right;">{{this.avgMs}}s</div>
+        </div>
+        {{/each}}
+        {{else}}
+        <div style="text-align:center;padding:40px;color:#444;">
+            <i class="bi bi-cpu" style="font-size:2rem;margin-bottom:12px;display:block;"></i>
+            Nenhuma chamada registrada ainda.
+        </div>
+        {{/if}}
+    </div>
+
+    <p style="color:#333;font-size:0.72rem;margin-top:16px;">
+        <i class="bi bi-info-circle me-1"></i>
+        Dados coletados a partir da implementação do sistema de métricas. Economia estimada baseada em benchmarks de mercado.
+    </p>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const lineLabels = {{{chartLabels}}};
+const lineData   = {{{chartData}}};
+
+const ctx = document.getElementById('lineChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: lineLabels,
+            datasets: [{
+                label: 'Chamadas',
+                data: lineData,
+                borderColor: '#f03e3e',
+                backgroundColor: 'rgba(240,62,62,0.08)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: '#f03e3e',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#555', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: '#1e1e1e' } },
+                y: { ticks: { color: '#555', stepSize: 1 }, grid: { color: '#1e1e1e' }, beginAtZero: true }
+            }
+        }
+    });
+}
+
+// Anima progress bars ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.progress-fill').forEach(el => {
+        const w = el.style.width;
+        el.style.width = '0';
+        setTimeout(() => { el.style.width = w; }, 100);
+    });
+});
+</script>

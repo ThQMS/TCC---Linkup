@@ -1,0 +1,674 @@
+<div style="padding-top: 100px; padding-bottom: 60px;">
+  <div class="container" style="max-width: 800px;">
+
+    <!-- CABEÇALHO DA PÁGINA -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <h2 style="color:#f03e3e;font-weight:700;margin:0;">
+        <i class="bi bi-file-earmark-text me-2"></i>Meu Currículo
+      </h2>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <a href="/resume/create"
+          style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:8px 16px;text-decoration:none;font-size:0.9rem;">
+          <i class="bi bi-pencil me-1"></i> Editar
+        </a>
+        <button onclick="document.getElementById('templateModal').style.display='flex'"
+          style="background:#2a2a2a;border:1px solid #3a3a3a;color:#e0e0e0;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:0.9rem;">
+          <i class="bi bi-palette me-1"></i> Template: <span id="selectedTemplateName">Refinado</span>
+        </button>
+        <button onclick="exportPDF()"
+          style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:0.9rem;font-weight:600;">
+          <i class="bi bi-file-pdf me-1"></i> Exportar PDF
+        </button>
+        <a href="/profile"
+          style="color:#aaa;text-decoration:none;font-size:0.9rem;display:flex;align-items:center;">
+          <i class="bi bi-arrow-left me-1"></i> Perfil
+        </a>
+      </div>
+    </div>
+
+    <!-- PREVIEW NA TELA -->
+    <div id="resumeContent">
+      <div class="resume-card">
+        <div class="d-flex align-items-center gap-4">
+          <div style="width:80px;height:80px;border-radius:50%;border:3px solid #f03e3e;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#f03e3e;flex-shrink:0;">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <div style="flex:1;">
+            <h1 style="font-size:1.6rem;font-weight:700;margin-bottom:6px;">{{user.name}}</h1>
+            <p style="color:#aaa;margin-bottom:6px;font-size:0.9rem;display:flex;flex-wrap:wrap;gap:16px;">
+              {{#if user.city}}<span><i class="bi bi-geo-alt me-1"></i>{{user.city}}</span>{{/if}}
+              {{#if user.birthDate}}<span><i class="bi bi-calendar3 me-1"></i>{{user.birthDate}}</span>{{/if}}
+              {{#if user.address}}<span><i class="bi bi-house me-1"></i>{{user.address}}</span>{{/if}}
+            </p>
+            <p style="color:#aaa;font-size:0.85rem;margin:0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+              <span><i class="bi bi-envelope me-1"></i>{{user.email}}</span>
+              {{#if user.phone}}<span>•</span><span>{{user.phone}}</span>{{/if}}
+              {{#if user.linkedin}}<span>•</span><a href="{{user.linkedin}}" style="color:#f03e3e;" target="_blank">LinkedIn</a>{{/if}}
+              {{#if user.github}}<span>•</span><a href="{{user.github}}" style="color:#f03e3e;" target="_blank">GitHub</a>{{/if}}
+            </p>
+          </div>
+        </div>
+      </div>
+      {{#if resume.summary}}
+      <div class="resume-card">
+        <h5><i class="bi bi-person-lines-fill me-2"></i>Resumo Profissional</h5>
+        <p style="color:#ccc;line-height:1.7;margin:0;">{{resume.summary}}</p>
+      </div>
+      {{/if}}
+      {{#if resume.experiences}}
+      <div class="resume-card">
+        <h5><i class="bi bi-briefcase me-2"></i>Experiências</h5>
+        {{#each resume.experiences}}
+          <div style="border-left:3px solid #f03e3e;padding-left:16px;margin-bottom:20px;">
+            <div class="d-flex justify-content-between align-items-start flex-wrap">
+              <div>
+                <p style="font-weight:700;font-size:1rem;margin-bottom:2px;">{{this.role}}</p>
+                <p style="color:#f03e3e;font-size:0.9rem;margin-bottom:4px;">{{this.company}}</p>
+              </div>
+              {{#if this.period}}<span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:3px 10px;font-size:0.8rem;">{{this.period}}</span>{{/if}}
+            </div>
+            {{#if this.description}}<p style="color:#ccc;font-size:0.9rem;margin:8px 0 0;line-height:1.6;">{{this.description}}</p>{{/if}}
+          </div>
+        {{/each}}
+      </div>
+      {{/if}}
+      {{#if resume.education}}
+      <div class="resume-card">
+        <h5><i class="bi bi-mortarboard me-2"></i>Formação Acadêmica</h5>
+        {{#each resume.education}}
+          <div style="border-left:3px solid #f03e3e;padding-left:16px;margin-bottom:20px;">
+            <div class="d-flex justify-content-between align-items-start flex-wrap">
+              <div>
+                <p style="font-weight:700;font-size:1rem;margin-bottom:2px;">{{this.course}}</p>
+                <p style="color:#f03e3e;font-size:0.9rem;margin-bottom:0;">{{this.institution}}</p>
+              </div>
+              {{#if this.period}}<span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:3px 10px;font-size:0.8rem;">{{this.period}}</span>{{/if}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+      {{/if}}
+      {{#if resume.skills}}
+      <div class="resume-card">
+        <h5><i class="bi bi-lightning me-2"></i>Habilidades</h5>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          {{#each resume.skills}}
+            <span style="background:#2a2a2a;border:1px solid #f03e3e;color:#f03e3e;border-radius:20px;padding:5px 14px;font-size:0.85rem;">{{this}}</span>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE SELEÇÃO DE TEMPLATE -->
+<div id="templateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1e1e1e;border:1px solid #333;border-radius:16px;padding:32px;max-width:760px;width:95%;max-height:90vh;overflow-y:auto;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 style="color:#f03e3e;font-weight:700;margin:0;"><i class="bi bi-palette me-2"></i>Escolha o Template</h5>
+      <button onclick="document.getElementById('templateModal').style.display='none'"
+        style="background:transparent;border:none;color:#aaa;font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <!-- REFINADO -->
+      <div class="template-card" onclick="selectTemplate('refined','Refinado')" id="tcard-refined"
+        style="border:2px solid #f03e3e;border-radius:12px;overflow:hidden;cursor:pointer;">
+        <div style="background:#2c3e50;padding:10px 12px;">
+          <div style="display:flex;gap:8px;">
+            <div style="width:36px;height:36px;border-radius:50%;border:2px solid #e74c3c;background:#34495e;"></div>
+            <div style="flex:1;">
+              <div style="background:#ffffff;height:6px;border-radius:3px;width:70%;margin-bottom:4px;"></div>
+              <div style="background:rgba(255,255,255,0.4);height:4px;border-radius:2px;width:50%;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;">
+          <div style="width:38%;background:#34495e;padding:8px;">
+            <div style="background:rgba(255,255,255,0.2);height:3px;border-radius:2px;margin-bottom:4px;"></div>
+            <div style="background:rgba(255,255,255,0.15);height:3px;border-radius:2px;width:80%;margin-bottom:4px;"></div>
+            <div style="background:rgba(255,255,255,0.15);height:3px;border-radius:2px;width:60%;margin-bottom:8px;"></div>
+            <div style="background:#e74c3c;height:2px;border-radius:1px;margin-bottom:4px;"></div>
+            <div style="background:rgba(255,255,255,0.2);height:3px;border-radius:2px;margin-bottom:3px;"></div>
+            <div style="background:rgba(255,255,255,0.15);height:3px;border-radius:2px;width:75%;"></div>
+          </div>
+          <div style="flex:1;background:#f5f5f5;padding:8px;">
+            <div style="background:#e74c3c;height:2px;margin-bottom:5px;width:60%;"></div>
+            <div style="border-left:2px solid #e74c3c;padding-left:5px;margin-bottom:5px;">
+              <div style="background:#333;height:3px;border-radius:2px;width:80%;margin-bottom:2px;"></div>
+              <div style="background:#e74c3c;height:3px;border-radius:2px;width:50%;margin-bottom:2px;"></div>
+              <div style="background:#888;height:2px;border-radius:1px;width:90%;"></div>
+            </div>
+            <div style="border-left:2px solid #e74c3c;padding-left:5px;">
+              <div style="background:#333;height:3px;border-radius:2px;width:70%;margin-bottom:2px;"></div>
+              <div style="background:#e74c3c;height:3px;border-radius:2px;width:40%;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 12px;background:#1e1e1e;text-align:center;">
+          <span style="color:#f03e3e;font-weight:700;font-size:0.85rem;">✨ Refinado</span>
+          <p style="color:#888;font-size:0.75rem;margin:2px 0 0;">Barra lateral escura + conteúdo principal</p>
+        </div>
+      </div>
+
+      <!-- ELEGANTE -->
+      <div class="template-card" onclick="selectTemplate('elegant','Elegante')" id="tcard-elegant"
+        style="border:2px solid #333;border-radius:12px;overflow:hidden;cursor:pointer;">
+        <div style="background:#1a1a2e;padding:10px 12px;">
+          <div style="background:#ffffff;height:8px;border-radius:3px;width:55%;margin-bottom:4px;"></div>
+          <div style="background:#c0392b;height:2px;width:30%;margin-bottom:4px;border-radius:1px;"></div>
+          <div style="background:rgba(255,255,255,0.4);height:3px;border-radius:2px;width:80%;"></div>
+        </div>
+        <div style="background:#ffffff;padding:8px 12px;">
+          <div style="border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:6px;">
+            <div style="background:#c0392b;height:3px;border-radius:2px;width:40%;margin-bottom:2px;"></div>
+            <div style="background:#c0392b;height:2px;width:100%;opacity:0.3;"></div>
+          </div>
+          <div style="margin-bottom:5px;">
+            <div style="background:#222;height:3px;border-radius:2px;width:60%;margin-bottom:2px;"></div>
+            <div style="background:#c0392b;height:3px;border-radius:2px;width:35%;margin-bottom:2px;font-style:italic;"></div>
+            <div style="background:#666;height:2px;border-radius:1px;width:90%;margin-bottom:1px;"></div>
+            <div style="background:#666;height:2px;border-radius:1px;width:75%;"></div>
+          </div>
+          <div>
+            <div style="background:#222;height:3px;border-radius:2px;width:50%;margin-bottom:2px;"></div>
+            <div style="background:#c0392b;height:3px;border-radius:2px;width:30%;"></div>
+          </div>
+        </div>
+        <div style="padding:8px 12px;background:#1e1e1e;text-align:center;">
+          <span style="color:#e0e0e0;font-weight:700;font-size:0.85rem;">🎩 Elegante</span>
+          <p style="color:#888;font-size:0.75rem;margin:2px 0 0;">Header escuro + layout limpo</p>
+        </div>
+      </div>
+
+      <!-- DUAS COLUNAS -->
+      <div class="template-card" onclick="selectTemplate('twocol','Duas Colunas')" id="tcard-twocol"
+        style="border:2px solid #333;border-radius:12px;overflow:hidden;cursor:pointer;">
+        <div style="background:#2e4057;padding:8px 12px;">
+          <div style="background:#ffffff;height:7px;border-radius:3px;width:60%;margin-bottom:3px;"></div>
+          <div style="background:#048a81;height:2px;width:25%;margin-bottom:3px;border-radius:1px;"></div>
+          <div style="background:rgba(255,255,255,0.35);height:3px;border-radius:2px;width:85%;"></div>
+        </div>
+        <div style="display:flex;">
+          <div style="width:38%;background:#f4f6f8;padding:8px;">
+            <div style="background:#048a81;height:2px;margin-bottom:4px;border-radius:1px;"></div>
+            <div style="background:#333;height:3px;border-radius:2px;width:80%;margin-bottom:2px;"></div>
+            <div style="background:#666;height:2px;border-radius:1px;width:65%;margin-bottom:2px;"></div>
+            <div style="background:#666;height:2px;border-radius:1px;width:75%;margin-bottom:6px;"></div>
+            <div style="background:#048a81;height:2px;margin-bottom:4px;border-radius:1px;"></div>
+            <div style="display:flex;align-items:center;gap:3px;margin-bottom:2px;">
+              <div style="width:4px;height:4px;background:#048a81;border-radius:1px;"></div>
+              <div style="background:#333;height:2px;border-radius:1px;flex:1;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:3px;">
+              <div style="width:4px;height:4px;background:#048a81;border-radius:1px;"></div>
+              <div style="background:#333;height:2px;border-radius:1px;flex:1;width:70%;"></div>
+            </div>
+          </div>
+          <div style="flex:1;background:#ffffff;padding:8px;">
+            <div style="background:#2e4057;height:2px;margin-bottom:5px;width:70%;"></div>
+            <div style="border-left:2px solid #048a81;padding-left:5px;margin-bottom:5px;">
+              <div style="background:#222;height:3px;border-radius:2px;width:80%;margin-bottom:2px;"></div>
+              <div style="background:#048a81;height:3px;border-radius:2px;width:50%;margin-bottom:2px;"></div>
+              <div style="background:#888;height:2px;border-radius:1px;width:95%;"></div>
+            </div>
+            <div style="border-left:2px solid #048a81;padding-left:5px;">
+              <div style="background:#222;height:3px;border-radius:2px;width:70%;margin-bottom:2px;"></div>
+              <div style="background:#048a81;height:3px;border-radius:2px;width:40%;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 12px;background:#1e1e1e;text-align:center;">
+          <span style="color:#e0e0e0;font-weight:700;font-size:0.85rem;">📋 Duas Colunas</span>
+          <p style="color:#888;font-size:0.75rem;margin:2px 0 0;">Sidebar cinza + conteúdo verde/azul</p>
+        </div>
+      </div>
+
+      <!-- CRIATIVO -->
+      <div class="template-card" onclick="selectTemplate('creative','Criativo')" id="tcard-creative"
+        style="border:2px solid #333;border-radius:12px;overflow:hidden;cursor:pointer;">
+        <div style="background:linear-gradient(90deg,#6c3483,#1a5276);padding:10px 12px;">
+          <div style="background:#ffffff;height:8px;border-radius:3px;width:55%;margin-bottom:3px;"></div>
+          <div style="background:#d35400;height:2px;width:35%;margin-bottom:4px;border-radius:1px;"></div>
+          <div style="background:rgba(255,255,255,0.4);height:3px;border-radius:2px;width:80%;"></div>
+        </div>
+        <div style="background:#fafafa;padding:8px 12px;">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">
+            <div style="width:5px;height:8px;background:#6c3483;border-radius:1px;"></div>
+            <div style="background:#6c3483;height:3px;border-radius:2px;width:40%;"></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:4px;margin-bottom:4px;">
+            <div style="width:5px;height:5px;border-radius:50%;background:#d35400;flex-shrink:0;margin-top:1px;"></div>
+            <div style="flex:1;">
+              <div style="background:#222;height:3px;border-radius:2px;width:70%;margin-bottom:2px;"></div>
+              <div style="background:#d35400;height:3px;border-radius:2px;width:40%;margin-bottom:2px;"></div>
+              <div style="background:#666;height:2px;border-radius:1px;width:90%;"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <div style="background:#6c3483;border-radius:10px;padding:1px 6px;height:8px;"></div>
+            <div style="background:#d35400;border-radius:10px;padding:1px 6px;height:8px;width:30px;"></div>
+            <div style="background:#1a5276;border-radius:10px;padding:1px 6px;height:8px;width:24px;"></div>
+          </div>
+        </div>
+        <div style="padding:8px 12px;background:#1e1e1e;text-align:center;">
+          <span style="color:#e0e0e0;font-weight:700;font-size:0.85rem;">🎨 Criativo</span>
+          <p style="color:#888;font-size:0.75rem;margin:2px 0 0;">Degradê roxo/azul + badges coloridos</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="d-flex justify-content-end mt-4">
+      <button onclick="document.getElementById('templateModal').style.display='none'"
+        style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:10px 24px;cursor:pointer;font-weight:600;">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Filtra valores inválidos vindos do Handlebars
+function clean(val) {
+  if (!val || val === 'undefined' || val === 'null' || val === 'false' || val.trim() === '') return '';
+  return val.trim();
+}
+
+const RESUME_DATA = {
+  name:        clean("{{user.name}}"),
+  email:       clean("{{user.email}}"),
+  phone:       clean("{{user.phone}}"),
+  city:        clean("{{user.city}}"),
+  birthDate:   clean("{{user.birthDate}}"),
+  address:     clean("{{user.address}}"),
+  linkedin:    clean("{{user.linkedin}}"),
+  github:      clean("{{user.github}}"),
+  summary:     {{{safeJson resume.summary}}},
+  experiences: {{{safeJson resume.experiences}}},
+  education:   {{{safeJson resume.education}}},
+  skills:      {{{safeJson resume.skills}}}
+};
+
+let selectedTemplate = 'refined';
+
+function selectTemplate(key, name) {
+  selectedTemplate = key;
+  document.getElementById('selectedTemplateName').textContent = name;
+  document.querySelectorAll('.template-card').forEach(c => c.style.border = '2px solid #333');
+  document.getElementById('tcard-' + key).style.border = '2px solid #f03e3e';
+  document.getElementById('templateModal').style.display = 'none';
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const { jsPDF } = window.jspdf;
+
+function hex2rgb(hex) {
+  hex = hex.replace('#','');
+  return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+}
+function setFill(doc, hex) { const [r,g,b] = hex2rgb(hex); doc.setFillColor(r,g,b); }
+function setTxt(doc, hex)  { const [r,g,b] = hex2rgb(hex); doc.setTextColor(r,g,b); }
+function setDraw(doc, hex) { const [r,g,b] = hex2rgb(hex); doc.setDrawColor(r,g,b); }
+
+function wrapText(doc, text, x, y, maxW, lineH) {
+  if (!text) return y;
+  const lines = doc.splitTextToSize(String(text), maxW);
+  lines.forEach(line => { doc.text(line, x, y); y += lineH; });
+  return y;
+}
+
+// ── REFINADO ─
+function buildRefined(d) {
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W=210, H=297, sW=68, mX=sW+10, mW=W-mX-10;
+
+  setFill(doc,'#2c3e50'); doc.rect(0,0,sW,H,'F');
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); setTxt(doc,'#ffffff');
+  const nLines = doc.splitTextToSize(d.name||'', sW-12);
+  doc.text(nLines, 6, 20);
+  let sy = 20 + nLines.length*6 + 3;
+
+  setDraw(doc,'#e74c3c'); doc.setLineWidth(0.8); doc.line(6,sy,sW-6,sy); sy+=6;
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(doc,'#bdc3c7');
+  [d.email, d.phone, d.city, d.birthDate, d.address, d.linkedin?'linkedin.com':'', d.github?'github.com':'']
+    .filter(Boolean).forEach(c => {
+      if (sy > H-10) return;
+      const ls = doc.splitTextToSize(c, sW-14);
+      doc.text(ls, 6, sy); sy += ls.length*4+1;
+    });
+  sy += 5;
+
+  if (d.skills && d.skills.length) {
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); setTxt(doc,'#e74c3c');
+    doc.text('HABILIDADES', 6, sy); sy+=3;
+    setDraw(doc,'#e74c3c'); doc.setLineWidth(0.4); doc.line(6,sy,sW-6,sy); sy+=5;
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(doc,'#ecf0f1');
+    d.skills.forEach(s => { if(sy>H-10)return; doc.text('• '+s,6,sy); sy+=4.5; });
+    sy+=4;
+  }
+
+  if (d.education && d.education.length) {
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); setTxt(doc,'#e74c3c');
+    doc.text('FORMAÇÃO', 6, sy); sy+=3;
+    setDraw(doc,'#e74c3c'); doc.line(6,sy,sW-6,sy); sy+=5;
+    d.education.forEach(edu => {
+      if(sy>H-10)return;
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); setTxt(doc,'#ffffff');
+      const cl = doc.splitTextToSize(edu.course||'', sW-14);
+      doc.text(cl,6,sy); sy+=cl.length*4;
+      doc.setFont('helvetica','normal'); setTxt(doc,'#bdc3c7');
+      const il = doc.splitTextToSize(edu.institution||'', sW-14);
+      doc.text(il,6,sy); sy+=il.length*4;
+      if(edu.period){doc.text(edu.period,6,sy);sy+=4;}
+      sy+=3;
+    });
+  }
+
+  let my = 16;
+  const sec = (title, fn) => {
+    if(my>H-25){doc.addPage();my=15;}
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); setTxt(doc,'#2c3e50');
+    doc.text(title,mX,my); my+=3;
+    setDraw(doc,'#e74c3c'); doc.setLineWidth(0.5); doc.line(mX,my,W-10,my); my+=6;
+    fn(); my+=5;
+  };
+
+  if(d.summary){ sec('PERFIL PROFISSIONAL', ()=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#333333');
+    my = wrapText(doc,d.summary,mX,my,mW,4.5);
+  });}
+
+  if(d.experiences&&d.experiences.length){ sec('EXPERIÊNCIA PROFISSIONAL', ()=>{
+    d.experiences.forEach(exp=>{
+      if(my>H-20){doc.addPage();my=15;}
+      setFill(doc,'#e74c3c'); doc.rect(mX,my-3,2,16,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#111111');
+      const rl = doc.splitTextToSize(exp.role||'', mW-8);
+      doc.text(rl,mX+5,my); my+=rl.length*4.5;
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#e74c3c');
+      doc.text(exp.company||'',mX+5,my);
+      if(exp.period){setTxt(doc,'#888888');doc.setFontSize(7.5);doc.text(exp.period,W-10,my,{align:'right'});}
+      my+=5;
+      if(exp.description){setTxt(doc,'#444444');doc.setFontSize(8);my=wrapText(doc,exp.description,mX+5,my,mW-8,4.2);}
+      my+=4;
+    });
+  });}
+
+  doc.save('curriculo-'+d.name+'-refinado.pdf');
+}
+
+// ── ELEGANTE ────
+function buildElegant(d) {
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W=210, H=297, mx=18, cW=W-mx*2;
+
+  setFill(doc,'#1a1a2e'); doc.rect(0,0,W,40,'F');
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(20); setTxt(doc,'#ffffff');
+  doc.text(d.name||'', mx, 17);
+  setFill(doc,'#c0392b'); doc.rect(mx,21,32,1.2,'F');
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.setTextColor(190,190,210);
+  const cp = [d.email,d.phone,d.city].filter(Boolean).join('   |   ');
+  if(cp) doc.text(cp, mx, 28);
+  const cp2 = [d.linkedin?'LinkedIn':'',d.github?'GitHub':'',d.birthDate,d.address].filter(Boolean).join('   |   ');
+  if(cp2) doc.text(cp2, mx, 34);
+
+  let y = 52;
+
+  const sec = (title, fn) => {
+    if(y>H-25){doc.addPage();y=20;}
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#c0392b');
+    doc.text(title, mx, y); y+=3;
+    setDraw(doc,'#dddddd'); doc.setLineWidth(0.3); doc.line(mx,y,W-mx,y); y+=7;
+    fn(); y+=5;
+  };
+
+  if(d.summary){ sec('PERFIL', ()=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#333333');
+    y = wrapText(doc,d.summary,mx,y,cW,4.5);
+  });}
+
+  if(d.experiences&&d.experiences.length){ sec('EXPERIÊNCIA', ()=>{
+    d.experiences.forEach(exp=>{
+      if(y>H-25){doc.addPage();y=20;}
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#111111');
+      const rl = doc.splitTextToSize(exp.role||'', cW-28);
+      doc.text(rl, mx, y);
+      if(exp.period){
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(doc,'#888888');
+        doc.text(exp.period, W-mx, y, {align:'right'});
+      }
+      y += rl.length*4.5;
+      doc.setFont('helvetica','italic'); doc.setFontSize(8.5); setTxt(doc,'#c0392b');
+      doc.text(exp.company||'', mx, y); y+=5;
+      if(exp.description){
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(doc,'#444444');
+        y = wrapText(doc,exp.description,mx+3,y,cW-3,4.2);
+      }
+      y+=4;
+    });
+  });}
+
+  if(d.education&&d.education.length){ sec('FORMAÇÃO', ()=>{
+    d.education.forEach(edu=>{
+      if(y>H-20){doc.addPage();y=20;}
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#111111');
+      doc.text(edu.course||'', mx, y);
+      if(edu.period){
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(doc,'#888888');
+        doc.text(edu.period, W-mx, y, {align:'right'});
+      }
+      y+=4.5;
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#555555');
+      doc.text(edu.institution||'', mx, y); y+=6;
+    });
+  });}
+
+  if(d.skills&&d.skills.length){ sec('HABILIDADES', ()=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#333333');
+    y = wrapText(doc, d.skills.join('  •  '), mx, y, cW, 4.5);
+  });}
+
+  doc.save('curriculo-'+d.name+'-elegante.pdf');
+}
+
+// ── DUAS COLUNAS ────
+function buildTwoCol(d) {
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W=210, H=297, lW=72, rX=lW+10, rW=W-rX-10;
+
+  setFill(doc,'#2e4057'); doc.rect(0,0,W,34,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(17); setTxt(doc,'#ffffff');
+  doc.text(d.name||'', 12, 15);
+  setFill(doc,'#048a81'); doc.rect(12,18,22,1.2,'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.setTextColor(180,210,210);
+  const hc = [d.email,d.phone,d.city].filter(Boolean).join('   |   ');
+  if(hc) doc.text(hc,12,24);
+  const hc2=[d.linkedin?'LinkedIn':'',d.github?'GitHub':''].filter(Boolean).join('   |   ');
+  if(hc2) doc.text(hc2,12,29);
+
+  setFill(doc,'#f4f6f8'); doc.rect(0,34,lW,H-34,'F');
+
+  let ly=44, ry=44;
+
+  const lSec=(title,fn)=>{
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); setTxt(doc,'#048a81');
+    doc.text(title,8,ly); ly+=3;
+    setDraw(doc,'#048a81'); doc.setLineWidth(0.4); doc.line(8,ly,lW-6,ly); ly+=5;
+    fn(); ly+=5;
+  };
+
+  const rSec=(title,fn)=>{
+    if(ry>H-20){doc.addPage();ry=15;}
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#2e4057');
+    doc.text(title,rX,ry); ry+=3;
+    setDraw(doc,'#048a81'); doc.setLineWidth(0.5); doc.line(rX,ry,W-10,ry); ry+=7;
+    fn(); ry+=4;
+  };
+
+  lSec('CONTATO',()=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(doc,'#333333');
+    [d.email,d.phone,d.city,d.birthDate,d.address].filter(Boolean).forEach(c=>{
+      const ls=doc.splitTextToSize(c,lW-14); doc.text(ls,8,ly); ly+=ls.length*4+1;
+    });
+  });
+
+  if(d.skills&&d.skills.length){ lSec('HABILIDADES',()=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(doc,'#222222');
+    d.skills.forEach(s=>{
+      if(ly>H-10)return;
+      setFill(doc,'#048a81'); doc.rect(8,ly-2.5,2,2.5,'F');
+      setTxt(doc,'#222222'); doc.text(s,12,ly); ly+=4.5;
+    });
+  });}
+
+  if(d.education&&d.education.length){ lSec('FORMAÇÃO',()=>{
+    d.education.forEach(edu=>{
+      if(ly>H-10)return;
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); setTxt(doc,'#111111');
+      const cl=doc.splitTextToSize(edu.course||'',lW-14); doc.text(cl,8,ly); ly+=cl.length*4;
+      doc.setFont('helvetica','normal'); setTxt(doc,'#555555');
+      const il=doc.splitTextToSize(edu.institution||'',lW-14); doc.text(il,8,ly); ly+=il.length*4;
+      if(edu.period){doc.text(edu.period,8,ly);ly+=4;}
+      ly+=2;
+    });
+  });}
+
+  if(d.summary){ rSec('PERFIL PROFISSIONAL',()=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#333333');
+    ry=wrapText(doc,d.summary,rX,ry,rW,4.5);
+  });}
+
+  if(d.experiences&&d.experiences.length){ rSec('EXPERIÊNCIA PROFISSIONAL',()=>{
+    d.experiences.forEach(exp=>{
+      if(ry>H-20){doc.addPage();ry=15;}
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#111111');
+      const rl=doc.splitTextToSize(exp.role||'',rW-26);
+      doc.text(rl,rX,ry);
+      if(exp.period){
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(doc,'#888888');
+        doc.text(exp.period,W-10,ry,{align:'right'});
+      }
+      ry+=rl.length*4.5;
+      doc.setFont('helvetica','italic'); doc.setFontSize(8.5); setTxt(doc,'#048a81');
+      doc.text(exp.company||'',rX,ry); ry+=5;
+      if(exp.description){
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(doc,'#444444');
+        ry=wrapText(doc,exp.description,rX+2,ry,rW-2,4.2);
+      }
+      ry+=4;
+    });
+  });}
+
+  doc.save('curriculo-'+d.name+'-duas-colunas.pdf');
+}
+
+// ── CRIATIVO ─────────────────────────────────────────────────────────────
+function buildCreative(d) {
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W=210, H=297, mx=15, cW=W-mx*2;
+
+  // Degradê simulado
+  for(let i=0;i<W;i++){
+    const r=Math.round(108+(26-108)*(i/W));
+    const g=Math.round(52+(82-52)*(i/W));
+    const b=Math.round(131+(118-131)*(i/W));
+    doc.setFillColor(r,g,b);
+    doc.rect(i,0,1.5,42,'F');
+  }
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(21); setTxt(doc,'#ffffff');
+  doc.text(d.name||'', mx, 17);
+  setFill(doc,'#d35400'); doc.rect(mx,21,36,1.5,'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(215,215,240);
+  const cp=[d.email,d.phone,d.city,d.linkedin?'LinkedIn':'',d.github?'GitHub':''].filter(Boolean).join('   |   ');
+  if(cp) doc.text(cp,mx,29);
+  const cp2=[d.birthDate,d.address].filter(Boolean).join('   |   ');
+  if(cp2) doc.text(cp2,mx,35);
+
+  let y=52;
+
+  const sec=(title,color,fn)=>{
+    if(y>H-25){doc.addPage();y=20;}
+    const [r,g,b]=hex2rgb(color);
+    doc.setFillColor(r,g,b); doc.rect(mx,y-4,3,5,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); setTxt(doc,color);
+    doc.text(title,mx+6,y); y+=3;
+    setDraw(doc,'#e0e0e0'); doc.setLineWidth(0.3); doc.line(mx+6,y,W-mx,y); y+=7;
+    fn(); y+=5;
+  };
+
+  if(d.summary){ sec('PERFIL PROFISSIONAL','#6c3483',()=>{
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#333333');
+    y=wrapText(doc,d.summary,mx,y,cW,4.5);
+  });}
+
+  if(d.experiences&&d.experiences.length){ sec('EXPERIÊNCIA PROFISSIONAL','#1a5276',()=>{
+    d.experiences.forEach(exp=>{
+      if(y>H-25){doc.addPage();y=20;}
+      setFill(doc,'#d35400'); doc.circle(mx+1.5,y-1,1.5,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#111111');
+      const rl=doc.splitTextToSize(exp.role||'',cW-28);
+      doc.text(rl,mx+6,y);
+      if(exp.period){
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(doc,'#999999');
+        doc.text(exp.period,W-mx,y,{align:'right'});
+      }
+      y+=rl.length*4.5;
+      doc.setFont('helvetica','italic'); doc.setFontSize(8.5); setTxt(doc,'#d35400');
+      doc.text(exp.company||'',mx+6,y); y+=5;
+      if(exp.description){
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(doc,'#444444');
+        y=wrapText(doc,exp.description,mx+6,y,cW-6,4.2);
+      }
+      y+=4;
+    });
+  });}
+
+  if(d.education&&d.education.length){ sec('FORMAÇÃO ACADÊMICA','#6c3483',()=>{
+    d.education.forEach(edu=>{
+      if(y>H-20){doc.addPage();y=20;}
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(doc,'#111111');
+      doc.text(edu.course||'',mx,y);
+      if(edu.period){
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(doc,'#999999');
+        doc.text(edu.period,W-mx,y,{align:'right'});
+      }
+      y+=4.5;
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(doc,'#555555');
+      doc.text(edu.institution||'',mx,y); y+=6;
+    });
+  });}
+
+  if(d.skills&&d.skills.length){ sec('HABILIDADES','#d35400',()=>{
+    let sx=mx, sy2=y;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    d.skills.forEach(skill=>{
+      const tw=doc.getTextWidth(skill)+8;
+      if(sx+tw>W-mx){sx=mx;sy2+=8;y=sy2;}
+      setFill(doc,'#d35400'); doc.roundedRect(sx,sy2-4,tw,6,1.5,1.5,'F');
+      setTxt(doc,'#ffffff'); doc.text(skill,sx+4,sy2);
+      sx+=tw+4;
+    });
+    y=sy2+8;
+  });}
+
+  doc.save('curriculo-'+d.name+'-criativo.pdf');
+}
+
+function exportPDF() {
+  const d = RESUME_DATA;
+  if(selectedTemplate==='refined')  buildRefined(d);
+  if(selectedTemplate==='elegant')  buildElegant(d);
+  if(selectedTemplate==='twocol')   buildTwoCol(d);
+  if(selectedTemplate==='creative') buildCreative(d);
+}
+</script>

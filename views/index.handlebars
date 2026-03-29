@@ -1,0 +1,798 @@
+<div class="container-fluid text-center" id="top-container">
+    <h1>Encontre a oportunidade ideal para você</h1>
+    <p>Conectamos candidatos às melhores oportunidades do mercado.</p>
+
+    <!-- BARRA DE BUSCA + BOTÃO FILTROS -->
+    <form method="get" action="/" id="filter-form">
+      <input type="hidden" name="modality" id="modality-val" value="{{modality}}">
+      <input type="hidden" name="salary"   id="salary-val"   value="{{salary}}">
+      <input type="hidden" name="city"     id="city-val"     value="{{city}}">
+
+      <div class="sf-row">
+        <div class="sf-search-wrap">
+          <i class="bi bi-search sf-search-icon"></i>
+          <input type="text" name="job" id="search-input" class="sf-search-input"
+                 placeholder="Cargo, empresa ou palavra-chave" value="{{search}}" autocomplete="off">
+        </div>
+        <button type="button" id="filter-btn" class="sf-filter-btn" onclick="toggleFilterPanel()">
+          <i class="bi bi-sliders2 me-1"></i>Filtros
+          <span id="filter-badge" class="sf-badge" style="display:none;">0</span>
+        </button>
+        <button type="submit" class="sf-submit-btn" id="search-submit-btn">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+
+      <!-- PAINEL DE FILTROS -->
+      <div id="filter-panel" class="sf-panel" style="display:none;">
+        <div class="sf-panel-grid">
+
+          <!-- MODALIDADE -->
+          <div class="sf-section">
+            <p class="sf-section-title"><i class="bi bi-grid me-1"></i>Modalidade</p>
+            <div class="sf-pills">
+              <button type="button" class="sf-pill {{#if (eq modality 'presencial')}}sf-pill-active{{/if}}"
+                onclick="toggleModality('presencial')">
+                <i class="bi bi-buildings me-1"></i>Presencial
+              </button>
+              <button type="button" class="sf-pill {{#if (eq modality 'hibrido')}}sf-pill-active{{/if}}"
+                onclick="toggleModality('hibrido')">
+                <i class="bi bi-arrow-left-right me-1"></i>Híbrido
+              </button>
+              <button type="button" class="sf-pill {{#if (eq modality 'homeoffice')}}sf-pill-active{{/if}}"
+                onclick="toggleModality('homeoffice')">
+                <i class="bi bi-house-door me-1"></i>Home Office
+              </button>
+            </div>
+          </div>
+
+          <!-- SALÁRIO -->
+          <div class="sf-section">
+            <p class="sf-section-title"><i class="bi bi-cash-coin me-1"></i>Faixa Salarial</p>
+            <div class="sf-options">
+              <label class="sf-option {{#if (eq salary 'todos')}}sf-option-active{{/if}}">
+                <input type="radio" value="todos" {{#if (eq salary 'todos')}}checked{{/if}} onchange="selectSalary('todos')"> Qualquer valor
+              </label>
+              <label class="sf-option {{#if (eq salary '1000')}}sf-option-active{{/if}}">
+                <input type="radio" value="1000" {{#if (eq salary '1000')}}checked{{/if}} onchange="selectSalary('1000')"> Até R$ 1.000
+              </label>
+              <label class="sf-option {{#if (eq salary '2000')}}sf-option-active{{/if}}">
+                <input type="radio" value="2000" {{#if (eq salary '2000')}}checked{{/if}} onchange="selectSalary('2000')"> Até R$ 2.000
+              </label>
+              <label class="sf-option {{#if (eq salary '3000')}}sf-option-active{{/if}}">
+                <input type="radio" value="3000" {{#if (eq salary '3000')}}checked{{/if}} onchange="selectSalary('3000')"> Até R$ 3.000
+              </label>
+              <label class="sf-option {{#if (eq salary '5000')}}sf-option-active{{/if}}">
+                <input type="radio" value="5000" {{#if (eq salary '5000')}}checked{{/if}} onchange="selectSalary('5000')"> Até R$ 5.000
+              </label>
+              <label class="sf-option {{#if (eq salary 'combinar')}}sf-option-active{{/if}}">
+                <input type="radio" value="combinar" {{#if (eq salary 'combinar')}}checked{{/if}} onchange="selectSalary('combinar')"> A combinar
+              </label>
+            </div>
+          </div>
+
+          <!-- CIDADE -->
+          <div class="sf-section">
+            <p class="sf-section-title"><i class="bi bi-geo-alt me-1"></i>Cidade</p>
+            <div style="position:relative;">
+              <input type="text" id="city-input" class="sf-city-input"
+                placeholder="Buscar cidade..."
+                value="{{#unless (eq city 'todos')}}{{city}}{{/unless}}"
+                autocomplete="off"
+                oninput="filterCities(this.value)"
+                onfocus="filterCities(this.value)"
+                onblur="setTimeout(()=>closeDrop('city-drop'),200)">
+              <i class="bi bi-geo-alt sf-city-icon"></i>
+              <div id="city-drop" class="sf-city-drop" style="display:none;"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FOOTER DO PAINEL -->
+        <div class="sf-panel-footer">
+          <button type="button" class="sf-clear-btn" onclick="clearAllFilters()">
+            <i class="bi bi-x-circle me-1"></i>Limpar tudo
+          </button>
+          <button type="submit" class="sf-apply-btn">
+            Ver vagas <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- CHIPS DE FILTROS ATIVOS -->
+    <div id="active-chips" class="sf-chips-row" style="display:none;"></div>
+</div>
+
+<main>
+  <div class="container mb-5">
+
+    <!-- SUGESTÕES PERSONALIZADAS -->
+    {{#if hasSuggestions}}
+    <div style="margin-bottom:32px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <i class="bi bi-robot" style="font-size:1.3rem;color:#a855f7;"></i>
+        <h2 style="font-size:1.1rem;font-weight:700;margin:0;">Vagas para você</h2>
+        <span style="background:#a855f7;color:white;font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:0.5px;">IA</span>
+        <span style="color:#888;font-size:0.85rem;">Baseado no seu currículo</span>
+      </div>
+      <div class="row g-3">
+        {{#each suggestedJobs}}
+        <div class="col-md-4">
+          <div style="background:linear-gradient(135deg,#1e1e1e,#2a1f3d);border:1px solid #a855f7;border-radius:12px;padding:20px;height:100%;display:flex;flex-direction:column;justify-content:space-between;transition:border-color 0.2s;"
+            onmouseover="this.style.borderColor='#c084fc'" onmouseout="this.style.borderColor='#a855f7'">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:42px;height:42px;border-radius:8px;border:2px solid #a855f7;background:#2a2a2a;display:flex;align-items:center;justify-content:center;color:#a855f7;flex-shrink:0;">
+                  <i class="bi bi-building" style="font-size:1.1rem;"></i>
+                </div>
+                <div>
+                  <p style="font-weight:700;font-size:0.95rem;margin:0;color:#e0e0e0;">{{title}}</p>
+                  <p style="color:#a855f7;font-size:0.8rem;margin:0;">{{company}}</p>
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+                {{#if modality}}
+                  <span style="background:#1a1a2e;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.72rem;">
+                    {{#if (eq modality 'presencial')}}<i class="bi bi-buildings me-1"></i>{{/if}}
+                    {{#if (eq modality 'hibrido')}}<i class="bi bi-arrow-left-right me-1"></i>{{/if}}
+                    {{#if (isRemote modality)}}<i class="bi bi-house-door me-1"></i>{{/if}}
+                    {{formatModality modality}}
+                  </span>
+                {{/if}}
+                {{#if salary}}
+                  <span style="background:#1a1a2e;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.72rem;">
+                    <i class="bi bi-cash-coin me-1"></i>R$ {{salary}}
+                  </span>
+                {{/if}}
+                {{#if isPcd}}
+                  <span style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);color:#4ade80;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;">
+                    <i class="bi bi-person-wheelchair me-1"></i>PCD
+                  </span>
+                {{/if}}
+                {{#unless (isRemote modality)}}
+                {{#if city}}
+                  <span style="background:#1a1a2e;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.72rem;">
+                    <i class="bi bi-geo-alt me-1"></i>{{city}}
+                  </span>
+                {{/if}}
+                {{/unless}}
+                <span style="background:#1a1a2e;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.72rem;">
+                  <i class="bi bi-clock me-1"></i>{{timeAgo createdAt}}
+                </span>
+              </div>
+            </div>
+            <a href="/jobs/view/{{id}}"
+              style="background:#a855f7;border:none;color:white;border-radius:8px;padding:8px 16px;text-decoration:none;font-weight:600;font-size:0.85rem;text-align:center;display:block;">
+              Ver Vaga
+            </a>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      <div style="border-top:1px solid #2a2a2a;margin-top:24px;"></div>
+    </div>
+    {{/if}}
+
+    <!-- HEADER DE RESULTADOS -->
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+      <div>
+        {{#if search}}
+          <h2 style="font-size:1.1rem;margin:0;">
+            Resultados para: <strong style="color:#f03e3e;">{{search}}</strong>
+            <span style="color:#888;font-size:0.9rem;font-weight:400;"> — {{totalJobs}} vaga(s)</span>
+          </h2>
+        {{else}}
+          <h2 style="font-size:1.1rem;margin:0;">
+            Vagas em destaque
+            <span style="color:#888;font-size:0.9rem;font-weight:400;"> — {{totalJobs}} vaga(s)</span>
+          </h2>
+        {{/if}}
+      </div>
+      {{#if user}}{{#if (eq user.userType 'candidato')}}
+      {{#if search}}
+      <button onclick="salvarBusca()" id="save-search-btn"
+        style="background:transparent;border:1px solid #3a3a3a;color:#888;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.78rem;transition:all 0.2s;"
+        onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+        onmouseout="this.style.borderColor='#3a3a3a';this.style.color='#888'">
+        <i class="bi bi-bookmark me-1"></i> Salvar busca
+      </button>
+      {{/if}}
+      {{/if}}{{/if}}
+    </div>
+
+    <!-- LISTA DE VAGAS -->
+    <div id="job-list">
+      {{#each jobs}}
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px 24px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;transition:border-color 0.2s;"
+          onmouseover="this.style.borderColor='#f03e3e'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div style="width:48px;height:48px;border-radius:10px;border:1px solid #333;background:#1a1a1a;display:flex;align-items:center;justify-content:center;color:#888;flex-shrink:0;font-size:1.3rem;">
+              <i class="bi bi-building"></i>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                <p style="font-weight:700;font-size:1.05rem;margin:0;color:#f1f1f1;line-height:1.4;">{{title}}</p>
+                {{#if (isNew createdAt)}}
+                  <span style="background:#f03e3e;color:white;font-size:0.62rem;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:0.6px;">NOVA</span>
+                {{/if}}
+                {{#if empresaResponsiva}}
+                  <span style="background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);color:#4caf50;font-size:0.62rem;padding:2px 8px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">
+                    <i class="bi bi-shield-check"></i> Responsiva
+                  </span>
+                {{/if}}
+              </div>
+              <p style="color:#888;font-size:0.82rem;margin-bottom:8px;font-weight:500;">{{company}}</p>
+              <div class="d-flex gap-2 flex-wrap">
+                {{#if modality}}
+                  <span style="background:#1e1e1e;border:1px solid #2a2a2a;color:#aaa;border-radius:20px;padding:3px 10px;font-size:0.73rem;">
+                    {{#if (eq modality 'presencial')}}<i class="bi bi-buildings me-1"></i>{{/if}}
+                    {{#if (eq modality 'hibrido')}}<i class="bi bi-arrow-left-right me-1"></i>{{/if}}
+                    {{#if (isRemote modality)}}<i class="bi bi-house-door me-1"></i>{{/if}}
+                    {{formatModality modality}}
+                  </span>
+                {{/if}}
+                {{#if salary}}
+                  <span style="background:rgba(76,175,80,0.08);border:1px solid rgba(76,175,80,0.25);color:#4caf50;border-radius:20px;padding:3px 10px;font-size:0.73rem;font-weight:600;">
+                    <i class="bi bi-cash-coin me-1"></i>R$ {{salary}}
+                  </span>
+                {{/if}}
+                {{#if isPcd}}
+                  <span style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);color:#4ade80;border-radius:20px;padding:3px 10px;font-size:0.73rem;font-weight:700;">
+                    <i class="bi bi-person-wheelchair me-1"></i>PCD
+                  </span>
+                {{/if}}
+                {{#unless (isRemote modality)}}
+                {{#if city}}
+                  <span style="background:#1e1e1e;border:1px solid #2a2a2a;color:#aaa;border-radius:20px;padding:3px 10px;font-size:0.73rem;">
+                    <i class="bi bi-geo-alt me-1"></i>{{city}}
+                  </span>
+                {{/if}}
+                {{/unless}}
+                <span style="color:#555;font-size:0.73rem;display:flex;align-items:center;gap:4px;">
+                  <i class="bi bi-clock"></i>{{timeAgo createdAt}}
+                </span>
+              </div>
+            </div>
+          </div>
+          <a href="/jobs/view/{{id}}"
+            style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:9px 22px;text-decoration:none;font-weight:600;font-size:0.88rem;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:opacity 0.2s;"
+            onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+            Ver Vaga <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      {{/each}}
+
+      {{#unless jobs.length}}
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:60px;text-align:center;">
+          <i class="bi bi-search" style="font-size:3rem;color:#f03e3e;"></i>
+          <h5 class="mt-3">Nenhuma vaga encontrada</h5>
+          <p class="text-muted">Tente buscar por outro termo ou limpar os filtros.</p>
+          <a href="/" style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 20px;text-decoration:none;">
+            Limpar filtros
+          </a>
+        </div>
+      {{/unless}}
+    </div>
+
+    <!-- PAGINAÇÃO -->
+    {{#if (gt totalPages 1)}}
+    <div class="d-flex justify-content-center align-items-center gap-2 mt-4 flex-wrap">
+      {{#if hasPrev}}
+        <a href="{{prevUrl}}" style="background:#1e1e1e;border:1px solid #3a3a3a;color:#e0e0e0;border-radius:8px;padding:7px 14px;text-decoration:none;font-size:0.85rem;display:flex;align-items:center;gap:4px;">
+          <i class="bi bi-chevron-left"></i> Anterior
+        </a>
+      {{/if}}
+      {{#each pages}}
+        <a href="{{this.url}}" style="border-radius:8px;padding:7px 13px;text-decoration:none;font-size:0.85rem;font-weight:600;{{#if this.active}}background:#f03e3e;color:white;border:1px solid #f03e3e;{{else}}background:#1e1e1e;color:#e0e0e0;border:1px solid #3a3a3a;{{/if}}">
+          {{this.number}}
+        </a>
+      {{/each}}
+      {{#if hasNext}}
+        <a href="{{nextUrl}}" style="background:#1e1e1e;border:1px solid #3a3a3a;color:#e0e0e0;border-radius:8px;padding:7px 14px;text-decoration:none;font-size:0.85rem;display:flex;align-items:center;gap:4px;">
+          Próxima <i class="bi bi-chevron-right"></i>
+        </a>
+      {{/if}}
+    </div>
+    <p style="text-align:center;color:#888;font-size:0.8rem;margin-top:10px;">
+      Página {{currentPage}} de {{totalPages}}
+    </p>
+    {{/if}}
+
+  </div>
+</main>
+
+<style>
+/* ── SEARCH + FILTER BAR ── */
+.sf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 680px;
+  margin: 0 auto 0;
+  position: relative;
+}
+.sf-search-wrap {
+  flex: 1;
+  position: relative;
+}
+.sf-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 1rem;
+  pointer-events: none;
+}
+.sf-search-input {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  padding: 11px 14px 11px 40px;
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.sf-search-input:focus { border-color: #f03e3e; }
+.sf-search-input::placeholder { color: #666; }
+
+.sf-filter-btn {
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  color: #e0e0e0;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.sf-filter-btn:hover,
+.sf-filter-btn.active { border-color: #f03e3e; color: #f03e3e; }
+.sf-badge {
+  background: #f03e3e;
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.sf-submit-btn {
+  background: #f03e3e;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+.sf-submit-btn:hover { opacity: 0.85; }
+
+/* ── FILTER PANEL ── */
+.sf-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, 94vw);
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+  z-index: 9999;
+  text-align: left;
+  animation: sf-drop 0.18s ease;
+}
+@keyframes sf-drop {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.sf-panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  padding: 20px 20px 0;
+}
+.sf-section {
+  padding: 0 16px 20px;
+  border-right: 1px solid #2a2a2a;
+}
+.sf-section:last-child { border-right: none; }
+.sf-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+/* Pills de modalidade */
+.sf-pills { display: flex; flex-direction: column; gap: 6px; }
+.sf-pill {
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  color: #aaa;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+}
+.sf-pill:hover { border-color: #f03e3e; color: #f03e3e; }
+.sf-pill-active {
+  background: rgba(240,62,62,0.1);
+  border-color: #f03e3e;
+  color: #f03e3e;
+  font-weight: 600;
+}
+
+/* Opções de salário */
+.sf-options { display: flex; flex-direction: column; gap: 4px; }
+.sf-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 0.85rem;
+  transition: background 0.15s;
+}
+.sf-option input[type="radio"] { display: none; }
+.sf-option:hover { background: #1e1e1e; color: #e0e0e0; }
+.sf-option-active { color: #f03e3e; font-weight: 600; background: rgba(240,62,62,0.08); }
+.sf-option::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #444;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.sf-option-active::before { border-color: #f03e3e; background: #f03e3e; }
+
+/* Input de cidade */
+.sf-city-input {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 8px 12px 8px 34px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.sf-city-input:focus { border-color: #f03e3e; }
+.sf-city-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #555;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+.sf-city-drop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+/* Footer do painel */
+.sf-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid #2a2a2a;
+}
+.sf-clear-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: color 0.2s;
+}
+.sf-clear-btn:hover { color: #f03e3e; }
+.sf-apply-btn {
+  background: #f03e3e;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.sf-apply-btn:hover { opacity: 0.85; }
+
+/* ── CHIPS DE FILTROS ATIVOS ── */
+.sf-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+}
+.sf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(240,62,62,0.1);
+  border: 1px solid rgba(240,62,62,0.3);
+  color: #f03e3e;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sf-chip:hover { background: rgba(240,62,62,0.2); }
+.sf-chip-x { opacity: 0.7; font-size: 0.75rem; }
+
+/* ── DROPDOWN CIDADES (barra antiga) ── */
+.sug-item {
+  padding: 8px 14px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sug-item:hover { background: #2a2a2a; }
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .sf-panel-grid { grid-template-columns: 1fr; }
+  .sf-section { border-right: none; border-bottom: 1px solid #2a2a2a; }
+  .sf-section:last-child { border-bottom: none; }
+  .sf-row { gap: 6px; }
+  .sf-filter-btn span:not(.sf-badge) { display: none; }
+}
+</style>
+
+<script>
+const USER_SKILLS = {{{userSkills}}};
+
+/* ── ATS ── */
+function calcATS(title, description, requirements) {
+    if (!USER_SKILLS || USER_SKILLS.length === 0) return null;
+    const jobText = [title, description, requirements].join(' ').toLowerCase();
+    const jobWords = jobText.split(/[\s,;\/\-\(\)]+/).filter(w => w.length > 3);
+    const unique = [...new Set(jobWords)];
+    if (unique.length === 0) return null;
+    const matches = unique.filter(w => USER_SKILLS.some(s => s.includes(w) || w.includes(s)));
+    return Math.min(100, Math.round((matches.length / Math.min(unique.length, 30)) * 100));
+}
+function renderATSBadges() {
+    document.querySelectorAll('[data-ats]').forEach(el => {
+        const score = calcATS(el.dataset.title || '', el.dataset.description || '', el.dataset.requirements || '');
+        if (score === null) { el.style.display = 'none'; return; }
+        const color = score >= 70 ? '#4caf50' : score >= 40 ? '#f59e0b' : '#f03e3e';
+        const fill  = Math.round(score / 10);
+        el.innerHTML = '<span style="font-size:0.7rem;color:' + color + ';font-weight:700;">' + score + '% ATS</span><span style="display:inline-flex;gap:2px;margin-left:4px;">' + Array.from({length:10},(_,i) => '<span style="width:4px;height:10px;border-radius:2px;background:' + (i < fill ? color : '#2a2a2a') + ';display:inline-block;"></span>').join('') + '</span>';
+        el.style.display = 'inline-flex';
+        el.style.alignItems = 'center';
+        el.style.gap = '2px';
+    });
+}
+if (typeof USER_SKILLS !== 'undefined' && USER_SKILLS.length > 0) {
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', renderATSBadges); }
+    else { renderATSBadges(); }
+}
+
+/* ── FILTER PANEL ── */
+let panelOpen = false;
+
+function toggleFilterPanel() {
+    panelOpen = !panelOpen;
+    const panel = document.getElementById('filter-panel');
+    const btn   = document.getElementById('filter-btn');
+    panel.style.display = panelOpen ? 'block' : 'none';
+    btn.classList.toggle('active', panelOpen);
+}
+
+document.addEventListener('click', function(e) {
+    if (panelOpen && !e.target.closest('#filter-panel') && !e.target.closest('#filter-btn')) {
+        panelOpen = false;
+        document.getElementById('filter-panel').style.display = 'none';
+        document.getElementById('filter-btn').classList.remove('active');
+    }
+});
+
+function toggleModality(val) {
+    const current = document.getElementById('modality-val').value;
+    const newVal  = current === val ? 'todos' : val;
+    document.getElementById('modality-val').value = newVal;
+    document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('sf-pill-active'));
+    if (newVal !== 'todos') {
+        document.querySelector(`.sf-pill[onclick="toggleModality('${newVal}')"]`)?.classList.add('sf-pill-active');
+    }
+    updateBadge();
+}
+
+function selectSalary(val) {
+    document.getElementById('salary-val').value = val;
+    document.querySelectorAll('.sf-option').forEach(o => o.classList.remove('sf-option-active'));
+    document.querySelector(`.sf-option input[value="${val}"]`)?.closest('.sf-option')?.classList.add('sf-option-active');
+    updateBadge();
+}
+
+function updateBadge() {
+    const modality = document.getElementById('modality-val').value;
+    const salary   = document.getElementById('salary-val').value;
+    const city     = document.getElementById('city-val').value;
+    let count = 0;
+    if (modality && modality !== 'todos') count++;
+    if (salary   && salary   !== 'todos') count++;
+    if (city     && city     !== 'todos') count++;
+    const badge = document.getElementById('filter-badge');
+    if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+    } else {
+        badge.style.display = 'none';
+    }
+    renderChips();
+}
+
+function clearAllFilters() {
+    document.getElementById('modality-val').value = 'todos';
+    document.getElementById('salary-val').value   = 'todos';
+    document.getElementById('city-val').value     = 'todos';
+    document.getElementById('city-input').value   = '';
+    document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('sf-pill-active'));
+    document.querySelectorAll('.sf-option').forEach(o => o.classList.remove('sf-option-active'));
+    document.querySelector('.sf-option input[value="todos"]')?.closest('.sf-option')?.classList.add('sf-option-active');
+    updateBadge();
+    document.getElementById('filter-form').submit();
+}
+
+function removeFilter(type) {
+    document.getElementById(type + '-val').value = 'todos';
+    if (type === 'city') document.getElementById('city-input').value = '';
+    if (type === 'modality') document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('sf-pill-active'));
+    if (type === 'salary') {
+        document.querySelectorAll('.sf-option').forEach(o => o.classList.remove('sf-option-active'));
+        document.querySelector('.sf-option input[value="todos"]')?.closest('.sf-option')?.classList.add('sf-option-active');
+    }
+    updateBadge();
+    document.getElementById('filter-form').submit();
+}
+
+const MODALITY_LABELS = { presencial: 'Presencial', hibrido: 'Híbrido', homeoffice: 'Home Office' };
+const SALARY_LABELS   = { '1000': 'Até R$ 1.000', '2000': 'Até R$ 2.000', '3000': 'Até R$ 3.000', '5000': 'Até R$ 5.000', combinar: 'A combinar' };
+
+function renderChips() {
+    const modality = document.getElementById('modality-val').value;
+    const salary   = document.getElementById('salary-val').value;
+    const city     = document.getElementById('city-val').value;
+    const row      = document.getElementById('active-chips');
+    let html = '';
+    if (modality && modality !== 'todos')
+        html += `<span class="sf-chip" onclick="removeFilter('modality')"><i class="bi bi-grid"></i>${MODALITY_LABELS[modality]||modality}<i class="bi bi-x sf-chip-x"></i></span>`;
+    if (salary && salary !== 'todos')
+        html += `<span class="sf-chip" onclick="removeFilter('salary')"><i class="bi bi-cash-coin"></i>${SALARY_LABELS[salary]||salary}<i class="bi bi-x sf-chip-x"></i></span>`;
+    if (city && city !== 'todos')
+        html += `<span class="sf-chip" onclick="removeFilter('city')"><i class="bi bi-geo-alt"></i>${city}<i class="bi bi-x sf-chip-x"></i></span>`;
+    row.innerHTML = html;
+    row.style.display = html ? 'flex' : 'none';
+}
+
+/* ── CIDADES ── */
+let allCities = [];
+let citiesLoaded = false;
+
+async function loadCities() {
+    if (citiesLoaded) return;
+    try {
+        const res  = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome');
+        const data = await res.json();
+        allCities = data.map(m => ({
+            name:  m.nome,
+            state: m.microrregiao?.mesorregiao?.UF?.sigla || m['regiao-imediata']?.['regiao-intermediaria']?.UF?.sigla || ''
+        })).filter(m => m.name);
+        citiesLoaded = true;
+    } catch (e) { console.error('Erro ao carregar cidades:', e); }
+}
+
+async function filterCities(query) {
+    const box = document.getElementById('city-drop');
+    box.style.display = 'block';
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) {
+        box.innerHTML = '<div class="sug-item" style="color:#888;pointer-events:none;">Digite ao menos 2 letras...</div>';
+        return;
+    }
+    if (!citiesLoaded) {
+        box.innerHTML = '<div class="sug-item" style="color:#888;pointer-events:none;">Carregando cidades...</div>';
+        await loadCities();
+    }
+    const filtered = allCities.filter(c => c.name.toLowerCase().includes(q)).slice(0, 10);
+    box.innerHTML = filtered.length
+        ? filtered.map(c => `<div class="sug-item" onmousedown="selectCity('${c.name.replace(/'/g,"\\'")}')">
+            ${c.name} <span style="color:#888;font-size:0.75rem;">- ${c.state}</span></div>`).join('')
+        : '<div class="sug-item" style="color:#888;pointer-events:none;">Nenhuma cidade encontrada</div>';
+}
+
+function selectCity(val) {
+    document.getElementById('city-val').value   = val;
+    document.getElementById('city-input').value = val;
+    closeDrop('city-drop');
+    updateBadge();
+}
+
+function closeDrop(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+}
+
+/* ── SALVAR BUSCA ── */
+async function salvarBusca() {
+    const btn    = document.getElementById('save-search-btn');
+    const params = new URLSearchParams(window.location.search);
+    const query  = params.toString();
+    if (!query) return;
+    try {
+        const res  = await fetch('/searches/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{csrfToken}}' },
+            body: JSON.stringify({ query, label: '{{search}}' })
+        });
+        const data = await res.json();
+        if (data.ok) {
+            btn.innerHTML = '<i class="bi bi-bookmark-fill me-1"></i> Busca salva!';
+            btn.style.borderColor = '#4caf50';
+            btn.style.color = '#4caf50';
+            btn.disabled = true;
+        }
+    } catch (e) {}
+}
+
+/* ── SPINNER NA BUSCA ── */
+document.getElementById('filter-form').addEventListener('submit', function() {
+    const btn = document.getElementById('search-submit-btn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+});
+
+/* ── INIT ── */
+loadCities();
+updateBadge();
+</script>

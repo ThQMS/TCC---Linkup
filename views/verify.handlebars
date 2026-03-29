@@ -1,0 +1,93 @@
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:40px 32px;max-width:440px;width:100%;text-align:center;">
+
+    <div style="width:64px;height:64px;border-radius:16px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:1.8rem;">
+      ✉️
+    </div>
+
+    <h1 style="font-size:1.5rem;font-weight:800;margin-bottom:8px;">Verificação de conta</h1>
+    <p style="color:#888;font-size:0.9rem;line-height:1.6;margin-bottom:32px;">
+      Enviamos um código de 6 dígitos para o seu e-mail.<br>
+      <strong style="color:#ccc;">Verifique também a caixa de spam.</strong>
+    </p>
+
+    <form action="/verify" method="POST" id="verify-form">
+      <input type="hidden" name="_csrf" value="{{csrfToken}}">
+      <div style="margin-bottom:20px;">
+        <input type="text" id="code" name="code"
+          style="width:100%;background:#111;border:1px solid #333;color:#f0f0f0;border-radius:12px;padding:16px;font-size:1.8rem;font-weight:700;text-align:center;letter-spacing:12px;outline:none;transition:border-color 0.2s;font-family:monospace;"
+          placeholder="——————" maxlength="6" autocomplete="off" inputmode="numeric" required
+          oninput="this.value=this.value.replace(/\D/g,'');if(this.value.length===6)document.getElementById('verify-form').submit()"
+          onfocus="this.style.borderColor='#e63946'" onblur="this.style.borderColor='#333'"/>
+      </div>
+      <button type="submit"
+        style="width:100%;background:#e63946;border:none;color:white;border-radius:12px;padding:14px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.2s;margin-bottom:16px;"
+        onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e63946'">
+        <i class="bi bi-shield-check me-2"></i>Verificar conta
+      </button>
+    </form>
+
+    <div style="border-top:1px solid #2a2a2a;padding-top:20px;">
+      <p style="color:#888;font-size:0.85rem;margin-bottom:12px;">Não recebeu o código?</p>
+      <button id="resend-btn" onclick="reenviarCodigo()"
+        style="background:transparent;border:1px solid #333;color:#aaa;border-radius:10px;padding:9px 20px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;font-family:inherit;"
+        onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'" onmouseout="this.style.borderColor='#333';this.style.color='#aaa'">
+        <i class="bi bi-arrow-clockwise me-1"></i>Reenviar código
+      </button>
+      <div id="resend-msg" style="margin-top:10px;font-size:0.82rem;display:none;"></div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <a href="/logout" style="color:#555;font-size:0.8rem;text-decoration:none;transition:color 0.15s;"
+        onmouseover="this.style.color='#888'" onmouseout="this.style.color='#555'">
+        <i class="bi bi-arrow-left me-1"></i>Entrar com outra conta
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+async function reenviarCodigo() {
+    const btn = document.getElementById('resend-btn');
+    const msg = document.getElementById('resend-msg');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Enviando...';
+    try {
+        const res  = await fetch('/resend-code', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{csrfToken}}' }
+        });
+        const data = await res.json();
+        if (data.ok) {
+            msg.textContent = 'Novo código enviado! Verifique seu e-mail.';
+            msg.style.color = '#4caf50';
+            btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Enviado';
+            // Reabilita após 60 segundos
+            let seconds = 60;
+            const interval = setInterval(() => {
+                seconds--;
+                btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Reenviar em ' + seconds + 's';
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Reenviar código';
+                    msg.style.display = 'none';
+                }
+            }, 1000);
+        } else {
+            msg.textContent = data.error || 'Erro ao reenviar. Tente novamente.';
+            msg.style.color = '#e63946';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Reenviar código';
+        }
+        msg.style.display = 'block';
+    } catch (e) {
+        msg.textContent = 'Erro de conexão.';
+        msg.style.color = '#e63946';
+        msg.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Reenviar código';
+    }
+}
+
+</script>

@@ -1,0 +1,99 @@
+<div style="padding-top:80px;padding-bottom:60px;">
+  <div class="container" style="max-width:900px;">
+
+    <a href="/" style="color:#f03e3e;text-decoration:none;font-size:0.9rem;display:inline-flex;align-items:center;gap:6px;margin-bottom:24px;">
+      <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+
+    <!-- HERO DA EMPRESA -->
+    <div style="background:linear-gradient(135deg,#1a1a1a,#2c2c2c);border:1px solid #2a2a2a;border-radius:16px;padding:36px;margin-bottom:24px;">
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div style="width:90px;height:90px;border-radius:50%;border:3px solid #f03e3e;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#f03e3e;flex-shrink:0;overflow:hidden;">
+          {{#if empresa.avatar}}
+            <img src="{{empresa.avatar}}" style="width:100%;height:100%;object-fit:cover;" />
+          {{else}}
+            <i class="bi bi-building"></i>
+          {{/if}}
+        </div>
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+            <h1 style="font-size:1.7rem;font-weight:700;margin:0;">{{empresa.name}}</h1>
+            <span style="background:#f03e3e;color:white;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">🏢 Empresa</span>
+            {{#if empresa.sector}}
+              <span style="background:#2a2a2a;color:#aaa;font-size:0.75rem;padding:3px 10px;border-radius:20px;">{{empresa.sector}}</span>
+            {{/if}}
+            {{#if empresaResponsiva}}
+              <span style="background:#1a3a1a;border:1px solid #4caf50;color:#4caf50;font-size:0.75rem;padding:3px 12px;border-radius:20px;font-weight:600;">
+                🏆 Empresa Responsiva
+              </span>
+            {{/if}}
+          </div>
+          {{#if empresa.bio}}
+            <p style="color:#aaa;margin-bottom:12px;">{{empresa.bio}}</p>
+          {{/if}}
+          <div class="d-flex gap-3 flex-wrap">
+            {{#if empresa.city}}
+              <span style="color:#888;font-size:0.85rem;"><i class="bi bi-geo-alt me-1"></i>{{empresa.city}}</span>
+            {{/if}}
+            {{#if empresa.companySize}}
+              <span style="color:#888;font-size:0.85rem;"><i class="bi bi-people me-1"></i>{{empresa.companySize}} funcionários</span>
+            {{/if}}
+            {{#if empresa.website}}
+              <a href="{{empresa.website}}" target="_blank" style="color:#f03e3e;font-size:0.85rem;text-decoration:none;">
+                <i class="bi bi-globe me-1"></i>Site
+              </a>
+            {{/if}}
+            {{#if empresa.linkedinCompany}}
+              <a href="{{empresa.linkedinCompany}}" target="_blank" style="color:#0a66c2;font-size:0.85rem;text-decoration:none;">
+                <i class="bi bi-linkedin me-1"></i>LinkedIn
+              </a>
+            {{/if}}
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:2rem;font-weight:700;color:#f03e3e;">{{jobsCount}}</div>
+          <div style="font-size:0.8rem;color:#888;">Vagas Abertas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAGAS DA EMPRESA -->
+    <h5 style="font-weight:700;margin-bottom:16px;">
+      <i class="bi bi-briefcase me-2" style="color:#f03e3e;"></i>Vagas Abertas
+    </h5>
+
+    {{#if jobs.length}}
+      {{#each jobs}}
+        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px 24px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;"
+          onmouseover="this.style.borderColor='#f03e3e'" onmouseout="this.style.borderColor='#2a2a2a'">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+              <p style="font-weight:700;font-size:1rem;margin:0;">{{this.title}}</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap mt-1">
+              {{#if this.modality}}
+                <span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.75rem;">{{this.modality}}</span>
+              {{/if}}
+              {{#if this.salary}}
+                <span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.75rem;">💰 R$ {{this.salary}}</span>
+              {{/if}}
+              <span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.75rem;">
+                🕐 {{timeAgo this.createdAt}}
+              </span>
+            </div>
+          </div>
+          <a href="/jobs/view/{{this.id}}"
+            style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 20px;text-decoration:none;font-weight:600;font-size:0.9rem;">
+            Ver Vaga
+          </a>
+        </div>
+      {{/each}}
+    {{else}}
+      <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:60px;text-align:center;">
+        <i class="bi bi-briefcase" style="font-size:3rem;color:#f03e3e;"></i>
+        <h5 class="mt-3">Nenhuma vaga aberta no momento</h5>
+      </div>
+    {{/if}}
+
+  </div>
+</div>

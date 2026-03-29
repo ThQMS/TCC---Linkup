@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LinkUp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css?v=5">
+</head>
+<body class="bg-dark text-white">
+
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark px-3 shadow" style="background:#0d0d0d;border-bottom:1px solid #1e1e1e;">
+
+        <!-- LOGO -->
+        <a class="navbar-brand" href="/" style="text-decoration:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 175 40" fill="none" style="height:28px;vertical-align:middle;">
+                <defs>
+                    <linearGradient id="nav-line" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#e63946"/>
+                        <stop offset="100%" stop-color="#e63946" stop-opacity="0.2"/>
+                    </linearGradient>
+                </defs>
+                <circle cx="9" cy="20" r="5.5" fill="#e63946"/>
+                <rect x="14.5" y="19" width="20" height="2" rx="1" fill="url(#nav-line)"/>
+                <circle cx="35" cy="20" r="4" fill="#e63946" opacity="0.4"/>
+                <text x="47" y="28" font-family="Syne, sans-serif" font-size="22" font-weight="800" letter-spacing="-0.8" fill="#f0f0f0">Link<tspan fill="#e63946">Up</tspan></text>
+            </svg>
+        </a>
+
+        <!-- TOGGLER MOBILE -->
+        <button class="navbar-toggler border-0" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            style="padding:6px 10px;">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1 py-2 py-lg-0">
+
+                {{#if hideNav}}
+                    <li class="nav-item">
+                        <a href="/logout"
+                           style="display:inline-block;background:#e63946;color:white;border-radius:8px;padding:7px 22px;font-weight:700;font-size:0.87rem;text-decoration:none;width:100%;text-align:center;"
+                           onmousedown="this.style.background='#c62828'" onmouseup="this.style.background='#e63946'" onmouseleave="this.style.background='#e63946'">Sair</a>
+                    </li>
+
+                {{else if user}}
+                    <!-- Ver Vagas — item primário -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" style="font-size:0.9rem;">
+                            <i class="bi bi-briefcase me-1"></i>Ver Vagas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/help" style="font-size:0.9rem;">
+                            <i class="bi bi-question-circle me-1"></i>Ajuda
+                        </a>
+                    </li>
+
+                    {{#if (eq user.userType 'candidato')}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jobs/my-applications" style="font-size:0.9rem;">
+                            <i class="bi bi-send me-1"></i>Candidaturas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jobs/favorites" style="font-size:0.9rem;">
+                            <i class="bi bi-heart me-1"></i>Favoritos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile/candidate/dashboard" style="font-size:0.9rem;">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    {{/if}}
+
+                    {{#if (isRecruiter user.userType)}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile/my-jobs" style="font-size:0.9rem;">
+                            <i class="bi bi-briefcase me-1"></i>Minhas Vagas
+                        </a>
+                    </li>
+                    <!-- Abrir Vaga — destaque primário -->
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-danger" href="/jobs/add" style="font-size:0.85rem;padding:7px 16px;">
+                            <i class="bi bi-plus-lg me-1"></i>Abrir Vaga
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile/dashboard" style="font-size:0.9rem;">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    {{/if}}
+
+                    <!-- SEPARADOR VISUAL DESKTOP -->
+                    <li class="nav-item d-none d-lg-block">
+                        <span style="width:1px;height:20px;background:#2a2a2a;display:inline-block;margin:0 4px;vertical-align:middle;"></span>
+                    </li>
+                    <li class="nav-item d-lg-none">
+                        <hr style="border-color:#2a2a2a;margin:4px 0;">
+                    </li>
+
+                    <!-- SININHO -->
+                    <li class="nav-item">
+                        <a href="/notifications"
+                            style="position:relative;color:#888;text-decoration:none;padding:7px 9px;display:inline-flex;align-items:center;gap:8px;border-radius:8px;border:1px solid #2a2a2a;transition:all 0.2s;"
+                            onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+                            onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#888'">
+                            <i class="bi bi-bell" style="font-size:1rem;"></i>
+                            <span class="d-lg-none">Notificações</span>
+                            {{#if unreadNotifications}}
+                                {{#if (gt unreadNotifications 0)}}
+                                <span class="d-none d-lg-flex" style="position:absolute;top:-4px;right:-4px;background:#e63946;color:white;border-radius:50%;width:17px;height:17px;font-size:0.6rem;align-items:center;justify-content:center;font-weight:700;border:2px solid #0d0d0d;">
+                                    {{unreadNotifications}}
+                                </span>
+                                <span class="d-lg-none" style="background:#e63946;color:white;border-radius:20px;padding:1px 8px;font-size:0.7rem;font-weight:700;">
+                                    {{unreadNotifications}} nova(s)
+                                </span>
+                                {{/if}}
+                            {{/if}}
+                        </a>
+                    </li>
+
+                    <!-- PERFIL — pill com avatar -->
+                    <li class="nav-item">
+                        <a href="/profile"
+                            style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border:1px solid #2a2a2a;border-radius:20px;text-decoration:none;color:#e0e0e0;font-size:0.85rem;transition:all 0.2s;"
+                            onmouseover="this.style.borderColor='#f03e3e'"
+                            onmouseout="this.style.borderColor='#2a2a2a'">
+                            {{#if user.avatar}}
+                                <img src="{{user.avatar}}" alt="avatar"
+                                    style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:2px solid #e63946;flex-shrink:0;" />
+                            {{else}}
+                                <span style="width:24px;height:24px;border-radius:50%;background:#2a2a2a;border:2px solid #e63946;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <i class="bi bi-person-fill" style="font-size:0.75rem;color:#e63946;"></i>
+                                </span>
+                            {{/if}}
+                            <span>{{user.name}}</span>
+                        </a>
+                    </li>
+
+                    <!-- SAIR — discreto -->
+                    <li class="nav-item">
+                        <a href="/logout"
+                            style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #2a2a2a;border-radius:8px;text-decoration:none;color:#666;font-size:0.85rem;transition:all 0.2s;"
+                            onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+                            onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#666'">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sair</span>
+                        </a>
+                    </li>
+
+                {{else}}
+                    {{#if showLoginBtn}}
+                    <li class="nav-item mt-2 mt-lg-0">
+                        <a href="/login"
+                           style="display:inline-block;background:#e63946;color:white;border-radius:8px;padding:7px 22px;font-weight:700;font-size:0.87rem;text-decoration:none;"
+                           onmousedown="this.style.background='#c62828'" onmouseup="this.style.background='#e63946'" onmouseleave="this.style.background='#e63946'">Login</a>
+                    </li>
+                    {{/if}}
+                    {{#if showRegisterBtn}}
+                    <li class="nav-item mt-2 mt-lg-0">
+                        <a href="/register"
+                           style="display:inline-block;background:#e63946;color:white;border-radius:8px;padding:7px 22px;font-weight:700;font-size:0.87rem;text-decoration:none;"
+                           onmousedown="this.style.background='#c62828'" onmouseup="this.style.background='#e63946'" onmouseleave="this.style.background='#e63946'">Registrar</a>
+                    </li>
+                    {{/if}}
+                {{/if}}
+
+            </ul>
+        </div>
+    </nav>
+
+    <!-- FLASH MESSAGES -->
+    <div class="container pt-5 mt-4">
+        {{#if success_msg}}
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> {{success_msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {{/if}}
+        {{#if error_msg}}
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{error_msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {{/if}}
+    </div>
+
+    <main>
+        {{{body}}}
+    </main>
+
+    <!-- ONBOARDING -->
+    {{#if user}}
+    {{#if user.isVerified}}
+    {{#unless user.onboardingComplete}}
+    <style>
+    .ob-dot{width:8px;height:8px;border-radius:50%;background:#2a2a2a;transition:all 0.3s;flex-shrink:0;}
+    .ob-dot.active{background:#e63946;width:24px;border-radius:4px;}
+    .ob-feature-item{display:flex;align-items:flex-start;gap:12px;background:#111;border:1px solid #222;border-radius:10px;padding:13px 15px;margin-bottom:10px;text-align:left;}
+    .ob-feature-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;}
+    .ob-feature-title{font-weight:600;font-size:.88rem;color:#e0e0e0;margin-bottom:2px;}
+    .ob-feature-desc{font-size:.78rem;color:#666;line-height:1.4;}
+    .ob-btn-skip{background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;padding:0;transition:color .15s;}
+    .ob-btn-skip:hover{color:#aaa;}
+    .ob-alert{background:rgba(230,57,70,.08);border:1px solid rgba(230,57,70,.2);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:.82rem;color:#e63946;text-align:left;}
+    </style>
+    <div id="onboarding-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:16px;">
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:36px 28px;max-width:500px;width:100%;text-align:center;position:relative;max-height:90vh;overflow-y:auto;">
+
+        <!-- DOTS -->
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:32px;" id="ob-dots">
+          <div class="ob-dot active"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+        </div>
+
+        <!-- ═══ PASSO 1: BOAS-VINDAS ═══ -->
+        <div id="ob-step-1">
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">👋</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:10px;">Bem-vindo ao LinkUp{{#if user.name}}, {{user.name}}{{/if}}!</h2>
+          {{#if (eq user.userType 'candidato')}}
+          <p style="color:#888;line-height:1.7;margin-bottom:28px;">A plataforma que conecta você às melhores oportunidades do mercado — com <strong style="color:#e0e0e0;">IA integrada</strong> para criar seu currículo, analisar compatibilidade com vagas e simular entrevistas.</p>
+          {{else}}
+          <p style="color:#888;line-height:1.7;margin-bottom:28px;">A plataforma que conecta sua empresa aos melhores talentos — com <strong style="color:#e0e0e0;">IA integrada</strong> para criar vagas, auditar linguagem, ranquear candidatos e muito mais.</p>
+          {{/if}}
+          <button onclick="obNext(2)" style="width:100%;background:#e63946;border:none;color:#fff;border-radius:10px;padding:13px;font-size:.95rem;font-weight:700;font-family:inherit;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e63946'">Vamos começar →</button>
+        </div>
+
+        <!-- ═══ PASSO 2 — CANDIDATO: Busca | EMPRESA: Criar vagas ═══ -->
+        <div id="ob-step-2" style="display:none;">
+          {{#if (eq user.userType 'candidato')}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">🔍</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Encontre as vagas certas</h2>
+          <p style="color:#888;line-height:1.6;font-size:.9rem;margin-bottom:20px;">A busca do LinkUp vai além de palavras-chave:</p>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(76,175,80,.1);color:#4caf50;"><i class="bi bi-cpu-fill"></i></div>
+            <div><div class="ob-feature-title">Busca Semântica</div><div class="ob-feature-desc">Descreva o que você quer em linguagem natural e a IA encontra as vagas mais relevantes.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(255,193,7,.1);color:#ffc107;"><i class="bi bi-heart-fill"></i></div>
+            <div><div class="ob-feature-title">Favoritos</div><div class="ob-feature-desc">Salve vagas para analisar depois sem perder o link.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;"><i class="bi bi-bell-fill"></i></div>
+            <div><div class="ob-feature-title">Redescoberta de Oportunidades</div><div class="ob-feature-desc">Vagas que você viu antes e ainda estão abertas reaparecem como sugestões no seu feed.</div></div>
+          </div>
+          {{else}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">📋</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Crie vagas com IA</h2>
+          <p style="color:#888;line-height:1.6;font-size:.9rem;margin-bottom:20px;">O formulário de vagas tem recursos para atrair os candidatos certos:</p>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(230,57,70,.1);color:#e63946;"><i class="bi bi-stars"></i></div>
+            <div><div class="ob-feature-title">Melhorar com IA</div><div class="ob-feature-desc">Reescreve descrição, requisitos e benefícios para ficarem mais profissionais e atrativos.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(76,175,80,.1);color:#4caf50;"><i class="bi bi-list-check"></i></div>
+            <div><div class="ob-feature-title">Etapas do processo</div><div class="ob-feature-desc">Defina as fases do seletivo com modelos prontos por área ou sugestão da IA.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(168,85,247,.1);color:#a855f7;"><i class="bi bi-shield-check"></i></div>
+            <div><div class="ob-feature-title">Bias Auditor</div><div class="ob-feature-desc">Detecta linguagem enviesada por gênero, idade ou cultura antes de publicar.</div></div>
+          </div>
+          {{/if}}
+          <button onclick="obNext(3)" style="width:100%;background:#e63946;border:none;color:#fff;border-radius:10px;padding:13px;font-size:.9rem;font-weight:700;font-family:inherit;cursor:pointer;margin-top:20px;transition:background .2s;" onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e63946'">Próximo →</button>
+        </div>
+
+        <!-- ═══ PASSO 3 — CANDIDATO: IA | EMPRESA: Candidatos ═══ -->
+        <div id="ob-step-3" style="display:none;">
+          {{#if (eq user.userType 'candidato')}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">🤖</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">IA para turbinar sua busca</h2>
+          <p style="color:#888;line-height:1.6;font-size:.9rem;margin-bottom:20px;">Dentro de cada vaga você tem acesso a ferramentas de IA exclusivas:</p>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(230,57,70,.1);color:#e63946;"><i class="bi bi-graph-up-arrow"></i></div>
+            <div><div class="ob-feature-title">Ver minha compatibilidade</div><div class="ob-feature-desc">A IA analisa seu currículo e a vaga e diz o quanto você se encaixa no perfil.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;"><i class="bi bi-envelope-paper-fill"></i></div>
+            <div><div class="ob-feature-title">Carta de apresentação</div><div class="ob-feature-desc">Gera uma carta personalizada para a vaga com base no seu perfil.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(168,85,247,.1);color:#a855f7;"><i class="bi bi-camera-video-fill"></i></div>
+            <div><div class="ob-feature-title">Simulação de entrevista</div><div class="ob-feature-desc">Treine com perguntas geradas pela IA baseadas na vaga antes da entrevista real.</div></div>
+          </div>
+          {{else}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,193,7,.1);border:1px solid rgba(255,193,7,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">👥</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Analise candidatos com IA</h2>
+          <p style="color:#888;line-height:1.6;font-size:.9rem;margin-bottom:20px;">Quando as candidaturas chegarem, você decide melhor e mais rápido:</p>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(230,57,70,.1);color:#e63946;"><i class="bi bi-trophy-fill"></i></div>
+            <div><div class="ob-feature-title">Ranking por IA</div><div class="ob-feature-desc">Ordena candidatos por compatibilidade com a vaga automaticamente.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;"><i class="bi bi-layout-split"></i></div>
+            <div><div class="ob-feature-title">Comparar candidatos</div><div class="ob-feature-desc">Compare até 3 candidatos lado a lado para decidir quem avança.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(76,175,80,.1);color:#4caf50;"><i class="bi bi-send-check-fill"></i></div>
+            <div><div class="ob-feature-title">Gerenciar status</div><div class="ob-feature-desc">Aprove, rejeite ou avance candidatos entre as etapas do processo.</div></div>
+          </div>
+          {{/if}}
+          <button onclick="obNext(4)" style="width:100%;background:#e63946;border:none;color:#fff;border-radius:10px;padding:13px;font-size:.9rem;font-weight:700;font-family:inherit;cursor:pointer;margin-top:20px;transition:background .2s;" onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e63946'">Próximo →</button>
+        </div>
+
+        <!-- ═══ PASSO 4 — CANDIDATO: Perfil | EMPRESA: Dashboard ═══ -->
+        <div id="ob-step-4" style="display:none;">
+          {{#if (eq user.userType 'candidato')}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">👤</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Seu perfil é sua identidade</h2>
+          <p style="color:#888;line-height:1.6;font-size:.9rem;margin-bottom:20px;">Adicione uma bio e sua cidade para que recrutadores entendam quem você é. Foto é opcional.</p>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;"><i class="bi bi-geo-alt-fill"></i></div>
+            <div><div class="ob-feature-title">Localização</div><div class="ob-feature-desc">Ajuda a encontrar vagas na sua região ou remotas compatíveis com você.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(168,85,247,.1);color:#a855f7;"><i class="bi bi-chat-quote-fill"></i></div>
+            <div><div class="ob-feature-title">Bio profissional</div><div class="ob-feature-desc">Resumo visível para recrutadores que visitarem sua página pública.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(76,175,80,.1);color:#4caf50;"><i class="bi bi-toggle-on"></i></div>
+            <div><div class="ob-feature-title">Disponível para trabalhar</div><div class="ob-feature-desc">Sinalize sua disponibilidade e apareça para empresas em busca ativa de talentos.</div></div>
+          </div>
+          {{else}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">📊</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Dashboard e métricas de IA</h2>
+          <p style="color:#888;line-height:1.6;font-size:.9rem;margin-bottom:20px;">Acompanhe a performance do seu recrutamento em tempo real:</p>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(230,57,70,.1);color:#e63946;"><i class="bi bi-speedometer2"></i></div>
+            <div><div class="ob-feature-title">Dashboard</div><div class="ob-feature-desc">Veja candidaturas por vaga, taxa de resposta e tempo médio de processo.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(168,85,247,.1);color:#a855f7;"><i class="bi bi-graph-up-arrow"></i></div>
+            <div><div class="ob-feature-title">Métricas de IA</div><div class="ob-feature-desc">Quantas vezes a IA foi usada, quais features, e o impacto no processo seletivo.</div></div>
+          </div>
+          <div class="ob-feature-item">
+            <div class="ob-feature-icon" style="background:rgba(6,182,212,.1);color:#06b6d4;"><i class="bi bi-person-lines-fill"></i></div>
+            <div><div class="ob-feature-title">Redescoberta de talentos</div><div class="ob-feature-desc">Candidatos anteriores compatíveis são notificados ao reabrir uma vaga.</div></div>
+          </div>
+          {{/if}}
+          <button onclick="obNext(5)" style="width:100%;background:#e63946;border:none;color:#fff;border-radius:10px;padding:13px;font-size:.9rem;font-weight:700;font-family:inherit;cursor:pointer;margin-top:20px;transition:background .2s;" onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e63946'">Próximo →</button>
+        </div>
+
+        <!-- ═══ PASSO 5 — AÇÕES FINAIS ═══ -->
+        <div id="ob-step-5" style="display:none;">
+          {{#if (eq user.userType 'candidato')}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">📄</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Agora crie seu currículo</h2>
+          <div class="ob-alert"><i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;"></i> Sem currículo não é possível se candidatar a nenhuma vaga — é o passo mais importante.</div>
+          <p style="color:#888;line-height:1.6;font-size:.9rem;margin-bottom:20px;">Ele fica salvo na plataforma e é enviado automaticamente em cada candidatura. A IA também o usa para calcular sua compatibilidade.</p>
+          <a href="/resume/create" onclick="obComplete()" style="display:block;background:#e63946;border:none;color:#fff;border-radius:10px;padding:14px;font-size:.95rem;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none;margin-bottom:12px;text-align:center;">Criar meu currículo →</a>
+          <button onclick="obComplete()" class="ob-btn-skip">Pular por agora (não recomendado)</button>
+          {{else}}
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">🚀</div>
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:12px;">Por onde quer começar?</h2>
+          <a href="/profile" onclick="obComplete()" style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;text-decoration:none;margin-bottom:10px;transition:border-color .2s;" onmouseover="this.style.borderColor='#e63946'" onmouseout="this.style.borderColor='#2a2a2a'">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(6,182,212,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-building-fill" style="color:#06b6d4;"></i></div>
+            <div style="text-align:left;"><div style="font-weight:600;font-size:.9rem;color:#e0e0e0;">Completar perfil da empresa</div><div style="font-size:.76rem;color:#666;">Setor, bio e logo (opcional)</div></div>
+          </a>
+          <a href="/jobs/add" onclick="obComplete()" style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;text-decoration:none;margin-bottom:10px;transition:border-color .2s;" onmouseover="this.style.borderColor='#e63946'" onmouseout="this.style.borderColor='#2a2a2a'">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(230,57,70,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-briefcase-fill" style="color:#e63946;"></i></div>
+            <div style="text-align:left;"><div style="font-weight:600;font-size:.9rem;color:#e0e0e0;">Criar minha primeira vaga</div><div style="font-size:.76rem;color:#666;">Com IA, etapas e bias auditor</div></div>
+          </a>
+          <button onclick="obComplete()" class="ob-btn-skip" style="margin-top:8px;">Explorar por conta própria</button>
+          {{/if}}
+          <div style="margin-top:20px;padding:12px 14px;background:#111;border:1px solid #222;border-radius:10px;text-align:left;display:flex;align-items:center;gap:10px;">
+            <i class="bi bi-book" style="color:#888;font-size:1rem;flex-shrink:0;"></i>
+            <p style="font-size:0.78rem;color:#666;margin:0;line-height:1.5;">Todas as features estão explicadas na página <a href="/help" onclick="obComplete()" style="color:#e63946;text-decoration:none;font-weight:600;">Ajuda &amp; Guia</a> — acesse a qualquer momento se tiver dúvidas.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <script>
+    function obNext(step){document.querySelectorAll('[id^="ob-step-"]').forEach(el=>el.style.display='none');document.getElementById('ob-step-'+step).style.display='block';document.querySelectorAll('.ob-dot').forEach((dot,i)=>dot.classList.toggle('active',i===step-1));}
+    function obComplete(){fetch('/onboarding/complete',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':'{{csrfToken}}'}}).finally(()=>{const o=document.getElementById('onboarding-overlay');o.style.transition='opacity 0.4s';o.style.opacity='0';setTimeout(()=>o.remove(),400);});}
+    </script>
+    {{/unless}}
+    {{/if}}
+    {{/if}}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{#if user}}
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    (function(){
+        const socket=io();
+        socket.on('notification',function(data){
+            const toast=document.createElement('div');
+            toast.style.cssText='position:fixed;bottom:24px;right:24px;background:#1e1e1e;border:1px solid #f03e3e;border-radius:12px;padding:14px 18px;z-index:99999;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.5);animation:slideIn 0.3s ease;';
+            toast.innerHTML='<p style="font-weight:700;margin:0 0 4px;font-size:0.88rem;color:#f0f0f0;">🔔 '+(data.title||'Nova notificação')+'</p><p style="color:#aaa;font-size:0.8rem;margin:0;">'+(data.message||'')+'</p>';
+            document.body.appendChild(toast);
+            setTimeout(()=>{toast.style.opacity='0';toast.style.transition='opacity 0.4s';setTimeout(()=>toast.remove(),400);},4000);
+        });
+    })();
+    </script>
+    <style>@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}</style>
+    {{/if}}
+</body>
+</html>

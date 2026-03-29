@@ -1,0 +1,106 @@
+<style>
+.fav-card{background:#1a1a1a;border:1px solid #2a2a2a;border-left:3px solid #e63946;border-radius:14px;padding:20px 24px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;transition:border-color 0.2s,box-shadow 0.2s;}
+.fav-card:hover{border-color:rgba(230,57,70,0.35);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+.fav-logo{width:46px;height:46px;border-radius:10px;border:1px solid #2a2a2a;background:#111;display:flex;align-items:center;justify-content:center;color:#555;font-size:1.1rem;flex-shrink:0;}
+.fav-pill{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:0.72rem;white-space:nowrap;}
+.fav-btn-view{background:#e63946;color:white;border:none;border-radius:8px;padding:8px 18px;text-decoration:none;font-size:0.84rem;font-weight:600;white-space:nowrap;transition:background 0.2s;}
+.fav-btn-view:hover{background:#c62828;color:white;}
+.fav-btn-del{background:transparent;border:1px solid #2a2a2a;color:#555;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:0.88rem;transition:all 0.2s;}
+.fav-btn-del:hover{border-color:#f03e3e;color:#f03e3e;}
+.fav-back{display:inline-flex;align-items:center;gap:6px;color:#888;text-decoration:none;font-size:0.87rem;border:1px solid #2a2a2a;border-radius:8px;padding:7px 14px;transition:all 0.2s;}
+.fav-back:hover{border-color:#f03e3e;color:#f03e3e;}
+@media(max-width:576px){
+  .fav-card{padding:16px;}
+  .fav-card>.d-flex.align-items-center.gap-2{width:100%;justify-content:flex-end;}
+  .fav-btn-view,.fav-btn-del{padding:7px 14px;font-size:0.82rem;}
+}
+</style>
+
+<div style="padding-top:90px;padding-bottom:72px;">
+  <div class="container" style="max-width:860px;">
+
+    <div class="d-flex align-items-start justify-content-between mb-5 flex-wrap gap-3">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-0.5px;margin:0;">Vagas Favoritas</h2>
+          {{#if favorites.length}}
+          <span style="background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);color:#e63946;border-radius:20px;padding:2px 10px;font-size:0.8rem;font-weight:700;">{{favorites.length}}</span>
+          {{/if}}
+        </div>
+        <p style="color:#666;margin:0;font-size:0.88rem;">Vagas que você salvou para candidatar-se depois.</p>
+      </div>
+      <a href="/" class="fav-back"><i class="bi bi-arrow-left"></i>Ver Vagas</a>
+    </div>
+
+    {{#if favorites.length}}
+      {{#each favorites}}
+        {{#if this.job}}
+        <div class="fav-card">
+          <div class="d-flex align-items-center gap-3 flex-wrap" style="flex:1;min-width:0;">
+            <div class="fav-logo">
+              <i class="bi bi-building"></i>
+            </div>
+            <div style="min-width:0;">
+              <p style="font-weight:700;font-size:1rem;margin-bottom:2px;color:#f1f1f1;overflow:clip;overflow-clip-margin:6px;text-overflow:ellipsis;white-space:nowrap;line-height:1.45;">{{this.job.title}}</p>
+              <p style="color:#777;font-size:0.82rem;margin-bottom:8px;">{{this.job.company}}</p>
+              <div class="d-flex gap-2 flex-wrap">
+                {{#if this.job.modality}}
+                  <span class="fav-pill" style="background:#1e1e1e;border:1px solid #2a2a2a;color:#aaa;">
+                    {{#if (eq this.job.modality 'presencial')}}<i class="bi bi-buildings me-1"></i>{{/if}}
+                    {{#if (eq this.job.modality 'hibrido')}}<i class="bi bi-arrow-left-right me-1"></i>{{/if}}
+                    {{#if (isRemote this.job.modality)}}<i class="bi bi-house-door me-1"></i>{{/if}}
+                    {{formatModality this.job.modality}}
+                  </span>
+                {{/if}}
+                {{#unless (isRemote this.job.modality)}}
+                {{#if this.job.city}}
+                  <span class="fav-pill" style="background:#1e1e1e;border:1px solid #2a2a2a;color:#aaa;">
+                    <i class="bi bi-geo-alt me-1"></i>{{this.job.city}}
+                  </span>
+                {{/if}}
+                {{/unless}}
+                {{#if this.job.salary}}
+                  <span class="fav-pill" style="background:rgba(76,175,80,0.06);border:1px solid rgba(76,175,80,0.2);color:#4caf50;font-weight:600;">
+                    R$ {{this.job.salary}}
+                  </span>
+                {{/if}}
+                {{#if (eq this.job.status 'aberta')}}
+                  <span class="fav-pill" style="background:rgba(76,175,80,0.06);border:1px solid rgba(76,175,80,0.2);color:#4caf50;">
+                    <i class="bi bi-circle-fill" style="font-size:0.4rem;"></i>Aberta
+                  </span>
+                {{else}}
+                  <span class="fav-pill" style="background:#1e1e1e;border:1px solid #2a2a2a;color:#555;">Encerrada</span>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <a href="/jobs/view/{{this.job.id}}" class="fav-btn-view">Ver Vaga</a>
+            <form action="/jobs/favorite/{{this.job.id}}" method="POST" style="margin:0;">
+              <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+              <button type="submit" class="fav-btn-del" title="Remover dos favoritos">
+                <i class="bi bi-heart-break me-1"></i>Remover
+              </button>
+            </form>
+          </div>
+        </div>
+        {{/if}}
+      {{/each}}
+
+    {{else}}
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:80px 40px;text-align:center;">
+        <div style="width:72px;height:72px;border-radius:50%;background:rgba(230,57,70,0.06);border:1px solid rgba(230,57,70,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <i class="bi bi-heart" style="font-size:1.8rem;color:#e63946;"></i>
+        </div>
+        <h5 style="font-weight:700;margin-bottom:8px;">Nenhuma vaga salva ainda</h5>
+        <p style="color:#555;font-size:0.88rem;max-width:320px;margin:0 auto 24px;line-height:1.7;">
+          Clique em <i class="bi bi-heart" style="color:#e63946;"></i> em qualquer vaga para salvá-la aqui.
+        </p>
+        <a href="/" style="background:#e63946;color:white;border-radius:8px;padding:10px 28px;text-decoration:none;font-weight:600;font-size:0.9rem;display:inline-flex;align-items:center;gap:8px;">
+          <i class="bi bi-search"></i>Explorar Vagas
+        </a>
+      </div>
+    {{/if}}
+
+  </div>
+</div>

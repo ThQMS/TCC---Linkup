@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinkUp — Encontre sua próxima oportunidade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e63946; --red-dark: #b71c1c; --red-glow: rgba(230,57,70,0.22);
+      --bg: #0a0a0a; --bg2: #111111; --bg3: #181818;
+      --border: rgba(255,255,255,0.07); --text: #f0f0f0; --muted: #777;
+      --card-bg: rgba(255,255,255,0.03);
+    }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    /* Garante que descenders de letras (g, j, p, q) não sejam cortados */
+    h1, h2, h3, h4, h5, h6 { overflow: visible; text-rendering: geometricPrecision; -webkit-font-smoothing: antialiased; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 60px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { text-decoration: none; display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+    .nav-logo-dot { width: 10px; height: 10px; background: var(--red); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
+    .nav-logo span { color: var(--red); }
+    .nav-links { display: flex; gap: 10px; align-items: center; }
+    .btn-outline { padding: 8px 20px; border: 1px solid var(--border); border-radius: 8px; color: #aaa; text-decoration: none; font-size: 0.88rem; font-family: 'DM Sans', sans-serif; transition: all 0.2s; background: transparent; }
+    .btn-outline:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .btn-primary { padding: 8px 20px; background: var(--red); border: 1px solid var(--red); border-radius: 8px; color: white; text-decoration: none; font-size: 0.88rem; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all 0.2s; }
+    .btn-primary:hover { background: var(--red-dark); box-shadow: 0 6px 20px var(--red-glow); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 120px 20px 80px;
+      position: relative;
+    }
+
+    /* Gradiente animado de fundo */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 40%, rgba(230,57,70,0.08) 0%, transparent 60%);
+      animation: heroPulse 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes heroPulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50%       { opacity: 1;   transform: scale(1.15); }
+    }
+
+    /* Partículas decorativas */
+    .hero-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .hero-particles span {
+      position: absolute; width: 2px; height: 2px; background: var(--red);
+      border-radius: 50%; opacity: 0;
+      animation: floatParticle var(--dur, 8s) var(--delay, 0s) infinite linear;
+    }
+    @keyframes floatParticle {
+      0%   { opacity: 0;   transform: translateY(100vh) translateX(0); }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.3; }
+      100% { opacity: 0;   transform: translateY(-100px) translateX(var(--drift, 20px)); }
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border: 1px solid rgba(230,57,70,0.3); border-radius: 100px;
+      background: rgba(230,57,70,0.07); font-size: 0.78rem; color: #ff8080;
+      margin-bottom: 32px; position: relative; z-index: 1;
+      animation: fadeDown 0.6s ease both;
+    }
+    .hero-badge-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 2s infinite; flex-shrink: 0; }
+
+    /* Título com letras animadas */
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 7vw, 5.5rem);
+      font-weight: 800; line-height: 1.25; letter-spacing: -2.5px;
+      margin-bottom: 24px; position: relative; z-index: 1;
+    }
+    .hero h1 .word { display: inline-block; overflow: hidden; padding-bottom: 0.8em; margin-bottom: -0.8em; vertical-align: top; }
+    .hero h1 .word span {
+      display: inline-block;
+      opacity: 0; transform: translateY(30px);
+      animation: wordReveal 0.6s forwards;
+    }
+    @keyframes wordReveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero h1 em { font-style: normal; color: var(--red); position: relative; }
+    .hero h1 em::after {
+      content: ''; position: absolute; bottom: 2px; left: 0; right: 0;
+      height: 3px; background: var(--red); border-radius: 2px; opacity: 0.35;
+      transform: scaleX(0); transform-origin: left;
+      animation: underlineReveal 0.6s 0.8s forwards;
+    }
+    @keyframes underlineReveal { to { transform: scaleX(1); } }
+
+    .hero p { font-size: 1.1rem; color: var(--muted); max-width: 500px; line-height: 1.75; margin-bottom: 40px; animation: fadeDown 0.6s 0.5s ease both; opacity: 0; position: relative; z-index: 1; }
+
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; animation: fadeDown 0.6s 0.7s ease both; opacity: 0; position: relative; z-index: 1; }
+
+    /* CTA com glow e ripple */
+    .btn-hero {
+      padding: 13px 30px; background: var(--red); color: white; border-radius: 10px;
+      text-decoration: none; font-size: 0.95rem; font-weight: 600;
+      font-family: 'DM Sans', sans-serif; transition: all 0.25s;
+      border: none; display: inline-flex; align-items: center; gap: 8px;
+      position: relative; overflow: hidden;
+    }
+    .btn-hero::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 0; height: 0; background: rgba(255,255,255,0.25);
+      border-radius: 50%; transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s, opacity 0.5s;
+    }
+    .btn-hero:active::after { width: 300px; height: 300px; opacity: 0; }
+    .btn-hero:hover { background: var(--red-dark); transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 30px var(--red-glow); }
+
+    .btn-hero-outline {
+      padding: 13px 30px; background: transparent; color: #aaa; border-radius: 10px;
+      text-decoration: none; font-size: 0.95rem; font-weight: 500;
+      font-family: 'DM Sans', sans-serif; transition: all 0.2s; border: 1px solid var(--border);
+    }
+    .btn-hero-outline:hover { border-color: rgba(255,255,255,0.18); color: var(--text); background: rgba(255,255,255,0.03); }
+
+    /* ── COUNTERS ── */
+    .counters {
+      display: flex; justify-content: center; margin-top: 64px;
+      border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+      background: var(--card-bg); backdrop-filter: blur(10px);
+      animation: fadeDown 0.6s 0.9s ease both; opacity: 0;
+      max-width: 640px; width: 100%; position: relative; z-index: 1;
+    }
+    .counter-item { flex: 1; padding: 26px 20px; text-align: center; border-right: 1px solid var(--border); }
+    .counter-item:last-child { border-right: none; }
+    .counter-num { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 1.9rem; font-weight: 800; color: var(--red); display: block; font-variant-numeric: tabular-nums; }
+    .counter-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; display: block; }
+
+    section { position: relative; z-index: 1; }
+    .section-tag { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; color: var(--red); margin-bottom: 12px; }
+    .section-title { font-family: 'Syne', sans-serif; font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -1.5px; line-height: 1.4; margin-bottom: 16px; padding-bottom: 0.1em; }
+    .section-sub { color: var(--muted); font-size: 0.95rem; line-height: 1.75; max-width: 460px; }
+
+    /* ── FEATURES ── */
+    .features { padding: 100px 60px; max-width: 1200px; margin: 0 auto; }
+    .features-header { margin-bottom: 56px; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    .feature-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: linear-gradient(90deg, var(--red), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover { border-color: rgba(230,57,70,0.3); transform: translateY(-8px); background: rgba(230,57,70,0.04); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover .feature-icon { transform: scale(1.15) rotate(-5deg); background: rgba(230,57,70,0.2); }
+
+    .feature-icon {
+      width: 44px; height: 44px; background: rgba(230,57,70,0.1); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 18px; color: var(--red);
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .feature-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+    .feature-card p { font-size: 0.87rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── IA SHOWCASE ── */
+    .ia-section { padding: 100px 60px; background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .ia-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .ia-tools { display: flex; flex-direction: column; gap: 12px; margin-top: 36px; }
+    .ia-tool {
+      display: flex; align-items: center; gap: 16px; padding: 18px 20px;
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 12px;
+      transition: all 0.3s;
+    }
+    .ia-tool:hover { border-color: rgba(230,57,70,0.2); background: rgba(230,57,70,0.03); transform: translateX(4px); }
+    .ia-tool-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+    .ia-tool-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+    .ia-tool-desc { font-size: 0.8rem; color: var(--muted); }
+
+    /* ── HOW IT WORKS ── */
+    .how { padding: 100px 60px; }
+    .how-inner { max-width: 1200px; margin: 0 auto; }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+    .step-card { padding: 32px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; transition: all 0.3s; }
+    .step-card:hover { border-color: rgba(230,57,70,0.2); transform: translateY(-3px); }
+    .step-num { width: 36px; height: 36px; background: var(--red); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-weight: 800; font-size: 0.85rem; margin-bottom: 20px; font-variant-numeric: tabular-nums; }
+    .step-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 8px; font-size: 1rem; }
+    .step-card p { font-size: 0.87rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── RESPONSIVIDADE ── */
+    .responsive-section { padding: 100px 60px; background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .responsive-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 36px; }
+    .metric-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .metric-card.full { grid-column: span 2; }
+    .metric-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .metric-value { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .metric-value.red { color: var(--red); }
+    .metric-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+    .metric-fill { height: 100%; background: var(--red); border-radius: 2px; }
+    .metric-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); color: #4caf50; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; margin-top: 8px; }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials { padding: 100px 60px; max-width: 1200px; margin: 0 auto; }
+    .testimonials-header { margin-bottom: 56px; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .testimonial-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 28px; transition: all 0.3s; }
+    .testimonial-card:hover { border-color: rgba(230,57,70,0.2); transform: translateY(-3px); }
+    .stars { color: var(--red); font-size: 0.85rem; margin-bottom: 14px; letter-spacing: 2px; }
+    .testimonial-text { font-size: 0.9rem; line-height: 1.7; color: #bbb; margin-bottom: 22px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .author-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--red), #ff8080); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .author-name { font-weight: 600; font-size: 0.88rem; }
+    .author-role { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── CTA ── */
+    .cta-section { padding: 100px 60px; text-align: center; background: var(--bg2); border-top: 1px solid var(--border); position: relative; overflow: hidden; }
+    .cta-section::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 800px; height: 400px; background: radial-gradient(ellipse, rgba(230,57,70,0.08) 0%, transparent 70%); pointer-events: none; }
+    .cta-section h2 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -1.5px; line-height: 1.35; margin-bottom: 16px; }
+    .cta-section p { color: var(--muted); font-size: 0.95rem; margin-bottom: 40px; }
+
+    /* ── FOOTER ── */
+    footer { padding: 36px 60px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .footer-text { font-size: 0.78rem; color: var(--muted); }
+
+    /* RECONEXÃO INTELIGENTE */
+    .reconnect-section { padding: 100px 60px; background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .reconnect-inner { max-width: 1200px; margin: 0 auto; }
+    .reconnect-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+    .reconnect-card {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 20px;
+      padding: 36px; position: relative; overflow: hidden; transition: all 0.35s;
+    }
+    .reconnect-card.company { border-color: rgba(168,85,247,0.15); }
+    .reconnect-card.candidate { border-color: rgba(6,182,212,0.15); }
+    .reconnect-card.similar { border-color: rgba(251,146,60,0.15); }
+    .reconnect-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .reconnect-card.company::before  { background: linear-gradient(90deg, #a855f7, transparent); }
+    .reconnect-card.candidate::before { background: linear-gradient(90deg, #06b6d4, transparent); }
+    .reconnect-card.similar::before  { background: linear-gradient(90deg, #fb923c, transparent); }
+    .reconnect-card.company:hover  { transform: translateY(-5px); box-shadow: 0 24px 48px rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.35); }
+    .reconnect-card.candidate:hover { transform: translateY(-5px); box-shadow: 0 24px 48px rgba(6,182,212,0.12); border-color: rgba(6,182,212,0.35); }
+    .reconnect-card.similar:hover  { transform: translateY(-5px); box-shadow: 0 24px 48px rgba(251,146,60,0.12); border-color: rgba(251,146,60,0.35); }
+    .reconnect-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; margin-bottom: 16px; }
+    .company-tag  { background: rgba(168,85,247,0.1); color: #a855f7; border: 1px solid rgba(168,85,247,0.25); }
+    .candidate-tag { background: rgba(6,182,212,0.1);   color: #06b6d4; border: 1px solid rgba(6,182,212,0.25); }
+    .similar-tag  { background: rgba(251,146,60,0.1);   color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+    .reconnect-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; line-height: 1.4; }
+    .reconnect-desc  { font-size: 0.87rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+    .reconnect-mock  { background: rgba(0,0,0,0.35); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .mock-candidate  { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    .mock-candidate.dim { opacity: 0.55; }
+    .mock-avatar { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem; flex-shrink: 0; color: #fff; }
+    .mock-info  { flex: 1; }
+    .mock-name  { font-size: 0.82rem; font-weight: 600; }
+    .mock-role  { font-size: 0.74rem; color: var(--muted); }
+    .mock-fit   { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-weight: 800; font-size: 0.88rem; color: #a855f7; font-variant-numeric: tabular-nums; }
+    .mock-notif { display: flex; align-items: center; gap: 12px; padding: 14px; background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.15); border-radius: 10px; }
+    .mock-notif-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(6,182,212,0.15); color: #06b6d4; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .mock-notif-body { flex: 1; }
+    .mock-notif-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 2px; }
+    .mock-notif-sub   { font-size: 0.74rem; color: var(--muted); }
+    .mock-notif-time  { font-size: 0.72rem; color: var(--muted); flex-shrink: 0; }
+    .avail-pills { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; }
+    .avail-pills-label { font-size: 0.74rem; color: var(--muted); width: 100%; margin-bottom: 4px; }
+    .avail-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 100px; font-size: 0.74rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); }
+    .avail-pill.active { background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.3); color: #06b6d4; }
+    .reconnect-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; }
+    .reconnect-badge.purple { color: #a855f7; }
+    .reconnect-badge.teal   { color: #06b6d4; }
+    .reconnect-badge.orange { color: #fb923c; }
+    .mock-fit.orange { color: #fb923c; }
+    .mock-fit-new { font-size: 0.65rem; font-weight: 600; padding: 2px 7px; border-radius: 100px; background: rgba(251,146,60,0.1); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); white-space: nowrap; }
+
+    /* ANIMATIONS */
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      nav { padding: 14px 20px; }
+      .features, .how, .testimonials, .cta-section, .ia-section, .responsive-section, .reconnect-section { padding: 60px 20px; }
+      .features-grid, .testimonials-grid, .steps-grid { grid-template-columns: 1fr; }
+      .ia-inner, .responsive-inner { grid-template-columns: 1fr; gap: 24px; }
+      .reconnect-grid { grid-template-columns: 1fr; gap: 24px; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      footer { flex-direction: column; gap: 10px; text-align: center; }
+      .counters { flex-direction: column; }
+      .counter-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .counter-item:last-child { border-bottom: none; }
+    }
+    @media (max-width: 480px) {
+      .hero h1 { letter-spacing: -1px; }
+      .hero-cta { flex-direction: column; align-items: stretch; }
+      .btn-hero, .btn-hero-outline { text-align: center; justify-content: center; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .metric-card.full { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-dot"></span>
+      Link<span>Up</span>
+    </a>
+    <div class="nav-links">
+      <a href="/login" class="btn-outline">Entrar</a>
+      <a href="/register" class="btn-primary">Cadastre-se</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <!-- Partículas -->
+    <div class="hero-particles" aria-hidden="true">
+      <span style="left:10%;--dur:12s;--delay:0s;--drift:30px;"></span>
+      <span style="left:25%;--dur:9s;--delay:2s;--drift:-20px;"></span>
+      <span style="left:40%;--dur:14s;--delay:1s;--drift:40px;"></span>
+      <span style="left:55%;--dur:10s;--delay:3s;--drift:-30px;"></span>
+      <span style="left:70%;--dur:11s;--delay:0.5s;--drift:20px;"></span>
+      <span style="left:85%;--dur:13s;--delay:4s;--drift:-40px;"></span>
+      <span style="left:60%;--dur:8s;--delay:1.5s;--drift:25px;"></span>
+      <span style="left:35%;--dur:15s;--delay:2.5s;--drift:-15px;"></span>
+    </div>
+
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Plataforma de recrutamento com IA integrada
+    </div>
+
+    <h1 id="hero-title">
+      <span class="word"><span style="animation-delay:0.1s">Conecte</span></span>
+      <span> </span>
+      <span class="word"><span style="animation-delay:0.2s">talento</span></span>
+      <span> </span>
+      <span class="word"><span style="animation-delay:0.3s">com</span></span>
+      <br>
+      <em><span class="word"><span style="animation-delay:0.4s">oportunidade</span></span></em>
+    </h1>
+
+    <p>Candidatos encontram vagas compatíveis com seu perfil. Empresas redescobrem talentos. IA reconecta quem pertence junto.</p>
+
+    <div class="hero-cta">
+      <a href="/register" class="btn-hero"><i class="bi bi-arrow-right-circle"></i> Começar agora — grátis</a>
+      <a href="/login" class="btn-hero-outline">Já tenho conta</a>
+    </div>
+
+    <div class="counters">
+      <div class="counter-item">
+        <span class="counter-num" data-target="{{totalJobs}}">0</span>
+        <span class="counter-label">Vagas abertas</span>
+      </div>
+      <div class="counter-item">
+        <span class="counter-num" data-target="{{totalCompanies}}">0</span>
+        <span class="counter-label">Empresas</span>
+      </div>
+      <div class="counter-item">
+        <span class="counter-num" data-target="{{totalCandidates}}">0</span>
+        <span class="counter-label">Candidatos</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="features-header reveal">
+      <p class="section-tag">Funcionalidades</p>
+      <h2 class="section-title">Tudo que você precisa,<br>em um só lugar</h2>
+      <p class="section-sub">Uma plataforma completa com IA real para candidatos e recrutadores.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-cpu"></i></div><h3>Compatibilidade com IA</h3><p>Score personalizado mostrando o quanto seu perfil combina com cada vaga, com análise detalhada e sugestões de melhoria.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-chat-dots"></i></div><h3>Chat com IA sobre a Vaga</h3><p>Converse com a IA diretamente na página da vaga. Tire dúvidas, entenda os requisitos e prepare sua candidatura.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-mic"></i></div><h3>Simulação de Entrevista</h3><p>Pratique entrevistas com a IA antes de enfrentar o recrutador real. Receba score por comunicação, técnica e fit cultural.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-scissors"></i></div><h3>Adaptar Currículo</h3><p>A IA reescreve seu currículo para cada vaga, destacando as experiências mais relevantes e aumentando seu score de compatibilidade.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-envelope-check"></i></div><h3>Feedback Automático</h3><p>Ao ser recusado, você recebe automaticamente um feedback construtivo gerado por IA — sem ghosting, sem ficar no vazio.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-graph-up-arrow"></i></div><h3>Dashboard Inteligente</h3><p>Métricas reais: taxa de resposta, tempo médio, candidaturas expiradas. Empresas responsivas ganham um selo público de credibilidade.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-people"></i></div><h3>Redescoberta de Talentos</h3><p>Ao abrir uma vaga, o sistema busca automaticamente candidatos anteriores com fit alto que ainda estão disponíveis — sem busca manual.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-arrow-repeat"></i></div><h3>Oportunidades Revisitadas</h3><p>Quando uma empresa reabre uma vaga compatível com seu perfil, você é notificado automaticamente — sem precisar monitorar manualmente.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-person-plus-fill"></i></div><h3>Candidatos Similares</h3><p>A IA encontra candidatos com alto fit que nunca se inscreveram na vaga e os apresenta para contato proativo — expandindo o alcance além das candidaturas recebidas.</p></div>
+    </div>
+  </section>
+
+  <!-- IA SHOWCASE -->
+  <section class="ia-section">
+    <div class="ia-inner">
+      <div class="reveal">
+        <p class="section-tag">IA integrada</p>
+        <h2 class="section-title">IA em cada etapa<br>da sua candidatura</h2>
+        <p class="section-sub">Cada vaga tem um conjunto de ferramentas de IA para você chegar mais preparado e se destacar.</p>
+      </div>
+      <div class="ia-tools">
+        <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><i class="bi bi-cpu"></i></div><div><div class="ia-tool-title">Ver compatibilidade</div><div class="ia-tool-desc">IA analisa seu perfil e dá um score de 0 a 100</div></div></div>
+        <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;"><i class="bi bi-chat-dots"></i></div><div><div class="ia-tool-title">Chat sobre a vaga</div><div class="ia-tool-desc">Tire dúvidas e entenda os requisitos com a IA</div></div></div>
+        <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(4, 80, 1, 0.795);color:#0bf574;"><i class="bi bi-mic"></i></div><div><div class="ia-tool-title">Praticar entrevista</div><div class="ia-tool-desc">Simulação completa com feedback por dimensão</div></div></div>
+        <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;"><i class="bi bi-scissors"></i></div><div><div class="ia-tool-title">Adaptar currículo</div><div class="ia-tool-desc">IA reescreve seu CV para maximizar a compatibilidade</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECONEXÃO INTELIGENTE -->
+  <section class="reconnect-section">
+    <div class="reconnect-inner">
+      <div class="reveal" style="text-align:center;max-width:560px;margin:0 auto 56px;">
+        <p class="section-tag">Inteligência de reconexão</p>
+        <h2 class="section-title">Conexões que não<br>se perdem</h2>
+        <p class="section-sub" style="margin:0 auto;">O sistema analisa candidatos anteriores, oportunidades reabertas e perfis fora do pool — e faz as conexões certas acontecerem sozinhas.</p>
+      </div>
+      <div class="reconnect-grid">
+
+        <div class="reconnect-card company reveal">
+          <div class="reconnect-tag company-tag"><i class="bi bi-buildings"></i> Para empresas</div>
+          <h3 class="reconnect-title">Redescoberta de Talentos</h3>
+          <p class="reconnect-desc">Ao criar ou reabrir uma vaga, o sistema analisa automaticamente candidatos dos últimos 6 meses com fit ≥ 88% que ainda estão disponíveis. Reative o contato com um clique.</p>
+          <div class="reconnect-mock">
+            <div class="mock-candidate">
+              <div class="mock-avatar" style="background:linear-gradient(135deg,#a855f7,#d946ef)">RL</div>
+              <div class="mock-info"><div class="mock-name">Rafael Lima</div><div class="mock-role">Dev Full Stack · São Paulo</div></div>
+              <div class="mock-fit">95%</div>
+            </div>
+            <div class="mock-candidate">
+              <div class="mock-avatar" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">JM</div>
+              <div class="mock-info"><div class="mock-name">Juliana Mendes</div><div class="mock-role">UX Designer · Remoto</div></div>
+              <div class="mock-fit">91%</div>
+            </div>
+            <div class="mock-candidate dim">
+              <div class="mock-avatar" style="background:linear-gradient(135deg,#581c87,#7c3aed)">CS</div>
+              <div class="mock-info"><div class="mock-name">Carlos Souza</div><div class="mock-role">Backend · São Paulo</div></div>
+              <div class="mock-fit">88%</div>
+            </div>
+          </div>
+          <span class="reconnect-badge purple"><i class="bi bi-lightning-fill"></i> Automático ao criar ou reabrir vaga</span>
+        </div>
+
+        <div class="reconnect-card candidate reveal">
+          <div class="reconnect-tag candidate-tag"><i class="bi bi-person"></i> Para candidatos</div>
+          <h3 class="reconnect-title">Oportunidades Revisitadas</h3>
+          <p class="reconnect-desc">Quando uma empresa para quem você se candidatou reabre uma vaga compatível, você recebe uma notificação em tempo real — sem precisar voltar a procurar.</p>
+          <div class="reconnect-mock">
+            <div class="mock-notif">
+              <div class="mock-notif-icon"><i class="bi bi-arrow-repeat"></i></div>
+              <div class="mock-notif-body">
+                <div class="mock-notif-title">TechCorp reabriu uma vaga parecida</div>
+                <div class="mock-notif-sub">"Desenvolvedor Backend" · 92% de compatibilidade</div>
+              </div>
+              <div class="mock-notif-time">agora</div>
+            </div>
+            <div class="avail-pills">
+              <span class="avail-pills-label">Seu status de disponibilidade</span>
+              <span class="avail-pill active"><i class="bi bi-search"></i> Buscando ativamente</span>
+              <span class="avail-pill"><i class="bi bi-hand-thumbs-up"></i> Aberto a oportunidades</span>
+              <span class="avail-pill"><i class="bi bi-pause-circle"></i> Não disponível</span>
+            </div>
+          </div>
+          <span class="reconnect-badge teal"><i class="bi bi-bell-fill"></i> Notificação em tempo real via socket</span>
+        </div>
+
+        <div class="reconnect-card similar reveal">
+          <div class="reconnect-tag similar-tag"><i class="bi bi-buildings"></i> Para empresas</div>
+          <h3 class="reconnect-title">Candidatos Similares</h3>
+          <p class="reconnect-desc">O sistema busca candidatos fora do seu pool de inscritos com alto fit para a vaga — e os apresenta para você entrar em contato proativamente.</p>
+          <div class="reconnect-mock">
+            <div class="mock-candidate">
+              <div class="mock-avatar" style="background:linear-gradient(135deg,#fb923c,#f97316)">BF</div>
+              <div class="mock-info"><div class="mock-name">Beatriz Fontes</div><div class="mock-role">Frontend · React · Remoto</div></div>
+              <div class="mock-fit orange">78%</div>
+            </div>
+            <div class="mock-candidate">
+              <div class="mock-avatar" style="background:linear-gradient(135deg,#c2410c,#fb923c)">LR</div>
+              <div class="mock-info"><div class="mock-name">Lucas Rocha</div><div class="mock-role">Full Stack · Node.js · SP</div></div>
+              <div class="mock-fit orange">71%</div>
+            </div>
+            <div class="mock-candidate dim">
+              <div class="mock-avatar" style="background:linear-gradient(135deg,#7c2d12,#c2410c)">PA</div>
+              <div class="mock-info"><div class="mock-name">Priya Alves</div><div class="mock-role">Backend · Python · Remoto</div></div>
+              <div class="mock-fit orange">65%</div>
+            </div>
+          </div>
+          <span class="reconnect-badge orange"><i class="bi bi-person-plus-fill"></i> Perfis fora do pool de candidaturas</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <div class="how-inner">
+      <div class="reveal">
+        <p class="section-tag">Como funciona</p>
+        <h2 class="section-title">Simples para todos</h2>
+        <p class="section-sub">Em poucos passos você já está conectado às melhores oportunidades.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card reveal"><div class="step-num">1</div><h4>Crie sua conta</h4><p>Cadastre-se como candidato ou empresa em menos de 2 minutos, sem burocracia.</p></div>
+        <div class="step-card reveal"><div class="step-num">2</div><h4>Monte seu perfil</h4><p>Candidatos criam o currículo digital. Empresas configuram a página da empresa com descrição e logo.</p></div>
+        <div class="step-card reveal"><div class="step-num">3</div><h4>Conecte-se</h4><p>Candidate-se com um clique. A empresa recebe seu currículo em PDF por e-mail automaticamente.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESPONSIVIDADE -->
+  <section class="responsive-section">
+    <div class="responsive-inner">
+      <div>
+        <div class="reveal">
+          <p class="section-tag">Para empresas</p>
+          <h2 class="section-title">Acabaram as<br><em style="font-style:normal;color:var(--red);">vagas fantasmas</em></h2>
+          <p class="section-sub">O sistema monitora a inatividade e envia alertas automáticos. Candidatos nunca mais ficam esperando uma resposta que não vem.</p>
+        </div>
+        <div style="margin-top:28px;" class="reveal">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;"><i class="bi bi-bell" style="color:var(--red);font-size:1.1rem;flex-shrink:0;"></i><div><div style="font-size:0.88rem;font-weight:600;">Lembrete no Dia 7</div><div style="font-size:0.78rem;color:var(--muted);">Empresa recebe alerta de candidato aguardando</div></div></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;"><i class="bi bi-clock-history" style="color:#f59e0b;font-size:1.1rem;flex-shrink:0;"></i><div><div style="font-size:0.88rem;font-weight:600;">Feedback no Dia 21</div><div style="font-size:0.78rem;color:var(--muted);">Candidatura encerrada automaticamente com feedback de IA</div></div></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;"><i class="bi bi-shield-check" style="color:#4caf50;font-size:1.1rem;flex-shrink:0;"></i><div><div style="font-size:0.88rem;font-weight:600;">Selo Empresa Responsiva</div><div style="font-size:0.78rem;color:var(--muted);">Empresas que respondem rápido ganham um selo público</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="metrics-grid reveal">
+        <div class="metric-card full"><div class="metric-label">Taxa de Resposta</div><div class="metric-value red">94%</div><div class="metric-bar"><div class="metric-fill" style="width:94%"></div></div><div class="metric-badge"><i class="bi bi-check-circle me-1"></i> Empresa Responsiva</div></div>
+        <div class="metric-card"><div class="metric-label">Tempo médio</div><div class="metric-value">4d</div></div>
+        <div class="metric-card"><div class="metric-label">Expiradas</div><div class="metric-value" style="color:#4caf50;">0</div></div>
+        <div class="metric-card"><div class="metric-label">Candidaturas</div><div class="metric-value">38</div></div>
+        <div class="metric-card"><div class="metric-label">Aceitos</div><div class="metric-value red">12</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="testimonials-header reveal"><p class="section-tag">Depoimentos</p><h2 class="section-title">O que dizem sobre<br>o LinkUp</h2></div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal"><div class="stars">★★★★★</div><p class="testimonial-text">"Encontrei meu emprego atual em menos de duas semanas. A análise de compatibilidade me ajudou a focar nas vagas certas."</p><div class="testimonial-author"><div class="author-avatar">RL</div><div><div class="author-name">Rafael Lima</div><div class="author-role">Desenvolvedor Full Stack</div></div></div></div>
+      <div class="testimonial-card reveal"><div class="stars">★★★★★</div><p class="testimonial-text">"Pratiquei a entrevista com a IA antes do processo seletivo e fui muito mais preparado. O feedback por dimensão foi cirúrgico."</p><div class="testimonial-author"><div class="author-avatar">JM</div><div><div class="author-name">Juliana Mendes</div><div class="author-role">UX Designer</div></div></div></div>
+      <div class="testimonial-card reveal"><div class="stars">★★★★★</div><p class="testimonial-text">"Como recrutadora, a plataforma trouxe mais organização e os candidatos já chegam com carta de apresentação personalizada."</p><div class="testimonial-author"><div class="author-avatar">AS</div><div><div class="author-name">Ana Silva</div><div class="author-role">Recrutadora — TechCorp</div></div></div></div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta-section">
+    <h2 class="reveal">Pronto para o<br>próximo passo?</h2>
+    <p class="reveal">Junte-se a candidatos e empresas que já usam o LinkUp.</p>
+    <div class="reveal"><a href="/register" class="btn-hero" style="font-size:1rem;padding:14px 36px;"><i class="bi bi-arrow-right-circle"></i> Criar conta gratuita</a></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/" class="nav-logo"><span class="nav-logo-dot"></span>Link<span>Up</span></a>
+    <p class="footer-text">© 2025 LinkUp — Projeto TCC</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 70);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Contadores animados
+    document.querySelectorAll('.counter-num').forEach(el => {
+      const target = parseInt(el.dataset.target) || 0;
+      if (!target) return;
+      let current = 0;
+      const step = Math.max(1, Math.ceil(target / 50));
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current;
+        if (current >= target) clearInterval(timer);
+      }, 28);
+    });
+  </script>
+</body>
+</html>

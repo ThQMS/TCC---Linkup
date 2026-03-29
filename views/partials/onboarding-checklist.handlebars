@@ -1,0 +1,116 @@
+{{#if checklist.shouldShow}}
+<div id="onboarding-checklist-card"
+     style="background:#1a1a1a;border:1px solid #2a2a2a;border-left:3px solid #e63946;border-radius:12px;margin-bottom:28px;overflow:hidden;">
+
+    <!-- Cabeçalho colapsável -->
+    <button onclick="toggleChecklist()"
+            style="width:100%;background:none;border:none;padding:18px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;">
+        <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-rocket-takeoff-fill" style="color:#e63946;font-size:1rem;"></i>
+            </div>
+            <div>
+                <div style="font-weight:700;font-size:0.92rem;color:#f0f0f0;">Primeiros passos</div>
+                <div style="font-size:0.78rem;color:#888;margin-top:1px;">
+                    {{checklist.completed}} de {{checklist.total}} concluídos
+                </div>
+            </div>
+        </div>
+        <!-- Barra de progresso compacta -->
+        <div style="flex:1;max-width:120px;display:flex;flex-direction:column;gap:4px;margin:0 12px;">
+            <div style="height:5px;border-radius:3px;background:#2a2a2a;overflow:hidden;">
+                <div style="height:100%;border-radius:3px;background:#e63946;transition:width 0.4s ease;width:{{checklist.progressPercent}}%;"></div>
+            </div>
+        </div>
+        <i class="bi bi-chevron-down" id="checklist-chevron"
+           style="color:#666;font-size:0.85rem;transition:transform 0.25s;flex-shrink:0;"></i>
+    </button>
+
+    <!-- Corpo colapsável -->
+    <div id="checklist-body" style="border-top:1px solid #222;padding:6px 20px 8px;">
+        <ul style="list-style:none;margin:0;padding:0;">
+            {{#each checklist.items}}
+            <li style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #1e1e1e;">
+                <!-- Ícone de status -->
+                <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+                    {{#if this.done}}background:#1a3a1a;border:2px solid #4caf50;{{else}}background:#242424;border:2px solid #333;{{/if}}">
+                    {{#if this.done}}
+                        <i class="bi bi-check-lg" style="color:#4caf50;font-size:0.75rem;"></i>
+                    {{else}}
+                        <i class="bi {{this.icon}}" style="color:#555;font-size:0.7rem;"></i>
+                    {{/if}}
+                </div>
+
+                <!-- Label + tip -->
+                <div style="flex:1;">
+                  <span style="font-size:0.875rem;
+                      {{#if this.done}}color:#666;text-decoration:line-through;{{else}}color:#ccc;{{/if}}">
+                      {{this.label}}
+                  </span>
+                  {{#unless this.done}}{{#if this.tip}}
+                  <p style="font-size:0.72rem;color:#555;margin:2px 0 0;line-height:1.4;">{{this.tip}}</p>
+                  {{/if}}{{/unless}}
+                </div>
+
+                <!-- Botão de ação (só para itens não concluídos) -->
+                {{#unless this.done}}
+                <a href="{{this.href}}"
+                   style="flex-shrink:0;font-size:0.75rem;padding:4px 12px;border-radius:6px;border:1px solid #333;color:#aaa;text-decoration:none;white-space:nowrap;transition:all 0.15s;"
+                   onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'"
+                   onmouseout="this.style.borderColor='#333';this.style.color='#aaa'">
+                    Ir <i class="bi bi-arrow-right" style="font-size:0.7rem;"></i>
+                </a>
+                {{/unless}}
+            </li>
+            {{/each}}
+        </ul>
+
+        <!-- Rodapé -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 6px;flex-wrap:wrap;gap:8px;">
+            <a href="/help"
+               style="font-size:0.78rem;color:#888;text-decoration:none;display:flex;align-items:center;gap:4px;transition:color 0.15s;"
+               onmouseover="this.style.color='#e63946'"
+               onmouseout="this.style.color='#888'">
+                <i class="bi bi-book me-1"></i>Ajuda &amp; Guia de features
+            </a>
+            <button onclick="dismissChecklist()"
+                    style="background:none;border:none;color:#555;cursor:pointer;font-size:0.78rem;padding:0;transition:color 0.15s;"
+                    onmouseover="this.style.color='#e63946'"
+                    onmouseout="this.style.color='#555'">
+                Não mostrar mais
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    // Estado do colapso — começa expandido
+    let expanded = true;
+
+    window.toggleChecklist = function () {
+        expanded = !expanded;
+        const body    = document.getElementById('checklist-body');
+        const chevron = document.getElementById('checklist-chevron');
+        if (body)    body.style.display    = expanded ? 'block' : 'none';
+        if (chevron) chevron.style.transform = expanded ? 'rotate(0deg)' : 'rotate(-90deg)';
+    };
+
+    window.dismissChecklist = function () {
+        fetch('/onboarding/checklist/dismiss', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{../csrfToken}}' }
+        }).finally(() => {
+            const card = document.getElementById('onboarding-checklist-card');
+            if (card) {
+                card.style.transition = 'opacity 0.3s, max-height 0.4s';
+                card.style.opacity    = '0';
+                card.style.maxHeight  = '0';
+                card.style.overflow   = 'hidden';
+                setTimeout(() => card.remove(), 420);
+            }
+        });
+    };
+}());
+</script>
+{{/if}}

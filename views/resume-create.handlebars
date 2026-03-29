@@ -1,0 +1,658 @@
+<div style="padding-top: 100px; padding-bottom: 60px;">
+  <div class="container" style="max-width: 800px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-0.5px;margin:0 0 4px;">Meu Currículo</h2>
+        <p style="color:#666;margin:0;font-size:0.88rem;">Preencha seu currículo ou importe via IA para candidatar-se às vagas.</p>
+      </div>
+      <a href="/profile"
+        style="display:inline-flex;align-items:center;gap:6px;color:#888;text-decoration:none;font-size:0.87rem;border:1px solid #2a2a2a;border-radius:8px;padding:7px 14px;transition:all 0.2s;"
+        onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'" onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#888'">
+        <i class="bi bi-arrow-left"></i>Voltar ao perfil
+      </a>
+    </div>
+
+    <!-- IMPORTAR COM IA -->
+    <div class="resume-card" style="border:1px solid #a855f7;background:linear-gradient(135deg,#1e1e1e,#2a1f3d);margin-bottom:20px;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 style="margin:0;color:#a855f7;"><i class="bi bi-robot me-2"></i>Importar Currículo com IA</h5>
+        <button type="button" onclick="toggleImport()"
+          style="background:transparent;border:1px solid #a855f7;color:#a855f7;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:0.85rem;">
+          <i class="bi bi-chevron-down" id="import-chevron"></i>
+        </button>
+      </div>
+      <p style="color:#aaa;font-size:0.85rem;margin-bottom:0;">Faça upload do seu PDF ou cole o texto — a IA preenche todos os campos automaticamente.</p>
+
+      <div id="import-area" style="display:none;margin-top:16px;">
+        <div class="d-flex gap-2 mb-3">
+          <button type="button" onclick="switchTab('pdf')" id="tab-pdf"
+            style="background:#a855f7;border:none;color:white;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:0.85rem;">
+            📄 Upload PDF
+          </button>
+          <button type="button" onclick="switchTab('text')" id="tab-text"
+            style="background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:0.85rem;">
+            📝 Colar texto
+          </button>
+        </div>
+        <div id="tab-pdf-area">
+          <input type="file" id="pdf-file" accept=".pdf"
+            style="background:#1e1e1e;border:1px solid #3a3a3a;color:#e0e0e0;border-radius:8px;padding:10px;width:100%;">
+          <p style="color:#888;font-size:0.8rem;margin-top:6px;">Apenas arquivos .pdf</p>
+        </div>
+        <div id="tab-text-area" style="display:none;">
+          <textarea id="import-text" rows="8" placeholder="Cole aqui o conteúdo do seu currículo..."
+            style="width:100%;background:#1e1e1e;border:1px solid #3a3a3a;color:#e0e0e0;border-radius:8px;padding:12px;resize:vertical;font-size:0.9rem;"></textarea>
+        </div>
+        <div class="d-flex gap-2 mt-2 justify-content-end">
+          <button type="button" onclick="toggleImport()"
+            style="background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:0.85rem;">
+            Cancelar
+          </button>
+          <button type="button" onclick="importWithAI()" id="import-btn"
+            style="background:#a855f7;border:none;color:white;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+            <i class="bi bi-magic me-1"></i> Preencher com IA
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARRA DE PROGRESSO -->
+    <div id="resume-progress" style="position:sticky;top:70px;z-index:100;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:12px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <div class="rp-step active" id="rp-dados" onclick="scrollToSection('sec-dados')" title="Dados Pessoais">
+        <div class="rp-icon"><i class="bi bi-person-vcard"></i></div>
+        <span class="rp-label">Dados</span>
+      </div>
+      <div class="rp-line"></div>
+      <div class="rp-step" id="rp-resumo" onclick="scrollToSection('sec-resumo')" title="Resumo Profissional">
+        <div class="rp-icon"><i class="bi bi-person-lines-fill"></i></div>
+        <span class="rp-label">Resumo</span>
+      </div>
+      <div class="rp-line"></div>
+      <div class="rp-step" id="rp-exp" onclick="scrollToSection('sec-exp')" title="Experiências">
+        <div class="rp-icon"><i class="bi bi-briefcase"></i></div>
+        <span class="rp-label">Experiências</span>
+      </div>
+      <div class="rp-line"></div>
+      <div class="rp-step" id="rp-edu" onclick="scrollToSection('sec-edu')" title="Formação">
+        <div class="rp-icon"><i class="bi bi-mortarboard"></i></div>
+        <span class="rp-label">Formação</span>
+      </div>
+      <div class="rp-line"></div>
+      <div class="rp-step" id="rp-skills" onclick="scrollToSection('sec-skills')" title="Habilidades">
+        <div class="rp-icon"><i class="bi bi-lightning"></i></div>
+        <span class="rp-label">Habilidades</span>
+      </div>
+    </div>
+
+    <style>
+    .rp-step { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; opacity:0.45; transition:opacity 0.2s; flex-shrink:0; }
+    .rp-step:hover { opacity:0.75; }
+    .rp-step.active { opacity:1; }
+    .rp-icon { width:34px; height:34px; border-radius:50%; border:2px solid #333; background:#1a1a1a; display:flex; align-items:center; justify-content:center; font-size:0.9rem; color:#888; transition:all 0.2s; }
+    .rp-step.active .rp-icon { border-color:#f03e3e; color:#f03e3e; background:rgba(240,62,62,0.08); }
+    .rp-step.done .rp-icon { border-color:#4caf50; color:#4caf50; background:rgba(76,175,80,0.08); opacity:1; }
+    .rp-step.done { opacity:0.8; }
+    .rp-label { font-size:0.68rem; color:#666; white-space:nowrap; }
+    .rp-step.active .rp-label { color:#f03e3e; }
+    .rp-step.done .rp-label { color:#4caf50; }
+    .rp-line { flex:1; height:1px; background:#2a2a2a; min-width:16px; }
+    @media (max-width:500px) { .rp-label { display:none; } .rp-line { min-width:8px; } }
+    </style>
+
+    <form action="/resume/save" method="POST" id="resumeForm">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+      <input type="hidden" name="experiences"  id="experiencesInput" />
+      <input type="hidden" name="education"    id="educationInput" />
+      <input type="hidden" name="skills"       id="skillsInput" />
+      <input type="hidden" name="pdfTemplate"  id="pdfTemplateInput" value="refined" />
+
+      <!-- DADOS PESSOAIS -->
+      <div class="resume-card" id="sec-dados">
+        <h5 style="margin-bottom:16px;"><i class="bi bi-person-vcard me-2"></i>Dados Pessoais</h5>
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label style="color:#aaa;font-size:0.82rem;">Telefone / WhatsApp</label>
+            <input type="text" class="resume-input" name="phone" id="field-phone"
+              value="{{#if resume}}{{resume.phone}}{{else}}{{user.phone}}{{/if}}"
+              placeholder="(00) 00000-0000" />
+          </div>
+
+          <div class="col-md-6">
+            <label style="color:#aaa;font-size:0.82rem;">Data de nascimento</label>
+            <input type="text" class="resume-input" name="birthDate" id="field-birthDate"
+              value="{{#if resume}}{{resume.birthDate}}{{else}}{{user.birthDate}}{{/if}}"
+              placeholder="DD/MM/AAAA" maxlength="10" />
+          </div>
+
+          <!-- CEP com busca automática -->
+          <div class="col-md-4">
+            <label style="color:#aaa;font-size:0.82rem;"><i class="bi bi-geo me-1"></i>CEP</label>
+            <div style="position:relative;">
+              <input type="text" class="resume-input" id="field-cep"
+                placeholder="00000-000" maxlength="9"
+                style="padding-right:36px;" />
+              <span id="cep-spinner" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#aaa;font-size:0.8rem;">
+                <i class="bi bi-arrow-repeat" style="animation:spin 1s linear infinite;"></i>
+              </span>
+            </div>
+            <p id="cep-error" style="color:#f03e3e;font-size:0.75rem;margin:4px 0 0;display:none;">CEP não encontrado.</p>
+          </div>
+
+          <div class="col-md-8">
+            <label style="color:#aaa;font-size:0.82rem;">Cidade / Estado</label>
+            <input type="text" class="resume-input" name="city" id="field-city"
+              value="{{#if resume}}{{resume.city}}{{else}}{{user.city}}{{/if}}"
+              placeholder="Preenchido automaticamente pelo CEP" />
+          </div>
+
+          <div class="col-12">
+            <label style="color:#aaa;font-size:0.82rem;">Endereço</label>
+            <input type="text" class="resume-input" name="address" id="field-address"
+              value="{{#if resume}}{{resume.address}}{{else}}{{user.address}}{{/if}}"
+              placeholder="Preenchido automaticamente pelo CEP" />
+          </div>
+
+          <div class="col-md-6">
+            <label style="color:#aaa;font-size:0.82rem;"><i class="bi bi-linkedin me-1"></i>LinkedIn</label>
+            <input type="url" class="resume-input" name="linkedin" id="field-linkedin"
+              value="{{#if resume}}{{resume.linkedin}}{{else}}{{user.linkedin}}{{/if}}"
+              placeholder="https://linkedin.com/in/usuario" />
+          </div>
+
+          <div class="col-md-6">
+            <label style="color:#aaa;font-size:0.82rem;"><i class="bi bi-github me-1"></i>GitHub</label>
+            <input type="url" class="resume-input" name="github" id="field-github"
+              value="{{#if resume}}{{resume.github}}{{else}}{{user.github}}{{/if}}"
+              placeholder="https://github.com/usuario" />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RESUMO PROFISSIONAL -->
+      <div class="resume-card" id="sec-resumo">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 style="margin:0;"><i class="bi bi-person-lines-fill me-2"></i>Resumo Profissional</h5>
+          <button type="button" onclick="improveField('summary')" class="btn-ia-resume">
+            ✨ Melhorar com IA
+          </button>
+        </div>
+        <textarea class="resume-input" name="summary" id="summary" rows="4"
+          placeholder="Descreva seu perfil profissional em poucas linhas..."
+          style="resize:none;">{{#if resume}}{{resume.summary}}{{/if}}</textarea>
+      </div>
+
+      <!-- EXPERIÊNCIAS -->
+      <div class="resume-card" id="sec-exp">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 style="margin:0;"><i class="bi bi-briefcase me-2"></i>Experiências</h5>
+          <button type="button" onclick="addExperience()"
+            style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:5px 14px;cursor:pointer;font-size:0.85rem;">
+            <i class="bi bi-plus-lg me-1"></i>Adicionar
+          </button>
+        </div>
+        <div id="experiencesList"></div>
+        <p id="expEmpty" class="text-muted small text-center py-2">Nenhuma experiência adicionada ainda.</p>
+      </div>
+
+      <!-- FORMAÇÃO -->
+      <div class="resume-card" id="sec-edu">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 style="margin:0;"><i class="bi bi-mortarboard me-2"></i>Formação Acadêmica</h5>
+          <button type="button" onclick="addEducation()"
+            style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:5px 14px;cursor:pointer;font-size:0.85rem;">
+            <i class="bi bi-plus-lg me-1"></i>Adicionar
+          </button>
+        </div>
+        <div id="educationList"></div>
+        <p id="eduEmpty" class="text-muted small text-center py-2">Nenhuma formação adicionada ainda.</p>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="resume-card" id="sec-skills">
+        <h5><i class="bi bi-lightning me-2"></i>Habilidades</h5>
+        <div class="d-flex gap-2 mb-3">
+          <input type="text" id="skillInput" placeholder="Ex: Atendimento ao cliente, Excel, Logística..."
+            class="resume-input" style="flex:1;"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill()}" />
+          <button type="button" onclick="addSkill()"
+            style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 16px;cursor:pointer;">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+        <div id="skillsTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        <p id="skillsEmpty" class="text-muted small mt-2">Nenhuma habilidade adicionada ainda.</p>
+      </div>
+
+      <button type="submit"
+        style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:12px;width:100%;font-weight:700;font-size:1rem;cursor:pointer;">
+        <i class="bi bi-check-lg me-2"></i>Salvar Currículo
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL IA -->
+<div id="ia-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1e1e1e;border:1px solid #3a3a3a;border-radius:16px;padding:32px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;">
+    <h5 style="color:#f03e3e;font-weight:700;margin-bottom:8px;">✨ Sugestão da IA</h5>
+    <p style="color:#aaa;font-size:0.85rem;margin-bottom:12px;">Revise e clique em "Usar este texto" para aplicar.</p>
+    <div id="ia-result" style="background:#2a2a2a;border:1px solid #333;border-radius:8px;padding:16px;color:#e0e0e0;line-height:1.8;white-space:pre-wrap;min-height:80px;"></div>
+    <div class="d-flex gap-2 mt-3 justify-content-end">
+      <button onclick="closeIAModal()"
+        style="background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;padding:8px 16px;cursor:pointer;">
+        Cancelar
+      </button>
+      <button onclick="applyIAResult()"
+        style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:600;">
+        Usar este texto
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+.resume-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:24px;margin-bottom:20px;}
+.resume-input{width:100%;background:#141414;border:1px solid #2a2a2a;color:#e0e0e0;border-radius:8px;padding:10px 14px;font-size:0.88rem;outline:none;transition:border-color 0.2s;}
+.resume-input:focus{border-color:#e63946;}
+.resume-input::placeholder{color:#444;}
+.btn-ia-resume{background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:6px;padding:3px 10px;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+.btn-ia-resume:hover{background:#f03e3e;color:white;}
+@keyframes spin{from{transform:translateY(-50%) rotate(0deg);}to{transform:translateY(-50%) rotate(360deg);}}
+@media(max-width:576px){
+  .resume-card{padding:18px 16px;}
+  #resume-progress{padding:10px 12px;gap:4px;}
+  .rp-step{gap:2px;}
+  .rp-icon{width:30px;height:30px;font-size:0.8rem;}
+  .rp-line{min-width:10px;}
+}
+</style>
+
+<script>
+  let experiences    = [];
+  let education      = [];
+  let skills         = [];
+  let currentIAField = null;
+
+  // ===== MÁSCARA DATA DD/MM/AAAA =====
+  document.getElementById('field-birthDate').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+    if (v.length >= 5)      v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+    else if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    e.target.value = v;
+  });
+
+  // ===== MÁSCARA + BUSCA CEP =====
+  document.getElementById('field-cep').addEventListener('input', function(e) {
+    // Máscara 00000-000
+    let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+    if (v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
+    e.target.value = v;
+
+    // Busca quando tiver 8 dígitos
+    if (v.replace(/\D/g,'').length === 8) buscarCEP(v.replace(/\D/g,''));
+  });
+
+  async function buscarCEP(cep) {
+    const spinner  = document.getElementById('cep-spinner');
+    const errEl    = document.getElementById('cep-error');
+    const cityEl   = document.getElementById('field-city');
+    const addrEl   = document.getElementById('field-address');
+
+    spinner.style.display = 'inline';
+    errEl.style.display   = 'none';
+
+    try {
+      const res  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await res.json();
+
+      if (data.erro) {
+        errEl.style.display = 'block';
+        return;
+      }
+
+      // Preenche cidade/estado
+      cityEl.value = `${data.localidade}, ${data.uf}`;
+
+      // Preenche endereço só se estiver vazio ou for placeholder
+      if (!addrEl.value || addrEl.value === addrEl.placeholder) {
+        addrEl.value = data.logradouro
+          ? `${data.logradouro} - ${data.bairro}`
+          : data.bairro || '';
+      }
+    } catch {
+      errEl.style.display = 'block';
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  // ===== IMPORTAR COM IA =====
+  function toggleImport() {
+    const area    = document.getElementById('import-area');
+    const chevron = document.getElementById('import-chevron');
+    const open    = area.style.display === 'none';
+    area.style.display = open ? 'block' : 'none';
+    chevron.className  = open ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+  }
+
+  function switchTab(tab) {
+    document.getElementById('tab-pdf-area').style.display  = tab === 'pdf'  ? 'block' : 'none';
+    document.getElementById('tab-text-area').style.display = tab === 'text' ? 'block' : 'none';
+    document.getElementById('tab-pdf').style.background    = tab === 'pdf'  ? '#a855f7' : 'transparent';
+    document.getElementById('tab-pdf').style.color         = tab === 'pdf'  ? 'white'   : '#aaa';
+    document.getElementById('tab-pdf').style.border        = tab === 'pdf'  ? 'none'    : '1px solid #555';
+    document.getElementById('tab-text').style.background   = tab === 'text' ? '#a855f7' : 'transparent';
+    document.getElementById('tab-text').style.color        = tab === 'text' ? 'white'   : '#aaa';
+    document.getElementById('tab-text').style.border       = tab === 'text' ? 'none'    : '1px solid #555';
+  }
+
+  async function importWithAI() {
+    const btn   = document.getElementById('import-btn');
+    const isPdf = document.getElementById('tab-pdf-area').style.display !== 'none';
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Processando...';
+
+    try {
+      let body, headers = {};
+      if (isPdf) {
+        const file = document.getElementById('pdf-file').files[0];
+        if (!file) { alert('Selecione um arquivo PDF.'); return; }
+        const formData = new FormData();
+        formData.append('pdf', file);
+        body = formData;
+      } else {
+        const text = document.getElementById('import-text').value.trim();
+        if (!text || text.length < 50) { alert('Cole o conteúdo do currículo.'); return; }
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify({ text });
+      }
+
+      headers['X-CSRF-Token'] = document.querySelector('input[name="_csrf"]').value;
+      const res  = await fetch('/resume/ai/import', { method: 'POST', headers, body });
+      const data = await res.json();
+      if (data.error) { alert(data.error); return; }
+
+      const fill = (id, val) => {
+        if (val && val !== 'null' && val !== 'undefined') {
+          const el = document.getElementById(id);
+          if (el) el.value = val;
+        }
+      };
+      fill('field-phone',     data.phone);
+      fill('field-city',      data.city);
+      fill('field-birthDate', data.birthDate);
+      fill('field-address',   data.address);
+      fill('field-linkedin',  data.linkedin);
+      fill('field-github',    data.github);
+
+      if (data.summary) document.getElementById('summary').value = data.summary;
+      if (data.experiences?.length) { experiences = []; data.experiences.forEach(e => addExperience(e)); }
+      if (data.education?.length)   { education   = []; data.education.forEach(e => addEducation(e)); }
+      if (data.skills?.length)      { skills = []; data.skills.forEach(s => { if(s && !skills.includes(s)) skills.push(s); }); renderSkills(); }
+
+      toggleImport();
+      alert('✅ Currículo importado! Revise os dados e salve.');
+    } catch (err) {
+      alert('Erro ao processar. Tente novamente.');
+    } finally {
+      btn.disabled  = false;
+      btn.innerHTML = '<i class="bi bi-magic me-1"></i> Preencher com IA';
+    }
+  }
+
+  // ===== MELHORAR COM IA =====
+  async function improveField(field, context = '') {
+    const el      = document.getElementById(field);
+    const content = el ? el.value.trim() : '';
+    if (!content) { alert('Escreva algo no campo antes de melhorar com IA!'); return; }
+
+    currentIAField = field;
+    document.getElementById('ia-modal').style.display = 'flex';
+    document.getElementById('ia-result').innerHTML    = '<span style="color:#888;">⏳ Gerando sugestão...</span>';
+
+    try {
+      const res  = await fetch('/resume/ai/improve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value },
+        body: JSON.stringify({ field, content, context })
+      });
+      const data = await res.json();
+      document.getElementById('ia-result').textContent = data.improved || data.error || 'Erro ao gerar sugestão.';
+    } catch {
+      document.getElementById('ia-result').innerHTML = '<span style="color:#f03e3e;">Erro ao conectar com a IA.</span>';
+    }
+  }
+
+  function applyIAResult() {
+    const text = document.getElementById('ia-result').textContent;
+    if (currentIAField) {
+      const el = document.getElementById(currentIAField);
+      if (el) { el.value = text; el.dispatchEvent(new Event('input')); }
+    }
+    closeIAModal();
+  }
+
+  function closeIAModal() {
+    document.getElementById('ia-modal').style.display = 'none';
+    currentIAField = null;
+  }
+
+  // ===== EXPERIÊNCIAS =====
+  function addExperience(data = {}) {
+    const id = Date.now() + Math.random();
+    const { id: _ignoreId, ...rest } = data;
+    experiences.push({ id, role: '', company: '', period: '', description: '', ...rest });
+    renderExperiences();
+  }
+
+  function removeExperience(id) {
+    experiences = experiences.filter(e => e.id !== id);
+    renderExperiences();
+  }
+
+  function renderExperiences() {
+    const list = document.getElementById('experiencesList');
+    document.getElementById('expEmpty').style.display = experiences.length ? 'none' : 'block';
+    list.innerHTML = experiences.map(exp => `
+      <div class="resume-item-block">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="resume-section-label">Experiência</span>
+          <div class="d-flex gap-2">
+            <button type="button" onclick="improveExpDesc(${exp.id})" class="btn-ia-resume" style="font-size:0.75rem;">✨ IA</button>
+            <button type="button" onclick="removeExperience(${exp.id})" class="btn-remove-item">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6">
+            <input type="text" placeholder="Cargo" value="${exp.role || ''}"
+              oninput="updateExp(${exp.id}, 'role', this.value)" class="resume-input" />
+          </div>
+          <div class="col-md-6">
+            <input type="text" placeholder="Empresa" value="${exp.company || ''}"
+              oninput="updateExp(${exp.id}, 'company', this.value)" class="resume-input" />
+          </div>
+          <div class="col-12">
+            <input type="text" placeholder="Período (ex: Jan 2022 - Dez 2023)" value="${exp.period || ''}"
+              oninput="updateExp(${exp.id}, 'period', this.value)" class="resume-input" />
+          </div>
+          <div class="col-12">
+            <textarea placeholder="Descrição das atividades..." rows="2" id="exp-desc-${exp.id}"
+              oninput="updateExp(${exp.id}, 'description', this.value)"
+              class="resume-input" style="resize:none;">${exp.description || ''}</textarea>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function improveExpDesc(id) {
+    const exp  = experiences.find(e => e.id === id);
+    if (!exp)  return;
+    const desc = document.getElementById(`exp-desc-${id}`).value.trim();
+    if (!desc) { alert('Preencha a descrição antes de melhorar com IA!'); return; }
+
+    currentIAField = `exp-desc-${id}`;
+    document.getElementById('ia-modal').style.display = 'flex';
+    document.getElementById('ia-result').innerHTML    = '<span style="color:#888;">⏳ Gerando sugestão...</span>';
+
+    fetch('/resume/ai/improve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value },
+      body: JSON.stringify({ field: 'experience', content: desc, context: `${exp.role} na ${exp.company}` })
+    })
+    .then(r => r.json())
+    .then(data => { document.getElementById('ia-result').textContent = data.improved || data.error; })
+    .catch(() => { document.getElementById('ia-result').innerHTML = '<span style="color:#f03e3e;">Erro ao conectar.</span>'; });
+  }
+
+  function updateExp(id, field, value) {
+    const exp = experiences.find(e => e.id === id);
+    if (exp) exp[field] = value;
+  }
+
+  // ===== FORMAÇÃO =====
+  function addEducation(data = {}) {
+    const id = Date.now() + Math.random();
+    const { id: _ignoreId, ...rest } = data;
+    education.push({ id, course: '', institution: '', period: '', ...rest });
+    renderEducation();
+  }
+
+  function removeEducation(id) {
+    education = education.filter(e => e.id !== id);
+    renderEducation();
+  }
+
+  function renderEducation() {
+    const list = document.getElementById('educationList');
+    document.getElementById('eduEmpty').style.display = education.length ? 'none' : 'block';
+    list.innerHTML = education.map(edu => `
+      <div class="resume-item-block">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="resume-section-label">Formação</span>
+          <button type="button" onclick="removeEducation(${edu.id})" class="btn-remove-item">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6">
+            <input type="text" placeholder="Curso" value="${edu.course || ''}"
+              oninput="updateEdu(${edu.id}, 'course', this.value)" class="resume-input" />
+          </div>
+          <div class="col-md-6">
+            <input type="text" placeholder="Instituição" value="${edu.institution || ''}"
+              oninput="updateEdu(${edu.id}, 'institution', this.value)" class="resume-input" />
+          </div>
+          <div class="col-12">
+            <input type="text" placeholder="Período (ex: 2019 - 2023)" value="${edu.period || ''}"
+              oninput="updateEdu(${edu.id}, 'period', this.value)" class="resume-input" />
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateEdu(id, field, value) {
+    const edu = education.find(e => e.id === id);
+    if (edu) edu[field] = value;
+  }
+
+  // ===== SKILLS =====
+  function addSkill() {
+    const input = document.getElementById('skillInput');
+    const val   = input.value.trim();
+    if (!val || skills.includes(val)) return;
+    skills.push(val);
+    input.value = '';
+    renderSkills();
+  }
+
+  function removeSkill(skill) {
+    skills = skills.filter(s => s !== skill);
+    renderSkills();
+  }
+
+  function renderSkills() {
+    const container = document.getElementById('skillsTags');
+    document.getElementById('skillsEmpty').style.display = skills.length ? 'none' : 'block';
+    container.innerHTML = skills.map(skill => `
+      <span class="skill-tag">
+        ${skill}
+        <button type="button" onclick="removeSkill('${skill.replace(/'/g, "\\'")}')">×</button>
+      </span>
+    `).join('');
+  }
+
+  // ===== SUBMIT =====
+  document.getElementById('resumeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('experiencesInput').value = JSON.stringify(experiences);
+    document.getElementById('educationInput').value   = JSON.stringify(education);
+    document.getElementById('skillsInput').value      = JSON.stringify(skills);
+    this.submit();
+  });
+
+  // ===== CARREGAR DADOS EXISTENTES =====
+  window.addEventListener('DOMContentLoaded', () => {
+    {{#if resume}}
+      const savedExp    = {{{safeJson resume.experiences}}};
+      const savedEdu    = {{{safeJson resume.education}}};
+      const savedSkills = {{{safeJson resume.skills}}};
+
+      savedExp.forEach((e, i) => {
+        const id = Date.now() + i + Math.random();
+        experiences.push({ id, role: e.role||'', company: e.company||'', period: e.period||'', description: e.description||'' });
+      });
+      renderExperiences();
+
+      savedEdu.forEach((e, i) => {
+        const id = Date.now() + i + 1000 + Math.random();
+        education.push({ id, course: e.course||'', institution: e.institution||'', period: e.period||'' });
+      });
+      renderEducation();
+
+      savedSkills.forEach(s => { if (s && !skills.includes(s)) skills.push(s); });
+      renderSkills();
+    {{/if}}
+  });
+
+  /* ── BARRA DE PROGRESSO ── */
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const offset = 140;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+  }
+
+  const rpSections = [
+    { sec: 'sec-dados',  step: 'rp-dados' },
+    { sec: 'sec-resumo', step: 'rp-resumo' },
+    { sec: 'sec-exp',    step: 'rp-exp' },
+    { sec: 'sec-edu',    step: 'rp-edu' },
+    { sec: 'sec-skills', step: 'rp-skills' }
+  ];
+
+  function updateProgress() {
+    const scrollY = window.scrollY + 160;
+    let current = 0;
+    rpSections.forEach((s, i) => {
+      const el = document.getElementById(s.sec);
+      if (el && el.getBoundingClientRect().top + window.scrollY <= scrollY) current = i;
+    });
+    rpSections.forEach((s, i) => {
+      const step = document.getElementById(s.step);
+      if (!step) return;
+      step.classList.remove('active', 'done');
+      if (i < current) step.classList.add('done');
+      else if (i === current) step.classList.add('active');
+    });
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+</script>

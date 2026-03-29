@@ -1,0 +1,110 @@
+<div style="padding-top:90px;padding-bottom:60px;">
+  <div class="container" style="max-width:900px;">
+
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+      <div>
+        <h2 style="font-weight:800;margin:0;">Minhas Vagas</h2>
+        <p style="color:#888;font-size:0.88rem;margin:4px 0 0;">{{jobs.length}} vaga(s) cadastrada(s)</p>
+      </div>
+      <a href="/jobs/add"
+        style="background:#e63946;color:white;border-radius:8px;padding:9px 22px;text-decoration:none;font-weight:700;font-size:0.88rem;display:inline-flex;align-items:center;gap:8px;"
+        onmouseover="this.style.background='#c62828'" onmouseleave="this.style.background='#e63946'">
+        <i class="bi bi-plus-lg"></i>Abrir Nova Vaga
+      </a>
+    </div>
+
+    {{#if jobs.length}}
+      {{#each jobs}}
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:20px 24px;margin-bottom:12px;transition:border-color 0.2s;"
+        onmouseover="this.style.borderColor='rgba(230,57,70,0.3)'" onmouseleave="this.style.borderColor='#2a2a2a'">
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+
+          <div style="flex:1;min-width:0;">
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+              <a href="/jobs/view/{{this.id}}" style="font-weight:700;font-size:1rem;color:#f1f1f1;text-decoration:none;">{{this.title}}</a>
+              {{#if (eq this.status 'aberta')}}
+                <span style="background:rgba(76,175,80,0.1);border:1px solid #4caf50;color:#4caf50;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;">Aberta</span>
+              {{else if (eq this.status 'pausada')}}
+                <span style="background:rgba(255,193,7,0.1);border:1px solid #ffc107;color:#ffc107;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;">Pausada</span>
+              {{else if (eq this.status 'encerrada')}}
+                <span style="background:#1e1e1e;border:1px solid #444;color:#555;border-radius:20px;padding:2px 10px;font-size:0.72rem;">Encerrada</span>
+              {{else}}
+                <span style="background:#1e1e1e;border:1px solid #444;color:#555;border-radius:20px;padding:2px 10px;font-size:0.72rem;">{{this.status}}</span>
+              {{/if}}
+              {{#if this.newJob}}
+                <span style="background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);color:#e63946;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;">Nova</span>
+              {{/if}}
+            </div>
+            <div class="d-flex gap-3 flex-wrap" style="font-size:0.8rem;color:#666;margin-top:4px;">
+              {{#if this.modality}}
+                <span><i class="bi bi-geo-alt me-1"></i>{{formatModality this.modality}}</span>
+              {{/if}}
+              {{#unless (isRemote this.modality)}}
+              {{#if this.city}}
+                <span><i class="bi bi-building me-1"></i>{{this.city}}</span>
+              {{/if}}
+              {{/unless}}
+              {{#if this.salary}}
+                <span><i class="bi bi-currency-dollar me-1"></i>R$ {{this.salary}}</span>
+              {{/if}}
+              <span style="color:#555;"><i class="bi bi-calendar3 me-1"></i>{{formatDate this.createdAt}}</span>
+            </div>
+          </div>
+
+          <!-- Métricas -->
+          <div class="d-flex align-items-center gap-3 flex-shrink-0 flex-wrap">
+            <div style="text-align:center;">
+              <div style="font-size:1.3rem;font-weight:700;color:#f03e3e;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;">{{this.totalApps}}</div>
+              <div style="font-size:0.7rem;color:#666;">candidatos</div>
+            </div>
+            {{#if this.pendentes}}
+            <div style="text-align:center;">
+              <div style="font-size:1.3rem;font-weight:700;color:#ffc107;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;">{{this.pendentes}}</div>
+              <div style="font-size:0.7rem;color:#666;">pendentes</div>
+            </div>
+            {{/if}}
+            {{#if this.aprovados}}
+            <div style="text-align:center;">
+              <div style="font-size:1.3rem;font-weight:700;color:#4caf50;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;">{{this.aprovados}}</div>
+              <div style="font-size:0.7rem;color:#666;">aprovados</div>
+            </div>
+            {{/if}}
+          </div>
+
+        </div>
+
+        <!-- Ações -->
+        <div class="d-flex gap-2 flex-wrap mt-3">
+          <a href="/jobs/applications/{{this.id}}"
+            style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:6px 14px;text-decoration:none;font-size:0.82rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;"
+            onmouseover="this.style.background='rgba(240,62,62,0.1)'" onmouseleave="this.style.background='transparent'">
+            <i class="bi bi-people"></i>Ver Candidatos
+          </a>
+          <a href="/jobs/edit/{{this.id}}"
+            style="background:transparent;border:1px solid #2a2a2a;color:#888;border-radius:8px;padding:6px 14px;text-decoration:none;font-size:0.82rem;display:inline-flex;align-items:center;gap:6px;"
+            onmouseover="this.style.borderColor='#555';this.style.color='#ccc'" onmouseleave="this.style.borderColor='#2a2a2a';this.style.color='#888'">
+            <i class="bi bi-pencil"></i>Editar
+          </a>
+          <a href="/jobs/view/{{this.id}}"
+            style="background:transparent;border:1px solid #2a2a2a;color:#888;border-radius:8px;padding:6px 14px;text-decoration:none;font-size:0.82rem;display:inline-flex;align-items:center;gap:6px;"
+            onmouseover="this.style.borderColor='#555';this.style.color='#ccc'" onmouseleave="this.style.borderColor='#2a2a2a';this.style.color='#888'">
+            <i class="bi bi-eye"></i>Visualizar
+          </a>
+        </div>
+      </div>
+      {{/each}}
+
+    {{else}}
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:80px 40px;text-align:center;">
+        <i class="bi bi-briefcase" style="font-size:3rem;color:#333;"></i>
+        <h5 style="font-weight:700;margin:20px 0 8px;">Nenhuma vaga publicada ainda</h5>
+        <p style="color:#555;font-size:0.88rem;margin:0 auto 24px;max-width:320px;">Crie sua primeira vaga e comece a receber candidatos.</p>
+        <a href="/jobs/add"
+          style="background:#e63946;color:white;border-radius:8px;padding:10px 28px;text-decoration:none;font-weight:700;font-size:0.9rem;display:inline-flex;align-items:center;gap:8px;">
+          <i class="bi bi-plus-lg"></i>Abrir Vaga
+        </a>
+      </div>
+    {{/if}}
+
+  </div>
+</div>

@@ -1,0 +1,952 @@
+<style>
+.jf-page{max-width:1120px;margin:0 auto;padding:32px 20px 100px}
+.jf-header{display:flex;align-items:center;gap:20px;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.jf-back{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#777;text-decoration:none;transition:all .2s;flex-shrink:0;font-size:1rem}
+.jf-back:hover{border-color:rgba(255,255,255,0.18);color:#fff}
+.jf-header-info{flex:1;min-width:0}
+.jf-page-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.5px;margin:0 0 2px;white-space:nowrap;overflow:clip;overflow-clip-margin:8px;text-overflow:ellipsis;line-height:1.45;text-rendering:geometricPrecision}
+.jf-page-title span{color:#e63946}
+.jf-page-sub{font-size:.82rem;color:#555;margin:0}
+.jf-layout{display:grid;grid-template-columns:1fr 288px;gap:24px;align-items:start}
+.jf-section{background:#111;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:28px;margin-bottom:14px}
+.jf-section-hdr{display:flex;align-items:flex-start;gap:14px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.jf-section-num{width:30px;height:30px;border-radius:8px;background:#e63946;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;font-size:.8rem;flex-shrink:0;margin-top:1px;font-variant-numeric:tabular-nums}
+.jf-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin:0 0 2px}
+.jf-section-sub{font-size:.78rem;color:#555;margin:0}
+.jf-optional{font-weight:400;font-size:.72rem;color:#555;margin-left:6px}
+.jf-field{margin-bottom:16px}.jf-field:last-child{margin-bottom:0}
+.jf-label{display:block;font-size:.82rem;font-weight:600;color:#bbb;margin-bottom:7px}
+.jf-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.jf-label-row .jf-label{margin-bottom:0}
+.jf-req{color:#e63946}
+.jf-input,.jf-textarea,.jf-select{width:100%;background:#0d0d0d;border:1px solid rgba(255,255,255,0.09);border-radius:10px;color:#e0e0e0;padding:11px 14px;font-size:.88rem;font-family:inherit;transition:border-color .2s,box-shadow .2s;outline:none;appearance:none}
+.jf-input:focus,.jf-textarea:focus,.jf-select:focus{border-color:#e63946;box-shadow:0 0 0 3px rgba(230,57,70,.1)}
+.jf-input::placeholder,.jf-textarea::placeholder{color:#333}
+.jf-textarea{resize:vertical;min-height:96px;line-height:1.65}
+.jf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.jf-modality-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.jf-contract-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.jf-mod-card{background:#0d0d0d;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 10px;text-align:center;cursor:pointer;transition:all .25s}
+.jf-mod-card:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.02)}
+.jf-mod-card.selected{border-color:#e63946;background:rgba(230,57,70,.06)}
+.jf-mod-icon{font-size:1.3rem;color:#444;margin-bottom:8px;transition:color .25s}
+.jf-mod-card.selected .jf-mod-icon{color:#e63946}
+.jf-mod-name{font-size:.8rem;font-weight:600;color:#666;transition:color .25s}
+.jf-mod-card.selected .jf-mod-name{color:#e0e0e0}
+.jf-status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.jf-status-card{background:#0d0d0d;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .25s}
+.jf-status-card:hover{background:rgba(255,255,255,0.02)}
+.jf-status-icon{font-size:1.2rem;margin-bottom:6px}
+.jf-status-name{font-size:.8rem;font-weight:600;color:#888;transition:color .25s}
+.jf-status-desc{font-size:.68rem;color:#444;margin-top:3px;line-height:1.4}
+.jf-status-card.sel-aberta{border-color:#4caf50;background:rgba(76,175,80,.06)}
+.jf-status-card.sel-aberta .jf-status-name{color:#4caf50}
+.jf-status-card.sel-pausada{border-color:#ffc107;background:rgba(255,193,7,.06)}
+.jf-status-card.sel-pausada .jf-status-name{color:#ffc107}
+.jf-status-card.sel-encerrada{border-color:#e63946;background:rgba(230,57,70,.06)}
+.jf-status-card.sel-encerrada .jf-status-name{color:#e63946}
+.jf-btn-ia{display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid rgba(230,57,70,.35);color:#e63946;border-radius:6px;padding:4px 10px;font-size:.74rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit}
+.jf-btn-ia:hover{background:#e63946;color:#fff;border-color:#e63946}
+.jf-btn-ia:disabled{opacity:.4;cursor:not-allowed}
+.jf-autocomplete{position:relative}
+.jf-city-drop{display:none;position:absolute;top:100%;left:0;z-index:200;background:#181818;border:1px solid rgba(255,255,255,0.1);border-radius:10px;width:100%;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.6);margin-top:4px}
+.jf-city-item{padding:10px 14px;cursor:pointer;font-size:.84rem;color:#ccc;transition:background .15s;border-radius:6px}
+.jf-city-item:hover{background:rgba(255,255,255,0.05)}
+.jf-questions-wrap{background:#0d0d0d;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px}
+.jf-bias-wrap{background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:20px}
+.jf-bias-btn{background:transparent;border:1px solid #a855f7;color:#a855f7;border-radius:8px;padding:8px 18px;cursor:pointer;font-weight:600;font-size:.84rem;transition:all .2s;font-family:inherit}
+.jf-bias-btn:hover{background:#a855f7;color:#fff}
+.jf-submit{width:100%;background:#e63946;color:#fff;border:none;border-radius:12px;padding:15px;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+.jf-submit:hover{background:#c62828;box-shadow:0 8px 28px rgba(230,57,70,.35);transform:translateY(-1px)}
+.jf-sidebar{position:sticky;top:90px}
+.jf-sb-card{background:#111;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;margin-bottom:12px}
+.jf-sb-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#444;margin-bottom:14px}
+.jf-company-name{font-weight:700;font-size:.9rem;color:#e0e0e0;margin-bottom:2px}
+.jf-company-email{font-size:.76rem;color:#555}
+.jf-ai-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;margin-bottom:6px;font-size:.8rem;color:#aaa;cursor:pointer;transition:all .2s}
+.jf-ai-item:hover{border-color:rgba(230,57,70,.25);color:#e0e0e0;background:rgba(230,57,70,.03)}
+.jf-ai-item:last-child{margin-bottom:0}
+.jf-ai-dot{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.jf-tip{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.78rem;color:#666;line-height:1.55}
+.jf-tip:last-child{border-bottom:none;padding-bottom:0}
+.jf-tip i{color:#e63946;flex-shrink:0;margin-top:1px}
+.jf-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center}
+.jf-modal-box{background:#141414;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:32px;max-width:580px;width:90%;max-height:80vh;overflow-y:auto}
+.jf-modal-title{font-family:'Syne',sans-serif;font-weight:700;color:#e63946;margin-bottom:4px;font-size:.95rem}
+.jf-modal-sub{font-size:.82rem;color:#555;margin-bottom:14px}
+.jf-modal-result{background:#0d0d0d;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;color:#e0e0e0;line-height:1.8;white-space:pre-wrap;min-height:80px;font-size:.87rem}
+.jf-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.jf-modal-cancel{background:transparent;border:1px solid rgba(255,255,255,.1);color:#777;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.85rem;font-family:inherit;transition:all .2s}
+.jf-modal-cancel:hover{border-color:rgba(255,255,255,.2);color:#ccc}
+.jf-modal-apply{background:#e63946;border:none;color:#fff;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:600;font-size:.85rem;font-family:inherit;transition:all .2s}
+.jf-modal-apply:hover{background:#c62828}
+@media(max-width:900px){
+  .jf-layout{grid-template-columns:1fr}
+  .jf-sidebar{position:static}
+  .jf-row{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .jf-modality-grid,.jf-status-grid{grid-template-columns:1fr}
+  .jf-contract-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+<div class="jf-page">
+
+  <!-- HEADER -->
+  <div class="jf-header">
+    <a href="/jobs/view/{{job.id}}" class="jf-back"><i class="bi bi-arrow-left"></i></a>
+    <div class="jf-header-info">
+      <h1 class="jf-page-title">Editar: <span>{{job.title}}</span></h1>
+      <p class="jf-page-sub">Alterações entram em vigor imediatamente</p>
+    </div>
+  </div>
+
+  <div class="jf-layout">
+
+    <!-- MAIN FORM -->
+    <div>
+      <form action="/jobs/update" method="POST" id="jobForm">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="id" value="{{job.id}}">
+        <input type="hidden" name="company" value="{{user.name}}">
+        <input type="hidden" name="email" value="{{user.email}}">
+
+        <!-- SEÇÃO 1: Informações Básicas -->
+        <div class="jf-section">
+          <div class="jf-section-hdr">
+            <div class="jf-section-num">1</div>
+            <div>
+              <h3 class="jf-section-title">Informações Básicas</h3>
+              <p class="jf-section-sub">Nome, formato de trabalho, localização e salário</p>
+            </div>
+          </div>
+
+          <div class="jf-field">
+            <label class="jf-label">Título da Vaga <span class="jf-req">*</span></label>
+            <input type="text" class="jf-input" name="title" id="title" value="{{job.title}}" required>
+          </div>
+
+          <div class="jf-field">
+            <label class="jf-label">Modalidade</label>
+            <div class="jf-modality-grid" id="modality-grid">
+              <div class="jf-mod-card {{#if (eq job.modality 'presencial')}}selected{{/if}}" onclick="selectModality('presencial')" id="card-presencial">
+                <input type="radio" name="modality" value="presencial" id="presencial" style="display:none" {{#if (eq job.modality 'presencial')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-buildings"></i></div>
+                <div class="jf-mod-name">Presencial</div>
+              </div>
+              <div class="jf-mod-card {{#if (eq job.modality 'hibrido')}}selected{{/if}}" onclick="selectModality('hibrido')" id="card-hibrido">
+                <input type="radio" name="modality" value="hibrido" id="hibrido" style="display:none" {{#if (eq job.modality 'hibrido')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-arrow-left-right"></i></div>
+                <div class="jf-mod-name">Híbrido</div>
+              </div>
+              <div class="jf-mod-card {{#if (eq job.modality 'homeoffice')}}selected{{/if}}" onclick="selectModality('homeoffice')" id="card-homeoffice">
+                <input type="radio" name="modality" value="homeoffice" id="homeoffice" style="display:none" {{#if (eq job.modality 'homeoffice')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-house-door"></i></div>
+                <div class="jf-mod-name">Home Office</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="jf-field">
+            <label class="jf-label">Tipo de Contratação</label>
+            <div class="jf-contract-grid" id="contract-grid">
+              <div class="jf-mod-card {{#if (eq job.contractType 'clt')}}selected{{/if}}" onclick="selectContractType('clt')" id="card-contract-clt">
+                <input type="radio" name="contractType" value="clt" id="contract-clt" style="display:none" {{#if (eq job.contractType 'clt')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-briefcase"></i></div>
+                <div class="jf-mod-name">CLT</div>
+              </div>
+              <div class="jf-mod-card {{#if (eq job.contractType 'pj')}}selected{{/if}}" onclick="selectContractType('pj')" id="card-contract-pj">
+                <input type="radio" name="contractType" value="pj" id="contract-pj" style="display:none" {{#if (eq job.contractType 'pj')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-building"></i></div>
+                <div class="jf-mod-name">PJ</div>
+              </div>
+              <div class="jf-mod-card {{#if (eq job.contractType 'estagio')}}selected{{/if}}" onclick="selectContractType('estagio')" id="card-contract-estagio">
+                <input type="radio" name="contractType" value="estagio" id="contract-estagio" style="display:none" {{#if (eq job.contractType 'estagio')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-mortarboard"></i></div>
+                <div class="jf-mod-name">Estágio</div>
+              </div>
+              <div class="jf-mod-card {{#if (eq job.contractType 'temporario')}}selected{{/if}}" onclick="selectContractType('temporario')" id="card-contract-temporario">
+                <input type="radio" name="contractType" value="temporario" id="contract-temporario" style="display:none" {{#if (eq job.contractType 'temporario')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-clock"></i></div>
+                <div class="jf-mod-name">Temporário</div>
+              </div>
+              <div class="jf-mod-card {{#if (eq job.contractType 'freelancer')}}selected{{/if}}" onclick="selectContractType('freelancer')" id="card-contract-freelancer">
+                <input type="radio" name="contractType" value="freelancer" id="contract-freelancer" style="display:none" {{#if (eq job.contractType 'freelancer')}}checked{{/if}}>
+                <div class="jf-mod-icon"><i class="bi bi-laptop"></i></div>
+                <div class="jf-mod-name">Freelancer</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="jf-field">
+            <label class="jf-label">Vaga PCD <span class="jf-optional">opcional</span></label>
+            <label id="pcd-label" style="display:flex;align-items:center;gap:12px;cursor:pointer;background:{{#if job.isPcd}}rgba(230,57,70,.06){{else}}#0d0d0d{{/if}};border:1px solid {{#if job.isPcd}}#e63946{{else}}rgba(255,255,255,0.09){{/if}};border-radius:10px;padding:14px;transition:border-color .2s,background .2s;">
+              <input type="checkbox" name="isPcd" id="isPcd" style="display:none" onchange="updatePcdToggle()" {{#if job.isPcd}}checked{{/if}}>
+              <span id="pcd-toggle" style="width:38px;height:22px;background:{{#if job.isPcd}}#e63946{{else}}#1a1a1a{{/if}};border:1px solid {{#if job.isPcd}}#e63946{{else}}rgba(255,255,255,.15){{/if}};border-radius:11px;flex-shrink:0;position:relative;transition:background .2s,border-color .2s;">
+                <span id="pcd-knob" style="position:absolute;top:3px;{{#if job.isPcd}}left:19px{{else}}left:3px{{/if}};width:14px;height:14px;background:{{#if job.isPcd}}#fff{{else}}#444{{/if}};border-radius:50%;transition:all .2s;"></span>
+              </span>
+              <span style="font-size:.86rem;line-height:1.45;" id="pcd-text"><span style="font-weight:600;color:{{#if job.isPcd}}#e0e0e0{{else}}#777{{/if}};">Vaga para PCD</span><br><span style="color:#444;font-size:.78rem;">Exclusiva ou prioritária para Pessoas com Deficiência</span></span>
+            </label>
+          </div>
+
+          <div class="jf-row">
+            <div class="jf-field">
+              <label class="jf-label">Salário</label>
+              <input type="text" class="jf-input" name="salary" value="{{job.salary}}"
+                placeholder="Ex: R$ 5.000 ou A combinar">
+            </div>
+            <div class="jf-field">
+              <label class="jf-label">Cidade</label>
+              <div class="jf-autocomplete">
+                <input type="text" class="jf-input" id="city-input-add" name="city"
+                  value="{{job.city}}" placeholder="Ex: São Paulo" autocomplete="off"
+                  oninput="filterCitiesAdd(this.value)"
+                  onfocus="filterCitiesAdd(this.value)"
+                  onblur="setTimeout(()=>document.getElementById('city-drop-add').style.display='none',200)">
+                <div id="city-drop-add" class="jf-city-drop"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 2: Status -->
+        <div class="jf-section">
+          <div class="jf-section-hdr">
+            <div class="jf-section-num">2</div>
+            <div>
+              <h3 class="jf-section-title">Status da Vaga</h3>
+              <p class="jf-section-sub">Controle a visibilidade e candidaturas desta vaga</p>
+            </div>
+          </div>
+          <input type="hidden" name="status" id="status-input" value="{{job.status}}">
+          <div class="jf-status-grid">
+            <div class="jf-status-card {{#if (eq job.status 'aberta')}}sel-aberta{{/if}}" onclick="selectStatus('aberta')" id="scard-aberta">
+              <div class="jf-status-icon"><i class="bi bi-check-circle" style="color:#4caf50;"></i></div>
+              <div class="jf-status-name">Aberta</div>
+              <div class="jf-status-desc">Aceitando candidaturas</div>
+            </div>
+            <div class="jf-status-card {{#if (eq job.status 'pausada')}}sel-pausada{{/if}}" onclick="selectStatus('pausada')" id="scard-pausada">
+              <div class="jf-status-icon"><i class="bi bi-pause-circle" style="color:#ffc107;"></i></div>
+              <div class="jf-status-name">Pausada</div>
+              <div class="jf-status-desc">Temporariamente fechada</div>
+            </div>
+            <div class="jf-status-card {{#if (eq job.status 'encerrada')}}sel-encerrada{{/if}}" onclick="selectStatus('encerrada')" id="scard-encerrada">
+              <div class="jf-status-icon"><i class="bi bi-x-circle" style="color:#e63946;"></i></div>
+              <div class="jf-status-name">Encerrada</div>
+              <div class="jf-status-desc">Vaga preenchida</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 3: Conteúdo -->
+        <div class="jf-section">
+          <div class="jf-section-hdr">
+            <div class="jf-section-num">3</div>
+            <div>
+              <h3 class="jf-section-title">Conteúdo da Vaga</h3>
+              <p class="jf-section-sub">Descrição, requisitos, benefícios e diferencial</p>
+            </div>
+          </div>
+
+          <div class="jf-field">
+            <div class="jf-label-row">
+              <label class="jf-label">Descrição <span class="jf-req">*</span></label>
+              <button type="button" class="jf-btn-ia" onclick="improveWithAI('description','descrição da vaga')">
+                <i class="bi bi-stars"></i> Melhorar com IA
+              </button>
+            </div>
+            <textarea class="jf-textarea" name="description" id="description" rows="4" required>{{job.description}}</textarea>
+          </div>
+
+          <div class="jf-field">
+            <div class="jf-label-row">
+              <label class="jf-label">Requisitos</label>
+              <button type="button" class="jf-btn-ia" onclick="improveWithAI('requirements','requisitos da vaga')">
+                <i class="bi bi-stars"></i> Melhorar com IA
+              </button>
+            </div>
+            <textarea class="jf-textarea" name="requirements" id="requirements" rows="3"
+              placeholder="Ex: 2 anos de experiência com Node.js...">{{job.requirements}}</textarea>
+          </div>
+
+          <div class="jf-field">
+            <div class="jf-label-row">
+              <label class="jf-label">Benefícios</label>
+              <button type="button" class="jf-btn-ia" onclick="improveWithAI('benefits','benefícios da vaga')">
+                <i class="bi bi-stars"></i> Melhorar com IA
+              </button>
+            </div>
+            <textarea class="jf-textarea" name="benefits" id="benefits" rows="3"
+              placeholder="Ex: Vale refeição, plano de saúde...">{{job.benefits}}</textarea>
+          </div>
+
+          <div class="jf-field">
+            <div class="jf-label-row">
+              <label class="jf-label">Diferencial <span style="color:#444;font-weight:400;font-size:.75rem;">(opcional)</span></label>
+              <button type="button" class="jf-btn-ia" onclick="improveWithAI('differential','diferencial da vaga')">
+                <i class="bi bi-stars"></i> Melhorar com IA
+              </button>
+            </div>
+            <textarea class="jf-textarea" name="differential" id="differential" rows="2"
+              placeholder="Ex: Experiência com AWS, inglês avançado...">{{job.differential}}</textarea>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 4: Teste Técnico -->
+        <div class="jf-section">
+          <div class="jf-section-hdr">
+            <div class="jf-section-num">4</div>
+            <div>
+              <h3 class="jf-section-title">Teste Técnico <span class="jf-optional">opcional</span></h3>
+              <p class="jf-section-sub">Adicione até 5 perguntas para filtrar candidatos</p>
+            </div>
+          </div>
+
+          <div class="jf-questions-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <select id="category-select" onchange="loadCategoryQuestions(this.value)"
+                style="background:#111;border:1px solid rgba(255,255,255,.1);color:#ccc;border-radius:8px;padding:8px 14px;font-size:.84rem;flex:1;max-width:320px;outline:none;font-family:inherit;">
+                <option value="">Selecione uma área para ver perguntas...</option>
+                <option value="frontend">Frontend</option>
+                <option value="backend">Backend</option>
+                <option value="mobile">Mobile</option>
+                <option value="devops">DevOps</option>
+                <option value="dados">Dados & BI</option>
+                <option value="ux">UX/UI Design</option>
+                <option value="vendas">Vendas & Comercial</option>
+                <option value="rh">RH & Pessoas</option>
+                <option value="marketing">Marketing</option>
+                <option value="financeiro">Financeiro & Contábil</option>
+                <option value="geral">Geral / Comportamental</option>
+              </select>
+              <span style="color:#555;font-size:.78rem;margin-left:12px;" id="question-counter-label">0/5 perguntas</span>
+            </div>
+
+            <div id="question-bank" style="display:none;background:#0a0a0a;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;margin-bottom:14px;">
+              <p style="color:#777;font-size:.78rem;font-weight:600;margin-bottom:10px;">Selecione as perguntas que deseja usar:</p>
+              <div id="bank-list"></div>
+            </div>
+
+            <div id="questions-list" style="margin-bottom:14px;"></div>
+
+            <button type="button" onclick="addCustomQuestion()"
+              style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#666;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:inherit;transition:all .2s;"
+              onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'"
+              onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='#666'">
+              <i class="bi bi-plus-lg me-1"></i> Pergunta personalizada
+            </button>
+
+            <input type="hidden" name="questions" id="questionsInput" value="{{job.questions}}">
+          </div>
+        </div>
+
+        <!-- SEÇÃO 5: Etapas do Processo Seletivo -->
+        <div class="jf-section">
+          <div class="jf-section-hdr">
+            <div class="jf-section-num">5</div>
+            <div>
+              <h3 class="jf-section-title">Etapas do Processo <span class="jf-optional">opcional</span></h3>
+              <p class="jf-section-sub">Defina as fases que os candidatos irão percorrer</p>
+            </div>
+          </div>
+
+          <div class="jf-questions-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+              <select id="stages-template-select" onchange="loadStageTemplate(this.value)"
+                style="background:#111;border:1px solid rgba(255,255,255,.1);color:#ccc;border-radius:8px;padding:8px 14px;font-size:.84rem;flex:1;max-width:310px;outline:none;font-family:inherit;">
+                <option value="">Carregar modelo por área...</option>
+                <option value="tech">Tecnologia</option>
+                <option value="design">Design / UX</option>
+                <option value="vendas">Vendas & Comercial</option>
+                <option value="rh">RH & Pessoas</option>
+                <option value="executivo">Executivo / Liderança</option>
+                <option value="operacional">Operacional</option>
+                <option value="marketing">Marketing</option>
+                <option value="financeiro">Financeiro</option>
+                <option value="padrao">Processo Padrão</option>
+              </select>
+              <button type="button" class="jf-btn-ia" id="stages-ai-btn" onclick="suggestStagesWithAI()">
+                <i class="bi bi-stars"></i> Sugerir com IA
+              </button>
+            </div>
+
+            <div id="stages-list" style="margin-bottom:14px;"></div>
+
+            <button type="button" onclick="addCustomStage()"
+              style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#666;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:.8rem;font-family:inherit;transition:all .2s;"
+              onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'"
+              onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='#666'">
+              <i class="bi bi-plus-lg me-1"></i> Adicionar etapa
+            </button>
+
+            <input type="hidden" name="stages" id="stagesInput" value="{{job.stages}}">
+          </div>
+        </div>
+
+        <!-- SEÇÃO 6: Auditoria de Bias -->
+        <div class="jf-section">
+          <div class="jf-section-hdr">
+            <div class="jf-section-num" style="background:#a855f7;">6</div>
+            <div>
+              <h3 class="jf-section-title">AI Bias Auditor</h3>
+              <p class="jf-section-sub">Analisa linguagem enviesada e sugere reescritas inclusivas</p>
+            </div>
+          </div>
+          <div class="jf-bias-wrap">
+            <button type="button" onclick="auditarBias()" id="bias-btn" class="jf-bias-btn">
+              <i class="bi bi-shield-check me-2"></i>Analisar Bias
+            </button>
+            <div id="bias-result" style="display:none;margin-top:16px;"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="jf-submit">
+          <i class="bi bi-check2-circle"></i> Salvar Alterações
+        </button>
+      </form>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="jf-sidebar">
+      <div class="jf-sb-card">
+        <div class="jf-sb-label">Vaga atual</div>
+        <div class="jf-company-name"><i class="bi bi-buildings me-1" style="color:#e63946;"></i>{{user.name}}</div>
+        <div class="jf-company-email"><i class="bi bi-envelope me-1"></i>{{user.email}}</div>
+      </div>
+
+      <div class="jf-sb-card">
+        <div class="jf-sb-label">Ferramentas de IA</div>
+        <div class="jf-ai-item" onclick="improveWithAI('description','descrição da vaga')">
+          <div class="jf-ai-dot" style="background:rgba(230,57,70,.1);color:#e63946;"><i class="bi bi-stars"></i></div>
+          Melhorar descrição
+        </div>
+        <div class="jf-ai-item" onclick="improveWithAI('requirements','requisitos da vaga')">
+          <div class="jf-ai-dot" style="background:rgba(6,182,212,.1);color:#06b6d4;"><i class="bi bi-stars"></i></div>
+          Melhorar requisitos
+        </div>
+        <div class="jf-ai-item" onclick="improveWithAI('benefits','benefícios da vaga')">
+          <div class="jf-ai-dot" style="background:rgba(76,175,80,.1);color:#4caf50;"><i class="bi bi-stars"></i></div>
+          Melhorar benefícios
+        </div>
+        <div class="jf-ai-item" onclick="suggestStagesWithAI()">
+          <div class="jf-ai-dot" style="background:rgba(6,182,212,.1);color:#06b6d4;"><i class="bi bi-list-check"></i></div>
+          Sugerir etapas
+        </div>
+        <div class="jf-ai-item" onclick="auditarBias()">
+          <div class="jf-ai-dot" style="background:rgba(168,85,247,.1);color:#a855f7;"><i class="bi bi-shield-check"></i></div>
+          Auditar bias
+        </div>
+      </div>
+
+      <div class="jf-sb-card">
+        <div class="jf-sb-label">Atenção</div>
+        <div class="jf-tip"><i class="bi bi-exclamation-circle-fill"></i> Ao reabrir uma vaga (status → Aberta), a Redescoberta de Talentos é acionada automaticamente.</div>
+        <div class="jf-tip"><i class="bi bi-bell-fill"></i> Candidatos anteriores compatíveis recebem notificação da nova oportunidade.</div>
+        <div class="jf-tip"><i class="bi bi-lightbulb-fill"></i> Atualize a descrição antes de reabrir para maximizar candidaturas relevantes.</div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- MODAL IA -->
+<div id="ia-modal" class="jf-modal">
+  <div class="jf-modal-box">
+    <div class="jf-modal-title"><i class="bi bi-stars me-1"></i> Sugestão da IA</div>
+    <p class="jf-modal-sub">Revise o texto gerado e clique em "Usar este texto" para aplicar.</p>
+    <div id="ia-result" class="jf-modal-result"></div>
+    <div class="jf-modal-actions">
+      <button onclick="closeIAModal()" class="jf-modal-cancel">Cancelar</button>
+      <button onclick="applyIAResult()" class="jf-modal-apply">Usar este texto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── QUESTION BANK ───────────────────────────────────────────────────────────
+const QUESTION_BANK = {
+    frontend: [
+        { type: 'aberta',      question: 'Explique a diferença entre position relative, absolute e fixed no CSS.' },
+        { type: 'aberta',      question: 'Como você otimiza a performance de uma aplicação React?' },
+        { type: 'situacional', question: 'Um componente está renderizando mais vezes do que o esperado. Como você investigaria e resolveria?' },
+        { type: 'aberta',      question: 'Qual a diferença entre localStorage, sessionStorage e cookies?' },
+        { type: 'situacional', question: 'Você precisa implementar uma funcionalidade que impacta vários componentes. Como você estruturaria o estado?' },
+        { type: 'multipla',    question: 'Qual hook React é usado para efeitos colaterais?', options: ['useState', 'useEffect', 'useContext', 'useReducer'], correct: 1 },
+        { type: 'aberta',      question: 'O que é acessibilidade web e como você a aplica no seu dia a dia?' },
+        { type: 'aberta',      question: 'Explique o conceito de Virtual DOM e suas vantagens.' }
+    ],
+    backend: [
+        { type: 'aberta',      question: 'Explique a diferença entre autenticação e autorização.' },
+        { type: 'situacional', question: 'Sua API está com tempo de resposta alto em horários de pico. Quais estratégias você usaria?' },
+        { type: 'aberta',      question: 'O que é um índice de banco de dados e quando você o utilizaria?' },
+        { type: 'situacional', question: 'Como você projetaria um sistema de filas para processar pedidos de e-commerce?' },
+        { type: 'multipla',    question: 'Qual método HTTP é idempotente por definição?', options: ['POST', 'PATCH', 'GET', 'PUT'], correct: 2 },
+        { type: 'aberta',      question: 'O que é injeção de SQL e como você a previne?' },
+        { type: 'aberta',      question: 'Explique a diferença entre REST e GraphQL. Quando usar cada um?' },
+        { type: 'situacional', question: 'Você precisa migrar um banco de dados em produção sem downtime. Como faria?' }
+    ],
+    mobile: [
+        { type: 'aberta',      question: 'Quais as principais diferenças entre desenvolvimento nativo e cross-platform?' },
+        { type: 'situacional', question: 'Como você lida com diferentes tamanhos de tela e resoluções no mobile?' },
+        { type: 'aberta',      question: 'O que é deep linking e para que serve?' },
+        { type: 'situacional', question: 'O app está consumindo muita bateria em background. Como você investigaria?' },
+        { type: 'aberta',      question: 'Explique o ciclo de vida de uma Activity no Android ou ViewController no iOS.' },
+        { type: 'multipla',    question: 'Qual é a principal vantagem do React Native sobre desenvolvimento nativo?', options: ['Performance superior', 'Código compartilhado entre plataformas', 'Acesso total ao hardware', 'Melhor UI nativa'], correct: 1 },
+        { type: 'aberta',      question: 'Como você implementaria notificações push em um app mobile?' }
+    ],
+    devops: [
+        { type: 'aberta',      question: 'Explique a diferença entre Docker e uma máquina virtual.' },
+        { type: 'situacional', question: 'Um serviço em produção caiu. Descreva o processo de investigação e recuperação.' },
+        { type: 'aberta',      question: 'O que é CI/CD e quais as principais etapas de um pipeline?' },
+        { type: 'aberta',      question: 'Como você configuraria monitoramento e alertas para uma aplicação em produção?' },
+        { type: 'situacional', question: 'Como você gerenciaria segredos e variáveis de ambiente em produção?' },
+        { type: 'multipla',    question: 'O que faz o comando "docker-compose up --build"?', options: ['Inicia containers sem rebuild', 'Rebuilda imagens e inicia containers', 'Para todos os containers', 'Lista containers ativos'], correct: 1 },
+        { type: 'aberta',      question: 'Explique o conceito de Infrastructure as Code e cite uma ferramenta.' },
+        { type: 'aberta',      question: 'Qual a diferença entre escalabilidade horizontal e vertical?' }
+    ],
+    dados: [
+        { type: 'aberta',      question: 'Explique a diferença entre Data Warehouse e Data Lake.' },
+        { type: 'situacional', question: 'Você recebeu um dataset com 30% de valores nulos. Como você trataria?' },
+        { type: 'aberta',      question: 'O que é overfitting em machine learning e como evitá-lo?' },
+        { type: 'multipla',    question: 'Qual técnica reduz dimensionalidade de dados?', options: ['Random Forest', 'PCA', 'K-Means', 'Gradient Boosting'], correct: 1 },
+        { type: 'aberta',      question: 'Explique a diferença entre LEFT JOIN e INNER JOIN com um exemplo prático.' },
+        { type: 'situacional', question: 'Como você apresentaria insights de dados para uma audiência não técnica?' },
+        { type: 'aberta',      question: 'O que é um pipeline de dados e quais ferramentas você já utilizou?' }
+    ],
+    ux: [
+        { type: 'aberta',      question: 'Explique seu processo de pesquisa com usuários antes de iniciar um design.' },
+        { type: 'situacional', question: 'O time quer um feature, mas sua pesquisa mostra que usuários não precisam dela. Como você lida?' },
+        { type: 'aberta',      question: 'Qual a diferença entre UX e UI? Como eles se complementam?' },
+        { type: 'aberta',      question: 'Como você mede o sucesso de um design após o lançamento?' },
+        { type: 'situacional', question: 'Você tem 2 dias para entregar um protótipo. Qual seria sua abordagem?' },
+        { type: 'multipla',    question: 'Qual é o objetivo principal de um teste de usabilidade?', options: ['Validar preferências estéticas', 'Identificar problemas de uso', 'Aprovar o design final', 'Medir tempo de desenvolvimento'], correct: 1 },
+        { type: 'aberta',      question: 'O que é design system e qual o benefício de adotá-lo?' }
+    ],
+    vendas: [
+        { type: 'situacional', question: 'Um cliente em potencial disse que o preço está acima do orçamento. Como você conduziria essa negociação?' },
+        { type: 'aberta',      question: 'Como você prioriza sua carteira de clientes quando tem múltiplas oportunidades abertas?' },
+        { type: 'situacional', question: 'Você perdeu um cliente importante para a concorrência. O que você faz?' },
+        { type: 'aberta',      question: 'Descreva sua estratégia para fazer prospecção ativa de novos clientes.' },
+        { type: 'multipla',    question: 'O que significa SPIN Selling?', options: ['Sistema de Prospecção Integrada de Novos clientes', 'Situação, Problema, Implicação, Necessidade', 'Segmento, Produto, Impacto, Negociação', 'Solução, Processo, Investimento, Negócio'], correct: 1 },
+        { type: 'situacional', question: 'Como você construiria um relacionamento de longo prazo com um cliente após a primeira venda?' }
+    ],
+    rh: [
+        { type: 'situacional', question: 'Como você conduz uma entrevista por competências? Dê um exemplo de pergunta que você usaria.' },
+        { type: 'aberta',      question: 'Como você mensura o sucesso de um processo seletivo além do preenchimento da vaga?' },
+        { type: 'situacional', question: 'Dois colaboradores têm um conflito que está afetando o time. Como você mediaria?' },
+        { type: 'aberta',      question: 'O que você considera ao estruturar um programa de onboarding eficaz?' },
+        { type: 'multipla',    question: 'O que é employer branding?', options: ['Marca do produto da empresa', 'Reputação da empresa como empregadora', 'Estratégia de vendas', 'Programa de benefícios'], correct: 1 },
+        { type: 'situacional', question: 'Um gestor quer demitir um colaborador por baixa performance. Quais etapas você seguiria?' }
+    ],
+    marketing: [
+        { type: 'aberta',      question: 'Explique a diferença entre marketing de conteúdo e inbound marketing.' },
+        { type: 'situacional', question: 'Você tem um budget limitado para uma campanha. Como você priorizaria os canais?' },
+        { type: 'aberta',      question: 'Quais métricas você analisa para avaliar o desempenho de uma campanha digital?' },
+        { type: 'situacional', question: 'Uma campanha nas redes sociais está gerando muitos comentários negativos. Como você agiria?' },
+        { type: 'multipla',    question: 'O que é taxa de conversão?', options: ['Número total de visitantes', '% de visitantes que realizam a ação desejada', 'Custo por clique', 'Alcance total da campanha'], correct: 1 },
+        { type: 'aberta',      question: 'Como você estruturaria uma estratégia de SEO para um novo site?' }
+    ],
+    financeiro: [
+        { type: 'aberta',      question: 'Explique a diferença entre fluxo de caixa e lucro líquido.' },
+        { type: 'situacional', question: 'Você identificou uma inconsistência no balanço patrimonial. Qual seria sua abordagem?' },
+        { type: 'multipla',    question: 'O que é EBITDA?', options: ['Lucro antes de impostos', 'Lucro antes de juros, impostos, depreciação e amortização', 'Receita bruta total', 'Fluxo de caixa operacional'], correct: 1 },
+        { type: 'aberta',      question: 'Como você elabora e monitora um orçamento empresarial?' },
+        { type: 'situacional', question: 'A empresa precisa reduzir custos em 15% sem demissões. Que análises você faria?' },
+        { type: 'aberta',      question: 'Explique o conceito de capital de giro e sua importância para a saúde financeira.' }
+    ],
+    geral: [
+        { type: 'situacional', question: 'Descreva uma situação em que você precisou aprender algo novo rapidamente sob pressão.' },
+        { type: 'situacional', question: 'Conte sobre um projeto em que você trabalhou em equipe e houve um conflito. Como resolveu?' },
+        { type: 'aberta',      question: 'Como você se organiza para gerenciar múltiplas tarefas com prazos simultâneos?' },
+        { type: 'situacional', question: 'Você cometeu um erro que impactou o time. O que fez a seguir?' },
+        { type: 'aberta',      question: 'Como você lida com feedbacks negativos sobre seu trabalho?' },
+        { type: 'situacional', question: 'Descreva uma situação em que você precisou tomar uma decisão difícil com informações incompletas.' },
+        { type: 'aberta',      question: 'Onde você se vê profissionalmente daqui a 2 anos e como esta vaga contribui para isso?' }
+    ]
+};
+
+let questions = [];
+
+(function() {
+    const input = document.getElementById('questionsInput');
+    if (input && input.value) {
+        try { JSON.parse(input.value).forEach(q => addQuestion(q)); } catch(e) {}
+    }
+})();
+
+function loadCategoryQuestions(category) {
+    const bank = document.getElementById('question-bank');
+    const list = document.getElementById('bank-list');
+    if (!category) { bank.style.display = 'none'; return; }
+    const items = QUESTION_BANK[category] || [];
+    bank.style.display = 'block';
+    list.innerHTML = items.map((q, i) => `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:8px;margin-bottom:6px;background:#111;transition:background .15s;"
+            onmouseover="this.style.background='#161616'" onmouseout="this.style.background='#111'">
+            <input type="checkbox" id="bank-q-${i}" onchange="toggleBankQuestion(${i},'${category}')"
+                style="accent-color:#e63946;margin-top:3px;flex-shrink:0;cursor:pointer;">
+            <label for="bank-q-${i}" style="cursor:pointer;flex:1;">
+                <span style="color:#ccc;font-size:.84rem;line-height:1.5;">${q.question}</span>
+                <span style="display:inline-block;margin-left:8px;background:${q.type==='multipla'?'rgba(6,182,212,.1)':q.type==='situacional'?'rgba(168,85,247,.1)':'rgba(76,175,80,.1)'};color:${q.type==='multipla'?'#06b6d4':q.type==='situacional'?'#a855f7':'#4caf50'};border-radius:20px;padding:1px 8px;font-size:.66rem;">${q.type}</span>
+            </label>
+        </div>`).join('');
+}
+
+function toggleBankQuestion(index, category) {
+    const q = QUESTION_BANK[category][index];
+    const checkbox = document.getElementById('bank-q-' + index);
+    if (checkbox.checked) {
+        if (questions.length >= 5) { alert('Máximo de 5 perguntas por vaga.'); checkbox.checked = false; return; }
+        addQuestion({ ...q, _bankIndex: index, _category: category });
+    } else {
+        questions = questions.filter(item => !(item._bankIndex === index && item._category === category));
+        renderQuestions();
+    }
+}
+
+function addCustomQuestion() {
+    if (questions.length >= 5) { alert('Máximo de 5 perguntas por vaga.'); return; }
+    addQuestion({ type: 'aberta', question: '', options: [], _custom: true });
+}
+
+function addQuestion(data = {}) {
+    const id = Date.now() + Math.random();
+    questions.push({ id, type: data.type || 'aberta', question: data.question || '', options: data.options || [], correct: data.correct, _bankIndex: data._bankIndex, _category: data._category, _custom: data._custom });
+    renderQuestions();
+}
+
+function removeQuestion(id) {
+    const q = questions.find(item => item.id === id);
+    if (q && q._bankIndex !== undefined) {
+        const cb = document.getElementById('bank-q-' + q._bankIndex);
+        if (cb) cb.checked = false;
+    }
+    questions = questions.filter(item => item.id !== id);
+    renderQuestions();
+}
+
+function updateQuestion(id, field, value) {
+    const q = questions.find(item => item.id === id);
+    if (q) q[field] = value;
+}
+
+function renderQuestions() {
+    const list = document.getElementById('questions-list');
+    document.getElementById('question-counter-label').textContent = `${questions.length}/5 perguntas`;
+    if (questions.length === 0) { list.innerHTML = ''; return; }
+    list.innerHTML = `
+        <p style="color:#666;font-size:.78rem;font-weight:600;margin-bottom:10px;">Perguntas selecionadas:</p>
+        ${questions.map((q, i) => `
+        <div style="background:#111;border:1px solid ${q._custom ? 'rgba(230,57,70,.2)' : 'rgba(255,255,255,.06)'};border-radius:10px;padding:14px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="color:#e63946;font-size:.78rem;font-weight:700;">Pergunta ${i+1}</span>
+                    ${q._custom ? '<span style="background:rgba(230,57,70,.1);color:#e63946;font-size:.65rem;padding:1px 8px;border-radius:20px;">personalizada</span>' : '<span style="background:rgba(255,255,255,.05);color:#555;font-size:.65rem;padding:1px 8px;border-radius:20px;">banco</span>'}
+                </div>
+                <button type="button" onclick="removeQuestion(${q.id})" style="background:transparent;border:none;color:#444;cursor:pointer;font-size:.85rem;padding:0;transition:color .2s;" onmouseover="this.style.color='#e63946'" onmouseout="this.style.color='#444'">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            ${q._custom ? `
+            <select onchange="updateQuestion(${q.id},'type',this.value)" style="background:#0d0d0d;border:1px solid rgba(255,255,255,.1);color:#ccc;border-radius:8px;padding:6px 12px;width:100%;margin-bottom:8px;font-size:.82rem;font-family:inherit;outline:none;">
+                <option value="aberta" ${q.type==='aberta'?'selected':''}>Resposta aberta (avaliada por IA)</option>
+                <option value="situacional" ${q.type==='situacional'?'selected':''}>Situacional (avaliada por IA)</option>
+                <option value="multipla" ${q.type==='multipla'?'selected':''}>Múltipla escolha</option>
+            </select>
+            <textarea placeholder="Digite sua pergunta personalizada..." rows="2" oninput="updateQuestion(${q.id},'question',this.value)"
+                style="width:100%;background:#0d0d0d;border:1px solid rgba(255,255,255,.1);color:#e0e0e0;border-radius:8px;padding:10px;resize:none;font-size:.84rem;font-family:inherit;outline:none;">${q.question}</textarea>
+            ${q.type === 'multipla' ? `
+            <div style="margin-top:8px;">
+                <p style="color:#555;font-size:.74rem;margin:0 0 6px;">Opções (1 por linha). Marque a correta com *:</p>
+                <textarea placeholder="Opção A&#10;Opção B&#10;*Opção C (correta)&#10;Opção D" rows="4" oninput="updateQuestion(${q.id},'options',this.value.split('\\n'))"
+                    style="width:100%;background:#0d0d0d;border:1px solid rgba(255,255,255,.1);color:#e0e0e0;border-radius:8px;padding:10px;resize:none;font-size:.82rem;font-family:inherit;outline:none;">${(q.options||[]).join('\n')}</textarea>
+            </div>` : ''}` : `
+            <p style="color:#ccc;font-size:.84rem;margin:0;line-height:1.55;">${q.question}</p>
+            ${q.type==='multipla' && q.options?.length ? `
+            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
+                ${q.options.map((opt,oi) => `<span style="background:${oi===q.correct?'rgba(76,175,80,.1)':'rgba(255,255,255,.04)'};border:1px solid ${oi===q.correct?'#4caf50':'rgba(255,255,255,.08)'};color:${oi===q.correct?'#4caf50':'#888'};border-radius:20px;padding:2px 10px;font-size:.74rem;">${oi===q.correct?'✓ ':''}${opt}</span>`).join('')}
+            </div>` : ''}`}
+        </div>`).join('')}`;
+}
+
+document.querySelector('form')?.addEventListener('submit', function() {
+    document.getElementById('questionsInput').value = JSON.stringify(
+        questions.map(({ id, _bankIndex, _category, _custom, ...rest }) => rest)
+    );
+    document.getElementById('stagesInput').value = JSON.stringify(stages.map(s => s.name));
+});
+
+// ─── ETAPAS DO PROCESSO ───────────────────────────────────────────────────────
+const STAGE_TEMPLATES = {
+    tech:        ['Triagem de Currículo', 'Entrevista RH', 'Teste Técnico', 'Entrevista Técnica', 'Entrevista com Gestor', 'Proposta'],
+    design:      ['Triagem de Currículo', 'Entrevista RH', 'Desafio de Portfolio', 'Entrevista com Time de Design', 'Proposta'],
+    vendas:      ['Triagem de Currículo', 'Entrevista RH', 'Role Play Comercial', 'Entrevista com Gestor', 'Proposta'],
+    rh:          ['Triagem de Currículo', 'Entrevista RH', 'Entrevista com Liderança', 'Proposta'],
+    executivo:   ['Triagem de Currículo', 'Entrevista RH', 'Assessment', 'Entrevista com Diretoria', 'Proposta'],
+    operacional: ['Triagem de Currículo', 'Entrevista RH', 'Entrevista Operacional', 'Proposta'],
+    marketing:   ['Triagem de Currículo', 'Entrevista RH', 'Desafio de Case', 'Entrevista com Time', 'Proposta'],
+    financeiro:  ['Triagem de Currículo', 'Entrevista RH', 'Teste Técnico', 'Entrevista com Gestor', 'Proposta'],
+    padrao:      ['Triagem de Currículo', 'Entrevista RH', 'Entrevista Final', 'Proposta'],
+};
+
+let stages = [];
+
+function loadStageTemplate(category) {
+    if (!category) return;
+    stages = (STAGE_TEMPLATES[category] || []).map((name, i) => ({ id: i, name }));
+    renderStages();
+    document.getElementById('stages-template-select').value = '';
+}
+
+function addCustomStage(name) {
+    stages.push({ id: Date.now(), name: name || '' });
+    renderStages();
+    const inputs = document.querySelectorAll('#stages-list input[type=text]');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function removeStage(id) {
+    stages = stages.filter(s => s.id !== id);
+    renderStages();
+}
+
+function updateStageName(id, value) {
+    const s = stages.find(s => s.id === id);
+    if (s) s.name = value;
+}
+
+function renderStages() {
+    const list = document.getElementById('stages-list');
+    if (!stages.length) {
+        list.innerHTML = '<p style="color:#444;font-size:.8rem;text-align:center;padding:14px 0;">Nenhuma etapa definida. Use um modelo ou adicione manualmente.</p>';
+        return;
+    }
+    list.innerHTML = stages.map((s, i) => `
+        <div style="display:flex;align-items:center;gap:10px;background:#0d0d0d;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;margin-bottom:8px;">
+            <span style="width:24px;height:24px;border-radius:6px;background:#e63946;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:800;font-size:.72rem;flex-shrink:0;color:#fff;font-variant-numeric:tabular-nums;">${i + 1}</span>
+            <input type="text" value="${s.name.replace(/"/g, '&quot;')}" placeholder="Nome da etapa..."
+                oninput="updateStageName(${s.id}, this.value)"
+                style="flex:1;background:transparent;border:none;color:#e0e0e0;font-size:.88rem;outline:none;font-family:inherit;">
+            <button type="button" onclick="removeStage(${s.id})"
+                style="background:transparent;border:none;color:#444;cursor:pointer;padding:0;font-size:1rem;line-height:1;transition:color .15s;"
+                onmouseover="this.style.color='#e63946'" onmouseout="this.style.color='#444'">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+async function suggestStagesWithAI() {
+    const title = document.getElementById('title')?.value?.trim();
+    const description = document.getElementById('description')?.value?.trim();
+    if (!title) { alert('Preencha o título da vaga antes de sugerir etapas!'); return; }
+    const btn = document.getElementById('stages-ai-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Gerando...';
+    try {
+        const response = await fetch('/jobs/ai/stages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value },
+            body: JSON.stringify({ title, description })
+        });
+        const data = await response.json();
+        if (data.stages && Array.isArray(data.stages)) {
+            stages = data.stages.map((name, i) => ({ id: i, name }));
+            renderStages();
+        }
+    } catch (err) {
+        alert('Erro ao conectar com a IA. Tente novamente.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-stars"></i> Sugerir com IA';
+    }
+}
+
+// Inicializa etapas salvas
+(function() {
+    const input = document.getElementById('stagesInput');
+    if (input && input.value && input.value !== '[]') {
+        try {
+            const parsed = JSON.parse(input.value);
+            stages = parsed.map((name, i) => ({ id: i, name: typeof name === 'string' ? name : (name.name || '') }));
+        } catch(e) {}
+    }
+    renderStages();
+}());
+
+// ─── PCD TOGGLE ──────────────────────────────────────────────────────────────
+function updatePcdToggle() {
+    const checked = document.getElementById('isPcd').checked;
+    const toggle  = document.getElementById('pcd-toggle');
+    const knob    = document.getElementById('pcd-knob');
+    const label   = document.getElementById('pcd-label');
+    const text    = document.getElementById('pcd-text').querySelector('span');
+    if (checked) {
+        toggle.style.background    = '#e63946';
+        toggle.style.borderColor   = '#e63946';
+        knob.style.background      = '#fff';
+        knob.style.left            = '19px';
+        label.style.borderColor    = '#e63946';
+        label.style.background     = 'rgba(230,57,70,.06)';
+        text.style.color           = '#e0e0e0';
+    } else {
+        toggle.style.background    = '#1a1a1a';
+        toggle.style.borderColor   = 'rgba(255,255,255,.15)';
+        knob.style.background      = '#444';
+        knob.style.left            = '3px';
+        label.style.borderColor    = 'rgba(255,255,255,0.09)';
+        label.style.background     = '#0d0d0d';
+        text.style.color           = '#777';
+    }
+}
+
+// ─── MODALITY & STATUS ───────────────────────────────────────────────────────
+function selectModality(type) {
+    document.getElementById(type).checked = true;
+    document.querySelectorAll('#modality-grid .jf-mod-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-' + type).classList.add('selected');
+}
+
+function selectContractType(type) {
+    document.getElementById('contract-' + type).checked = true;
+    document.querySelectorAll('#contract-grid .jf-mod-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-contract-' + type).classList.add('selected');
+}
+
+function selectStatus(val) {
+    document.getElementById('status-input').value = val;
+    document.querySelectorAll('.jf-status-card').forEach(c => c.className = 'jf-status-card');
+    const card = document.getElementById('scard-' + val);
+    if (card) card.classList.add('sel-' + val);
+}
+
+// ─── IA IMPROVE ──────────────────────────────────────────────────────────────
+let currentFieldId = null;
+
+async function improveWithAI(fieldId, fieldLabel) {
+    const textarea = document.getElementById(fieldId);
+    const content  = textarea.value.trim();
+    const title    = document.getElementById('title').value.trim();
+    if (!content) { alert('Escreva algo no campo antes de melhorar com IA!'); return; }
+    currentFieldId = fieldId;
+    const modal  = document.getElementById('ia-modal');
+    const result = document.getElementById('ia-result');
+    modal.style.display = 'flex';
+    result.innerHTML = '<span style="color:#555;">Gerando sugestão...</span>';
+    try {
+        const response = await fetch('/jobs/ai/improve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value },
+            body: JSON.stringify({ fieldLabel, content, title })
+        });
+        const data = await response.json();
+        result.textContent = data.improved || 'Erro ao gerar sugestão.';
+    } catch (err) {
+        result.innerHTML = '<span style="color:#e63946;">Erro ao conectar com a IA. Tente novamente.</span>';
+    }
+}
+
+function applyIAResult() {
+    const result = document.getElementById('ia-result').textContent;
+    if (currentFieldId) document.getElementById(currentFieldId).value = result;
+    closeIAModal();
+}
+
+function closeIAModal() {
+    document.getElementById('ia-modal').style.display = 'none';
+    currentFieldId = null;
+}
+
+// ─── BIAS AUDITOR ────────────────────────────────────────────────────────────
+let _biasProblemas = [];
+
+async function auditarBias() {
+    const btn    = document.getElementById('bias-btn');
+    const result = document.getElementById('bias-result');
+    const title        = document.querySelector('input[name="title"]')?.value || '';
+    const description  = document.querySelector('textarea[name="description"]')?.value || '';
+    const requirements = document.querySelector('textarea[name="requirements"]')?.value || '';
+    const benefits     = document.querySelector('textarea[name="benefits"]')?.value || '';
+    if (!description && !requirements) { alert('Preencha pelo menos a descrição antes de analisar.'); return; }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Analisando...';
+    result.style.display = 'block';
+    result.innerHTML = '<p style="color:#666;font-size:.84rem;">Analisando linguagem da vaga...</p>';
+    try {
+        const res  = await fetch('/bias/audit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value },
+            body: JSON.stringify({ title, description, requirements, benefits })
+        });
+        const data = await res.json();
+        const scoreColor = data.score_inclusividade >= 70 ? '#4caf50' : data.score_inclusividade >= 40 ? '#f59e0b' : '#e63946';
+        const riskColor  = { baixo: '#4caf50', medio: '#f59e0b', alto: '#e63946' }[data.nivel_risco] || '#888';
+        const problemasHtml = (data.problemas_encontrados || []).map(p => `
+            <div style="background:#0d0d0d;border-left:2px solid #f59e0b;border-radius:4px;padding:10px 14px;margin-bottom:8px;">
+                <p style="color:#f59e0b;font-size:.75rem;font-weight:700;margin:0 0 4px;text-transform:uppercase;">${p.tipo}</p>
+                <p style="color:#ccc;font-size:.82rem;margin:0 0 6px;"><strong>Trecho:</strong> "${p.trecho}"</p>
+                <p style="color:#4caf50;font-size:.82rem;margin:0;"><strong>Sugestão:</strong> ${p.sugestao}</p>
+            </div>`).join('');
+        result.innerHTML = `
+            <div style="display:flex;gap:20px;margin-bottom:14px;flex-wrap:wrap;">
+                <div style="text-align:center;"><div style="font-size:1.8rem;font-weight:700;color:${scoreColor};font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;">${data.score_inclusividade}</div><div style="color:#555;font-size:.72rem;">Score Inclusividade</div></div>
+                <div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:${riskColor};text-transform:capitalize;">${data.nivel_risco}</div><div style="color:#555;font-size:.72rem;">Nível de Risco</div></div>
+            </div>
+            ${data.problemas_encontrados?.length ? `<p style="color:#888;font-size:.8rem;font-weight:600;margin-bottom:8px;">Problemas encontrados:</p>${problemasHtml}` : '<p style="color:#4caf50;font-size:.84rem;">Nenhum problema de bias encontrado!</p>'}
+            <p style="color:#666;font-size:.78rem;margin-top:8px;">${data.resumo || ''}</p>
+            ${data.problemas_encontrados?.length ? `<button type="button" onclick="aplicarSugestoesBias()" style="margin-top:12px;background:#4caf50;border:none;color:#fff;border-radius:8px;padding:8px 18px;cursor:pointer;font-weight:600;font-size:.84rem;font-family:inherit;">Aplicar Sugestões</button>` : ''}`;
+        _biasProblemas = data.problemas_encontrados || [];
+    } catch (e) {
+        result.innerHTML = '<p style="color:#e63946;font-size:.84rem;">Erro ao analisar. Tente novamente.</p>';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Analisar Bias';
+    }
+}
+
+function aplicarSugestoesBias() {
+    const campos = ['description', 'requirements', 'benefits', 'differential'];
+    let total = 0;
+    _biasProblemas.forEach(p => {
+        if (!p.trecho || !p.sugestao) return;
+        campos.forEach(id => {
+            const el = document.querySelector('textarea[name="' + id + '"]');
+            if (el && el.value.includes(p.trecho)) { el.value = el.value.replace(p.trecho, p.sugestao); total++; }
+        });
+    });
+    alert(total > 0 ? total + ' sugestão(ões) aplicada(s)!' : 'Nenhuma sugestão aplicável automaticamente.');
+}
+
+// ─── CITY AUTOCOMPLETE ───────────────────────────────────────────────────────
+let citiesAdd = [], citiesAddLoaded = false;
+
+async function loadCitiesAdd() {
+    if (citiesAddLoaded) return;
+    try {
+        const res  = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome');
+        const data = await res.json();
+        citiesAdd = data.map(m => ({ name: m.nome, state: m.microrregiao?.mesorregiao?.UF?.sigla || '' })).filter(m => m.name);
+        citiesAddLoaded = true;
+    } catch (e) {}
+}
+
+async function filterCitiesAdd(query) {
+    const box = document.getElementById('city-drop-add');
+    box.style.display = 'block';
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) { box.innerHTML = '<div class="jf-city-item" style="color:#444;">Digite ao menos 2 letras...</div>'; return; }
+    if (!citiesAddLoaded) { box.innerHTML = '<div class="jf-city-item" style="color:#444;">Carregando...</div>'; await loadCitiesAdd(); }
+    const filtered = citiesAdd.filter(c => c.name.toLowerCase().includes(q)).slice(0, 10);
+    box.innerHTML = filtered.length === 0
+        ? '<div class="jf-city-item" style="color:#444;">Nenhuma cidade encontrada</div>'
+        : filtered.map(c => `<div class="jf-city-item" onmousedown="selectCityAdd('${c.name.replace(/'/g,"\\'")}')"> ${c.name} <span style="color:#444;font-size:.75rem;">- ${c.state}</span></div>`).join('');
+}
+
+function selectCityAdd(val) {
+    document.getElementById('city-input-add').value = val;
+    document.getElementById('city-drop-add').style.display = 'none';
+}
+
+loadCitiesAdd();
+</script>
