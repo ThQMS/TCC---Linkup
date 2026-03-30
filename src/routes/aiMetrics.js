@@ -30,16 +30,85 @@ const FEATURE_ICONS = {
     'chat':               'bi-chat-dots'
 };
 
+const GROQ_RPM_LIMIT   = 30;
+const GROQ_DAILY_LIMIT = 1000;
+const WEEK_DAY_NAMES   = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
-        const userId   = req.user.id;
+        const userId    = req.user.id;
         const isEmpresa = req.user.userType === 'empresa';
-        const now      = new Date();
-        const day30ago = new Date(now - 30 * 24 * 60 * 60 * 1000);
-        const day60ago = new Date(now - 60 * 24 * 60 * 60 * 1000);
+        const now       = new Date();
+        const day30ago  = new Date(now - 30 * 24 * 60 * 60 * 1000);
+        const day60ago  = new Date(now - 60 * 24 * 60 * 60 * 1000);
+        const day7ago   = new Date(now - 7  * 24 * 60 * 60 * 1000);
+
+        const todayStart = new Date(now);
+        todayStart.setHours(0, 0, 0, 0);
+        const oneMinuteAgo = new Date(now - 60 * 1000);
 
         const allLogs   = await AiLog.findAll({ where: { userId } });
         const totalCalls   = allLogs.length;
+
+        // ── Capacidade da API Groq (global — não filtrado por usuário) ──────────
+        const [usedLastMinute, usedToday, weeklyRaw] = await Promise.all([
+            AiLog.count({ where: { createdAt: { [Op.gte]: oneMinuteAgo } } }),
+            AiLog.count({ where: { createdAt: { [Op.gte]: todayStart    } } }),
+            AiLog.findAll({
+                attributes: [
+                    [fn('DATE', col('createdAt')), 'day'],
+                    [fn('COUNT', col('id')),       'total']
+                ],
+                where:  { createdAt: { [Op.gte]: day7ago } },
+                group:  [fn('DATE', col('createdAt'))],
+                order:  [[fn('DATE', col('createdAt')), 'ASC']],
+                raw:    true
+            })
+        ]);
+
+        const remainingToday  = Math.max(0, GROQ_DAILY_LIMIT - usedToday);
+        const dailyUsagePct   = Math.min(100, Math.round((usedToday / GROQ_DAILY_LIMIT) * 100));
+        const rpmUsagePct     = Math.min(100, Math.round((usedLastMinute / GROQ_RPM_LIMIT) * 100));
+
+        let capacityStatus, capacityColor;
+        if (dailyUsagePct >= 90)      { capacityStatus = 'Crítico';  capacityColor = '#f03e3e'; }
+        else if (dailyUsagePct >= 70) { capacityStatus = 'Atenção';  capacityColor = '#f59e0b'; }
+        else                          { capacityStatus = 'Seguro';   capacityColor = '#4caf50'; }
+
+        if (dailyUsagePct >= 80) {
+            req.flash('warning_msg',
+                `⚠️ Limite da API Groq: ${dailyUsagePct}% do limite diário consumido ` +
+                `(${usedToday}/${GROQ_DAILY_LIMIT} requests). ` +
+                `Restam ${remainingToday} requests hoje.`
+            );
+        }
+
+        // Monta mapa semanal preenchendo dias sem uso com zero
+        const weeklyMap = {};
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const key = d.toISOString().slice(0, 10);
+            weeklyMap[key] = { label: WEEK_DAY_NAMES[d.getDay()], count: 0 };
+        }
+        weeklyRaw.forEach(row => {
+            if (weeklyMap[row.day]) weeklyMap[row.day].count = parseInt(row.total, 10);
+        });
+        const weeklyLabels = JSON.stringify(Object.values(weeklyMap).map(v => v.label));
+        const weeklyData   = JSON.stringify(Object.values(weeklyMap).map(v => v.count));
+
+        const capacityData = {
+            rpmLimit: GROQ_RPM_LIMIT,
+            dailyLimit: GROQ_DAILY_LIMIT,
+            usedLastMinute,
+            usedToday,
+            remainingToday,
+            dailyUsagePct,
+            rpmUsagePct,
+            capacityStatus,
+            capacityColor
+        };
+        // ────────────────────────────────────────────────────────────────────────
         const successCalls = allLogs.filter(l => l.success).length;
         const totalErrors  = totalCalls - successCalls;
         const successRate  = totalCalls > 0 ? Math.round((successCalls / totalCalls) * 100) : 0;
@@ -175,7 +244,8 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             chartLabels: JSON.stringify(chartLabels),
             chartData:   JSON.stringify(chartData),
             callsThisMonth, callsLastMonth, callsGrowth,
-            isEmpresa, kpiCandidato, kpiEmpresa
+            isEmpresa, kpiCandidato, kpiEmpresa,
+            capacityData, weeklyLabels, weeklyData
         });
 
     } catch (err) {

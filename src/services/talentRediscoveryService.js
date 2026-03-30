@@ -43,34 +43,29 @@ const MAX_CANDIDATES_NOTIFY = 50;   // limite de candidatos processados por cham
 function calcFitScore(resume, job) {
     if (!resume) return 0;
 
-    const { skills, experiences, education, summary } = parseResume(resume);
+    const { skills, experiences } = parseResume(resume);
 
-    // Extrai keywords do perfil do candidato (mesma lógica do getSuggestedJobs)
-    const keywords = [
-        ...skills,
-        ...experiences.map(e => e.role   || ''),
-        ...experiences.map(e => e.company || ''),
-        ...education.map(e => e.course   || ''),
-        summary || ''
-    ]
-        .join(' ')
-        .toLowerCase()
-        .split(/[\s,;\/\-\(\)]+/)
-        .map(w => w.trim())
-        .filter(w => w.length > 3);
+    // Usa apenas skills + títulos de cargo — exclui nomes de empresa/educação
+    // que geram ruído e derrubam o score artificialmente
+    const candidateKeywords = new Set([
+        ...skills.map(s => s.toLowerCase().trim()),
+        ...experiences.map(e => (e.role || '').toLowerCase().trim()).filter(Boolean)
+    ].filter(w => w.length > 2));
 
-    if (keywords.length === 0) return 0;
+    if (candidateKeywords.size === 0) return 0;
 
-    const jobText = [
-        job.title        || '',
-        job.description  || '',
-        job.requirements || '',
-        job.benefits     || '',
-        job.differential || ''
-    ].join(' ').toLowerCase();
+    // Foca nos campos de requisitos — exclui benefits/differential (ruído)
+    const jobWords = new Set(
+        [job.title || '', job.requirements || '', job.description || '']
+            .join(' ')
+            .toLowerCase()
+            .split(/[\s,;\/\-\(\)\[\]\.]+/)
+            .map(w => w.trim())
+            .filter(w => w.length > 2)
+    );
 
-    const matched = keywords.filter(kw => jobText.includes(kw)).length;
-    return Math.round((matched / keywords.length) * 100);
+    const matched = [...candidateKeywords].filter(kw => jobWords.has(kw)).length;
+    return Math.round((matched / candidateKeywords.size) * 100);
 }
 
 // ─── Feature 1: Redescoberta de Talentos (para Empresa) ───────────────────────
@@ -425,8 +420,8 @@ function findSimilarCandidates(targetApplication, job, allApplications, resumeMa
     });
 
     return scored
-        .filter(s => s.similarity > 0 || s.fitScore > 30)
-        .sort((a, b) => (b.similarity + b.fitScore) - (a.similarity + a.fitScore))
+        .filter(s => s.fitScore >= 50)
+        .sort((a, b) => (b.fitScore * 0.7 + b.similarity * 0.3) - (a.fitScore * 0.7 + a.similarity * 0.3))
         .slice(0, limit);
 }
 

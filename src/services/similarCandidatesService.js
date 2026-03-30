@@ -17,7 +17,7 @@ const logger          = require('../helpers/logger');
 const { calcFitScore } = require('./talentRediscoveryService');
 const { isAvailable } = require('./availabilityService');
 
-const COMBINED_THRESHOLD = 40;  // score mínimo combinado (0-100)
+const COMBINED_THRESHOLD = 50;  // score mínimo combinado (0-100)
 const MAX_RESULTS        = 3;
 const MAX_SCAN           = 300; // candidatos a escanear no banco
 

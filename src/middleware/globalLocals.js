@@ -7,6 +7,7 @@ module.exports = function globalLocals(generateCsrfToken) {
 
         res.locals.success_msg = req.flash('success_msg');
         res.locals.error_msg   = req.flash('error_msg');
+        res.locals.warning_msg = req.flash('warning_msg');
         res.locals.error       = req.flash('error');
         res.locals.user        = req.user ? req.user.toJSON() : null;
         res.locals.csrfToken   = generateCsrfToken(req, res);

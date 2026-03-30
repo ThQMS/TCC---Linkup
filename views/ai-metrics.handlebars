@@ -159,6 +159,87 @@
     </div>
     {{/if}}
 
+    <!-- CAPACIDADE DA IA -->
+    {{#if capacityData}}
+    <div class="metric-card mb-4" style="padding:24px;">
+
+        <!-- Cabeçalho -->
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,rgba(240,62,62,0.15),rgba(240,62,62,0.05));border:1px solid rgba(240,62,62,0.2);display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-speedometer2" style="color:#f03e3e;font-size:0.9rem;"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:0.95rem;">Capacidade da IA</div>
+                    <small style="color:#555;">API Groq · Plano gratuito</small>
+                </div>
+            </div>
+            <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;background:{{capacityData.capacityColor}}1a;color:{{capacityData.capacityColor}};border:1px solid {{capacityData.capacityColor}}33;">
+                <span style="width:7px;height:7px;border-radius:50%;background:{{capacityData.capacityColor}};display:inline-block;"></span>
+                {{capacityData.capacityStatus}}
+            </span>
+        </div>
+
+        <!-- Mini-cards de métricas -->
+        <div class="row g-2 mb-4">
+            <div class="col-6 col-md-2">
+                <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
+                    <div style="font-size:1.3rem;font-weight:800;color:#f03e3e;font-variant-numeric:tabular-nums;">{{capacityData.rpmLimit}}</div>
+                    <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Limite RPM</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
+                    <div style="font-size:1.3rem;font-weight:800;color:#f03e3e;font-variant-numeric:tabular-nums;">{{capacityData.dailyLimit}}</div>
+                    <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Limite Diário</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
+                    <div style="font-size:1.3rem;font-weight:800;color:#06b6d4;font-variant-numeric:tabular-nums;">{{capacityData.usedLastMinute}}</div>
+                    <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Últ. minuto</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
+                    <div style="font-size:1.3rem;font-weight:800;color:#a855f7;font-variant-numeric:tabular-nums;">{{capacityData.usedToday}}</div>
+                    <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Uso hoje</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
+                    <div style="font-size:1.3rem;font-weight:800;color:#4caf50;font-variant-numeric:tabular-nums;">{{capacityData.remainingToday}}</div>
+                    <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Restantes hoje</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
+                    <div style="font-size:1.3rem;font-weight:800;font-variant-numeric:tabular-nums;color:{{capacityData.capacityColor}};">{{capacityData.dailyUsagePct}}%</div>
+                    <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Uso diário</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de progresso diária -->
+        <div style="margin-bottom:24px;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:1px;">Uso diário — {{capacityData.usedToday}} / {{capacityData.dailyLimit}} requests</span>
+                <span style="font-size:0.72rem;font-weight:700;color:{{capacityData.capacityColor}};">{{capacityData.dailyUsagePct}}%</span>
+            </div>
+            <div style="height:6px;background:#1e1e1e;border-radius:3px;overflow:hidden;">
+                <div id="capacityProgressBar" style="height:100%;border-radius:3px;width:0;background:{{capacityData.capacityColor}};transition:width 1s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Gráfico semanal -->
+        <div>
+            <div style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Uso nos últimos 7 dias</div>
+            <canvas id="weeklyChart" height="70"></canvas>
+        </div>
+
+    </div>
+    {{/if}}
+
     <!-- GRÁFICO 30 DIAS -->
     <div class="metric-card mb-4" style="padding:24px;">
         <div class="d-flex align-items-center justify-content-between mb-4">
@@ -254,6 +335,53 @@ if (ctx) {
     });
 }
 
+// Gráfico semanal — Capacidade da IA
+const weeklyLabels = {{{weeklyLabels}}};
+const weeklyData   = {{{weeklyData}}};
+const weeklyCtx    = document.getElementById('weeklyChart');
+if (weeklyCtx && weeklyLabels && weeklyData) {
+    new Chart(weeklyCtx, {
+        type: 'bar',
+        data: {
+            labels: weeklyLabels,
+            datasets: [{
+                label: 'Requests',
+                data: weeklyData,
+                backgroundColor: weeklyData.map(v => {
+                    const pct = (v / 1000) * 100;
+                    if (pct >= 90)  return 'rgba(240,62,62,0.7)';
+                    if (pct >= 70)  return 'rgba(245,158,11,0.7)';
+                    return 'rgba(240,62,62,0.35)';
+                }),
+                borderColor: weeklyData.map(v => {
+                    const pct = (v / 1000) * 100;
+                    if (pct >= 90)  return '#f03e3e';
+                    if (pct >= 70)  return '#f59e0b';
+                    return '#f03e3e';
+                }),
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    ticks: { color: '#555', font: { size: 11 } },
+                    grid:  { display: false }
+                },
+                y: {
+                    ticks:       { color: '#555', stepSize: 1 },
+                    grid:        { color: '#1e1e1e' },
+                    beginAtZero: true,
+                    max:         Math.max(Math.max(...weeklyData) + 2, 5)
+                }
+            }
+        }
+    });
+}
+
 // Anima progress bars ao carregar
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.progress-fill').forEach(el => {
@@ -261,5 +389,9 @@ document.addEventListener('DOMContentLoaded', () => {
         el.style.width = '0';
         setTimeout(() => { el.style.width = w; }, 100);
     });
+
+    // Anima barra de capacidade
+    const bar = document.getElementById('capacityProgressBar');
+    if (bar) setTimeout(() => { bar.style.width = '{{capacityData.dailyUsagePct}}%'; }, 150);
 });
 </script>

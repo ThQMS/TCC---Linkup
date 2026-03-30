@@ -184,6 +184,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {{/if}}
+        {{#if warning_msg}}
+            <div class="alert alert-warning alert-dismissible fade show border-0 shadow" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{warning_msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {{/if}}
         {{#if error_msg}}
             <div class="alert alert-danger alert-dismissible fade show border-0 shadow" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i> {{error_msg}}
