@@ -1,18 +1,16 @@
 <div align="center">
 
-# LinkUp — Plataforma de Recrutamento Inteligente
+# LinkUp
 
-**Conectando talentos e empresas com precisão, contexto e inteligência artificial.**
+**Infraestrutura inteligente de recrutamento para o mercado brasileiro.**
 
-![Node.js](https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Sequelize](https://img.shields.io/badge/Sequelize-6.x-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white)
-![Socket.io](https://img.shields.io/badge/Socket.io-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5_Dark-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
-![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3_70B-F55036?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python_Flask-Busca_Semântica-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![License](https://img.shields.io/badge/Licença-MIT-green?style=for-the-badge)
+[![Node.js](https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
+[![Socket.io](https://img.shields.io/badge/Socket.io-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io)
+[![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3_70B-F55036?style=for-the-badge)](https://groq.com)
+[![Python](https://img.shields.io/badge/Python_Flask-Busca_Semântica-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![License](https://img.shields.io/badge/Licença-MIT-green?style=for-the-badge)](LICENSE)
 
 </div>
 
@@ -20,216 +18,273 @@
 
 ## Visão Geral
 
-O **LinkUp** é uma plataforma bilateral de recrutamento que coloca inteligência artificial no núcleo de cada interação. Candidatos encontram oportunidades com precisão semântica e recebem suporte ativo da IA para se posicionarem melhor no mercado. Empresas gerenciam processos seletivos completos, desde a publicação da vaga até o onboarding, com ferramentas de auditoria, ranqueamento e redescoberta de talentos.
+O LinkUp é uma plataforma bilateral de recrutamento que coloca inteligência artificial no núcleo de cada interação. Candidatos encontram oportunidades com precisão semântica e recebem suporte ativo da IA para se posicionarem melhor no mercado. Empresas gerenciam processos seletivos completos — desde a publicação da vaga até a contratação — com ferramentas de ranqueamento, auditoria e redescoberta de talentos integradas nativamente.
 
-O projeto foi desenvolvido como Trabalho de Conclusão de Curso (TCC) em Engenharia de Software, com foco em arquitetura em camadas, segurança aplicada e experiência de usuário realista para ambos os perfis da plataforma.
+**O problema que resolve:** o mercado de tech brasileiro tem um problema estrutural de correspondência — candidatos qualificados são filtrados por sistemas baseados em keywords, enquanto empresas desperdiçam horas de recrutamento em triagem inicial. O LinkUp ataca os dois lados simultaneamente com uma única plataforma inteligente.
 
----
-
-## Funcionalidades
-
-### Para Candidatos
-
-| Funcionalidade                   | Descrição                                                                                                                                 |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Busca Semântica Híbrida**      | Combina embeddings semânticos (`sentence-transformers`) com BM25 keyword-matching via Reciprocal Rank Fusion — captura intenção e termos exatos simultaneamente |
-| **Score de Compatibilidade**     | IA analisa currículo vs. descrição da vaga e gera uma pontuação fundamentada                                                              |
-| **Carta de Apresentação por IA** | Geração automática e contextualizada a partir do perfil e da vaga                                                                         |
-| **Tailoring de Currículo**       | Sugestões de adaptação do currículo para uma vaga específica                                                                              |
-| **Chat Contextual com IA**       | Conversa interativa sobre qualquer vaga aberta                                                                                            |
-| **Simulação de Entrevista**      | Perguntas geradas pela IA com base na descrição da vaga; avaliação das respostas ao final                                                 |
-| **Importação de Currículo PDF**  | Extração automática de texto com parsing ATS e badges de habilidades detectadas                                                           |
-| **Melhoria de Currículo por IA** | Análise e reescrita profissional do currículo                                                                                             |
-| **Favoritos e Alertas**          | Salvar buscas com alertas automáticos por e-mail quando novas vagas compatíveis surgem                                                    |
-| **Rastreamento de Candidaturas** | Acompanhe cada etapa do processo seletivo em tempo real                                                                                   |
-| **Oportunidades Revisitadas**    | A plataforma sugere proativamente candidaturas anteriores com vagas similares abertas                                                     |
-| **Status de Disponibilidade**    | Informe ao mercado se está aberto a oportunidades                                                                                         |
-
-### Para Empresas
-
-| Funcionalidade                      | Descrição                                                                                                                              |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **Pipeline de Etapas Configurável** | Defina etapas customizadas do processo seletivo (ex: Triagem, Entrevista Técnica, Proposta); IA sugere etapas com base na área da vaga |
-| **Ranking de Candidatos**           | IA ordena candidatos por compatibilidade com a vaga, com justificativa                                                                 |
-| **Candidatos Similares**            | Recomendação de perfis similares ao melhor candidato de uma vaga                                                                       |
-| **Redescoberta de Talentos**        | Identifica candidatos de processos anteriores que se encaixam em vagas abertas agora                                                   |
-| **Vagas PCD**                       | Empresa pode marcar a vaga como exclusiva ou prioritária para Pessoas com Deficiência; badge visual destacado na listagem e na página da vaga |
-| **Bias Auditor**                    | Analisa a descrição da vaga em busca de linguagem excludente ou tendenciosa                                                            |
-| **Melhoria de Descrição por IA**    | Reescreve e aprimora a descrição da vaga                                                                                               |
-| **Encerramento Estruturado**        | Ao encerrar uma vaga, notifica candidatos com feedback humanizado por IA                                                               |
-| **Dashboard de Métricas**           | Visualizações de conversão por etapa, tempo médio por fase e performance do pipeline                                                   |
-| **Exportação de Relatórios em PDF** | Dashboard e candidaturas exportáveis                                                                                                   |
-| **Onboarding com Checklist**        | Guia passo a passo para novos usuários completarem seu perfil e extraírem valor máximo da plataforma                                   |
-| **Notificações em Tempo Real**      | Socket.io para feedback imediato de eventos relevantes                                                                                 |
-| **Métricas de IA**                  | Log completo de uso das features de IA, com volumes, features mais usadas e modelos acionados                                          |
+**Quem usa:**
+- **Candidatos** — busca semântica, tailoring de currículo por IA, simulação de entrevista, acompanhamento em tempo real do pipeline
+- **Empresas** — pipeline de contratação customizável, ranqueamento de candidatos por IA, feedback automatizado e humanizado, redescoberta proativa de talentos
 
 ---
 
-## Stack Tecnológica
+## Visão do Produto
 
-```
-Backend          Node.js 22 + Express 4
-ORM              Sequelize 6 (PostgreSQL 16)
-View Layer       Express-Handlebars + Bootstrap 5 (tema dark)
-IA Principal     Groq SDK — modelo LLaMA 3.3 70B (via API)
-Busca Semântica  Python 3 + Flask + sentence-transformers (microserviço, porta 5001)
-Tempo Real       Socket.io 4
-Jobs Agendados   node-cron 4
-Segurança        Helmet, csrf-csrf, express-rate-limit, bcryptjs
-Upload           Multer (memória) + pdfjs-dist (parsing)
-PDF              html-pdf-node
-E-mail           Nodemailer (Gmail)
-```
+O LinkUp é posicionado como **infraestrutura de recrutamento**, não como quadro de vagas.
+
+| Quadro de Vagas | LinkUp |
+|---|---|
+| Listagem passiva | Matching inteligente ativo |
+| Candidatos se filtram sozinhos | Score de fit mútuo por vaga |
+| Pipeline manual | Pipeline por etapas com ranqueamento IA |
+| Sem ciclo de feedback | Feedback humanizado automatizado |
+| Publicar e esperar | Redescoberta proativa da base de talentos |
+
+A visão de longo prazo é se tornar a camada de dados do recrutamento tech brasileiro — onde cada candidatura gera sinal que melhora os matches futuros em toda a plataforma.
 
 ---
 
-## Arquitetura Resumida
+## Funcionalidades Principais
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                     Cliente (Browser)                    │
-│            Bootstrap 5 Dark + Handlebars + Socket.io     │
-└────────────────────────┬─────────────────────────────────┘
-                         │ HTTP / WebSocket
-┌────────────────────────▼─────────────────────────────────┐
-│                   Camada de Rotas                         │
-│     routes/ → middleware (auth, CSRF, rate limit)        │
-└────────────────────────┬─────────────────────────────────┘
-                         │
-┌────────────────────────▼─────────────────────────────────┐
-│                  Camada de Controllers                    │
-│         Orquestração de requisição e resposta            │
-└──────────┬──────────────────────────┬────────────────────┘
-           │                          │
-┌──────────▼──────────┐   ┌───────────▼──────────────────┐
-│  Camada de Services │   │     Camada de Helpers        │
-│  Lógica de negócio  │   │  aiService, pdfService,      │
-│  applicationService │   │  jobSearch, mailer, socket   │
-│  talentRediscovery  │   └───────────────────────────────┘
-│  similarCandidates  │
-└──────────┬──────────┘
-           │
-┌──────────▼──────────────────────────────────────────────┐
-│                     Modelos (Sequelize)                  │
-│         User, Job, Application, Resume, AiLog...        │
-└──────────┬──────────────────────────────────────────────┘
-           │
-┌──────────▼──────────┐   ┌──────────────────────────────┐
-│    PostgreSQL DB    │   │  Microserviço Python (5001)  │
-│     linkup_db       │   │  Flask + sentence-transformers│
-└─────────────────────┘   └──────────────────────────────┘
-```
+### Busca Semântica Híbrida
+Combina um microserviço Python (sentence-transformers + BM25 + Reciprocal Rank Fusion) com filtragem SQL. Captura tanto a intenção semântica quanto os termos exatos simultaneamente. Empresas bloqueadas pelo candidato são automaticamente excluídas dos resultados. Fallback gracioso para SQL caso o serviço Python esteja indisponível.
 
-> Para detalhes completos da arquitetura, ADRs e diagramas Mermaid, consulte [`docs/architecture.md`](docs/architecture.md).
+### Redescoberta de Talentos
+Quando uma vaga é publicada, a plataforma escaneia automaticamente a base histórica de candidatos da empresa (janela de 6 meses) e exibe candidatos com fit ≥ 88% que estão disponíveis no momento. Dispara notificações no app e e-mails transacionais. Elimina o custo de reanúncio de posições que a base existente já cobre.
+
+### Pipeline de Contratação com Gestão de Etapas
+Empresas definem etapas customizadas por vaga (ex: Triagem → Entrevista Técnica → Proposta). Cada transição é registrada com timestamp. Quando a vaga é encerrada, o sistema gera feedback escrito por IA, personalizado por candidato, para todos os não contratados — reduzindo abandono e protegendo a marca empregadora.
+
+### Suite de Features de IA (Groq / LLaMA 3.3 70B)
+Nove features distintas alimentadas por IA, cada uma medida e registrada:
+
+| Feature | Perfil | Descrição |
+|---|---|---|
+| Gerador de Carta de Apresentação | Candidato | Carta personalizada para a vaga específica |
+| Tailoring de Currículo | Candidato | Adapta o currículo aos requisitos da vaga |
+| Score de Compatibilidade | Candidato | Explica lacunas de fit antes de candidatar |
+| Simulação de Entrevista | Candidato | Perguntas por vaga com avaliação por IA |
+| Ranqueamento de Candidatos | Empresa | Ranking por compatibilidade com justificativa |
+| Comparação de Candidatos | Empresa | Análise IA lado a lado de 2 a 3 candidatos |
+| Bias Auditor | Empresa | Detecta linguagem excludente na descrição da vaga |
+| Chat Contextual | Ambos | IA conversacional vinculada a uma vaga específica |
+| Melhoria de Vaga | Empresa | Sugestões para melhorar a qualidade e alcance da publicação |
+
+### Dashboard de Métricas de IA
+Observabilidade em tempo real do consumo de IA: volume de chamadas, taxas de sucesso, latência média por feature, gráfico de tendência 30 dias e monitoramento de capacidade da API com indicadores visuais de status e alertas proativos a 80% do limite diário.
+
+### Dashboards por Perfil
+- **Candidato**: funil de candidaturas, taxa de resposta, horas estimadas economizadas pela IA, mapeamento de preferência de modalidade
+- **Empresa**: conversão do pipeline por etapa, tempo médio de contratação, uso do Bias Auditor, economia estimada em triagem, métricas de reaproveitamento de talentos
 
 ---
 
-## Como Executar Localmente
+## Arquitetura do Sistema
 
-### Pré-requisitos
+O LinkUp é um monólito estruturado com um microserviço Python desacoplado para busca semântica. A arquitetura prioriza simplicidade operacional na escala atual, mantendo fronteiras de camada claras que permitem extração futura de serviços.
 
-- Node.js 18+ e npm
-- PostgreSQL 14+
-- Python 3.9+ com pip
-- Conta Groq com chave de API (gratuita em [console.groq.com](https://console.groq.com))
-- Conta Gmail com App Password habilitada (para envio de e-mails)
+```mermaid
+graph TB
+    subgraph Cliente
+        Browser[Browser — Handlebars + Bootstrap 5 Dark]
+    end
 
-### 1. Clonar o repositório
+    subgraph Core["Node.js Core — Express"]
+        Router[Camada de Rotas\nauth · csrf · rate-limit]
+        Controller[Camada de Controllers\norquestração]
+        Service[Camada de Services\nlógica de negócio]
+        Model[Camada de Models\nSequelize ORM]
+    end
 
-```bash
-git clone https://github.com/seu-usuario/linkup.git
-cd linkup
+    subgraph Integrações
+        Groq[Groq API\nLLaMA 3.3 70B]
+        SMTP[Gmail SMTP\nNodemailer]
+    end
+
+    subgraph Infraestrutura
+        PG[(PostgreSQL 16)]
+        Python[Microserviço Python :5001\nFlask · sentence-transformers · BM25]
+        Cron[Cron Jobs\nnode-cron]
+    end
+
+    Browser -->|HTTP| Router
+    Browser <-->|WebSocket| Router
+    Router --> Controller
+    Controller --> Service
+    Service --> Model
+    Model --> PG
+    Service -->|POST /search| Python
+    Service -->|Groq SDK| Groq
+    Service -->|SMTP| SMTP
+    Cron --> Service
 ```
 
-### 2. Instalar dependências Node.js
+### Fluxo de Candidatura
 
-```bash
-npm install
+```mermaid
+sequenceDiagram
+    participant C as Candidato
+    participant N as Node.js
+    participant DB as PostgreSQL
+    participant AI as Groq API
+    participant E as Empresa
+
+    C->>N: POST /jobs/apply/:id
+    N->>DB: INSERT Application (pendente)
+    N->>AI: Pontua respostas de triagem
+    AI-->>N: Score + feedback
+    N->>DB: UPDATE Application (answersScore)
+    N->>E: Notificação por e-mail
+    N->>E: Push em tempo real via Socket.io
+    N-->>C: Redirect + confirmação
 ```
 
-### 3. Configurar variáveis de ambiente
+### Fluxo do Pipeline de Etapas
 
-```bash
-cp .env.example .env
+```mermaid
+stateDiagram-v2
+    [*] --> Pendente: Candidatura recebida
+    Pendente --> EtapaCustom: Avançar etapa
+    EtapaCustom --> ProximaEtapa: Avançar etapa
+    ProximaEtapa --> Contratado: Contratar
+    Pendente --> Rejeitado: Desqualificar
+    EtapaCustom --> Rejeitado: Desqualificar
+    Contratado --> [*]
+    Rejeitado --> [*]: Feedback IA disparado
 ```
 
-Edite o arquivo `.env` com seus valores:
+### Fluxo de Redescoberta de Talentos
 
-```env
-# Banco de Dados
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=linkup_db
-DB_USER=postgres
-DB_PASS=sua_senha_postgres
-
-# Sessão (gere um valor aleatório longo)
-SESSION_SECRET=chave_secreta_longa_e_aleatoria
-
-# IA — Groq
-GROQ_API_KEY=gsk_...sua_chave...
-
-# E-mail — Gmail App Password
-GMAIL_USER=seu_email@gmail.com
-GMAIL_PASS=sua_app_password_16_digitos
-
-# Ambiente
-NODE_ENV=development
-PORT=3000
-
-# Validação de empresa (opcional — habilita verificação de CNPJ/domínio)
-VALIDATE_COMPANY=false
+```mermaid
+flowchart LR
+    A[Vaga Publicada] --> B[Busca candidaturas passadas\njanela de 6 meses\nmesma empresa + títulos similares]
+    B --> C[Deduplica por candidato\ncandidatura mais recente]
+    C --> D{isAvailable?}
+    D -->|Não| Skip[Ignorar]
+    D -->|Sim| E[calcFitScore\ncurrículo × requisitos da vaga]
+    E --> F{fitScore >= 88%?}
+    F -->|Não| Skip
+    F -->|Sim| G[Notificação no app\n+ E-mail transacional]
+    G --> H[Persiste em job.rediscoveryData]
 ```
 
-### 4. Criar banco de dados
+> Documentação técnica completa, ADRs e diagramas de fluxo de dados: [`docs/architecture.md`](docs/architecture.md)
 
-```bash
-# No psql ou pgAdmin, crie o banco:
-createdb linkup_db
+---
 
-# Ou via psql:
-psql -U postgres -c "CREATE DATABASE linkup_db;"
-```
+## Decisões Técnicas
 
-### 5. Executar migrações
+### Monólito Estruturado
+Na escala atual, microsserviços introduziriam overhead operacional — service discovery, rastreamento distribuído, latência de rede — sem benefício real. O código aplica separação estrita de camadas (`routes → controllers → services → models`) com dependências unidirecionais. Extrair um serviço para seu próprio processo requer mudar apenas a camada de transporte, não a lógica de negócio.
 
-```bash
-npm run migrate
-```
+O microserviço Python é a exceção deliberada: roda workloads de ML (inferência de sentence-transformers) que seriam operacionalmente inconvenientes dentro de um processo Node.js. Essa fronteira é funcional, não organizacional.
 
-### 6. (Opcional) Popular banco com dados de exemplo
+### PostgreSQL como Store Principal
+Escolhido pelas garantias ACID em dados relacionais (candidaturas, transições de pipeline, contas) combinadas com suporte nativo a colunas JSON para dados semi-estruturados (arrays de habilidades do currículo, histórico de etapas, respostas de triagem). O histórico de 30 migrações reflete evolução iterativa de schema gerenciada via Sequelize CLI.
 
-```bash
-npm run seed
-```
+### Groq / LLaMA 3.3 70B
+Latência de inferência abaixo de 1 segundo — crítica para features interativas como entrevista simulada e chat. A restrição do plano gratuito (30 RPM, 1.000 req/dia) é monitorada em tempo real via Dashboard de Métricas de IA. Trocar de provedor requer mudar apenas `src/helpers/groq.js`.
 
-### 7. Configurar e iniciar o microserviço Python
+### Reciprocal Rank Fusion para Busca
+O microserviço combina similaridade semântica (distância cosseno em embeddings multilíngues) com relevância de keywords BM25 via RRF. BM25 puro perde matches semânticos; semântico puro retorna resultados topicamente similares mas irrelevantes. RRF funde listas ranqueadas sem exigir normalização de scores.
 
-```bash
-cd python-search
-python -m venv venv
+Veja [`docs/architecture.md`](docs/architecture.md) e [`docs/engineering-principles.md`](docs/engineering-principles.md) para o racional completo das decisões.
 
-# Linux/macOS:
-source venv/bin/activate
-# Windows:
-venv\Scripts\activate
+---
 
-pip install -r requirements.txt
-python app.py
-# Rodando em http://localhost:5001
-```
+## Estratégia de Segurança
 
-### 8. Iniciar a aplicação principal
+| Camada | Mecanismo |
+|---|---|
+| Transporte | Helmet.js — CSP, HSTS, X-Frame-Options, X-Content-Type-Options |
+| Autenticação | Passport.js local strategy; bcryptjs (10 salt rounds); baseado em sessão |
+| Sessões | `SESSION_SECRET` aleatório criptograficamente; TTL 24h; cookies `httpOnly` + `sameSite: strict` |
+| CSRF | `csrf-csrf` double-submit cookie; token injetado em todo formulário via middleware `globalLocals` |
+| Entradas | Sanitização `express-validator`; remoção global de HTML via middleware `sanitizeInputs` |
+| Rate Limiting | Por endpoint: 10 logins/15min, 5 registros/hora, 10 chamadas IA/min, 3 uploads/min |
+| Validação de Empresa | Verificação de CNPJ + enforçamento de domínio de e-mail corporativo (`VALIDATE_COMPANY=true`) |
+| Segurança em PDF | `pdfUtils.escHtml()` sanitiza todo conteúdo do usuário antes da geração de PDF |
+| Auditoria | Log JSON estruturado em todas as mutações sensíveis |
+| Autorização | Guards por rota em todos os endpoints protegidos; verificação de ownership na camada de service |
 
-```bash
-# Desenvolvimento (com hot-reload):
-npm run dev
+---
 
-# Produção:
-npm start
-```
+## Considerações de Escalabilidade
 
-Acesse: **http://localhost:3000**
+**Restrições atuais:** processo Node.js único; PostgreSQL no mesmo host; microserviço Python como processo separado; Socket.io in-process.
+
+**Principal gargalo — plano gratuito Groq:** 30 RPM / 1.000 req/dia. Mitigado por `src/utils/aiCache.js` com cache em memória para prompts determinísticos (mesma entrada = resposta em cache, zero chamada de API).
+
+**Caminho para escalonamento horizontal:**
+
+| Componente | Atual | Caminho de escala |
+|---|---|---|
+| Sessões | Memória in-process | Redis adapter (`connect-redis`) |
+| Socket.io | In-process | `@socket.io/redis-adapter` |
+| Cron jobs | `node-cron` in-process | Processo worker Bull/BullMQ |
+| Cache de IA | `node-cache` (instância única) | Cache Redis compartilhado |
+| Microserviço de busca | Processo Flask único | Workers Python com load balancer |
+| Embeddings | Microserviço Python | pgvector (eliminar hop de rede) |
+
+---
+
+## Modelo de Negócio
+
+**Mercado-alvo:** empresas de tech brasileiras (50–500 funcionários) gastando R$3.000–15.000/mês em recrutamento com baixas taxas de conversão.
+
+**Estrutura:**
+- **Candidatos** — gratuito permanente. Menor custo de aquisição; base maior de candidatos aumenta o valor da plataforma para empresas
+- **Empresas** — freemium com camada de IA baseada em uso:
+
+| Plano | Preço | Inclui |
+|---|---|---|
+| Gratuito | R$0 | 3 vagas ativas, pipeline básico |
+| Growth | R$299/mês | Vagas ilimitadas, suite de IA completa, redescoberta de talentos |
+| Scale | R$799/mês | Multi-recrutador, acesso à API, integrações ATS, SLA |
+
+As features de IA são a alavanca principal de monetização — cada chamada de IA no plano gratuito demonstra valor que converte para pago. O modelo `AiLog` captura esse sinal com precisão.
+
+**Expansão:** gestão de pipeline white-label para agências de recrutamento; dados anônimos do mercado de contratações como produto B2B.
+
+---
+
+## Roadmap
+
+### v1.0 — Entregue
+- [x] Autenticação dual com verificação de e-mail
+- [x] CRUD de vagas — modalidade, tipo de contrato, flag PCD
+- [x] Busca semântica híbrida (microserviço Python, ranking RRF)
+- [x] Pipeline de contratação customizável com transições de etapa
+- [x] IA: carta de apresentação, tailoring de currículo, score de compatibilidade
+- [x] IA: simulação de entrevista com avaliação
+- [x] IA: ranqueamento e comparação de candidatos
+- [x] IA: Bias Auditor para descrições de vaga
+- [x] IA: chat contextual por vaga
+- [x] Redescoberta de talentos (automatizada + cron agendado)
+- [x] Candidatos similares (painel sugerido + por candidatura)
+- [x] Feedback de rejeição automatizado por IA ao encerrar vaga
+- [x] Notificações em tempo real via Socket.io
+- [x] Dashboards por perfil com exportação em PDF
+- [x] Dashboard de Métricas de IA com monitoramento de capacidade Groq
+- [x] Buscas salvas com alertas semanais por e-mail
+- [x] Score de responsividade da empresa
+- [x] Gestão de status de disponibilidade do candidato
+- [x] Checklists de onboarding por perfil
+- [x] Rate limiting, CSRF, Helmet CSP, audit logging
+- [x] 4 cron jobs: alertas, expiração, limpeza, redescoberta
+
+### v1.1 — Planejado
+- [ ] Redis session store + Socket.io adapter para implantação multi-instância
+- [ ] Fila Bull para jobs de IA (desacoplar do ciclo de requisição)
+- [ ] Integração pgvector (eliminar dependência do microserviço Python)
+- [ ] Suporte a webhooks para integrações ATS
+- [ ] Contas de empresa multi-recrutador
+
+### v2.0 — Planejado
+- [ ] PWA mobile-first
+- [ ] API pública com chaves com rate limit
+- [ ] Analytics anônimos do mercado de contratações (produto de dados B2B)
+- [ ] Ranqueamento baseado em ML (substituir ranqueamento LLM por modelo fine-tuned)
 
 ---
 
@@ -265,69 +320,79 @@ Acesse: **http://localhost:3000**
 
 ---
 
-## Estrutura de Diretórios
+## Estrutura do Projeto
 
 ```
 linkup/
-├── server.js                  # Entry point — inicializa HTTP + Socket.io
-├── app.js                     # Configuração Express (middlewares, rotas, erros)
+├── server.js                  # Entry point — servidor HTTP + inicialização Socket.io
+├── app.js                     # Configuração Express — middleware, rotas, tratamento de erros
 ├── seed.js                    # Dados de exemplo para desenvolvimento
 ├── src/
-│   ├── config/                # Banco, sessão, Passport, Handlebars, Socket.io
-│   ├── controllers/           # Lógica de apresentação (thin controllers)
-│   ├── helpers/               # Serviços utilitários (IA, PDF, e-mail, busca)
-│   ├── jobs/                  # Cron jobs (alertas, expiração, cleanup)
-│   ├── middleware/             # Auth, CSRF, rate limit, validação, audit log
-│   ├── models/                # Entidades Sequelize + relacionamentos
-│   ├── routes/                # Definição de endpoints HTTP
-│   ├── services/              # Lógica de negócio desacoplada
-│   └── utils/                 # Utilitários transversais (cache de IA)
+│   ├── config/                # Banco de dados, sessão, Passport, Handlebars, Socket.io
+│   ├── controllers/           # Orquestração de requisições (camada thin)
+│   ├── helpers/               # Serviços utilitários — IA, PDF, e-mail, busca, logging
+│   ├── jobs/                  # Cron jobs — alertas, expiração, limpeza, redescoberta
+│   ├── middleware/            # Guards de auth, CSRF, rate limiting, validação, auditoria
+│   ├── models/                # Entidades Sequelize + associações
+│   ├── routes/                # Definições de endpoints HTTP
+│   ├── services/              # Lógica de negócio — desacoplada da camada HTTP
+│   └── utils/                 # Utilitários transversais (cache de respostas IA)
 ├── views/                     # Templates Handlebars
 │   ├── layouts/
 │   └── partials/
-├── public/                    # Ativos estáticos (CSS, imagens)
-├── python-search/             # Microserviço Flask (busca semântica)
-├── migrations/                # Histórico de schema do banco
+├── public/                    # Assets estáticos
+├── python-search/             # Microserviço de busca semântica (Flask)
+├── migrations/                # Histórico de migrações do schema PostgreSQL (30 arquivos)
 └── docs/                      # Documentação técnica
-    ├── architecture.md
-    └── business-rules.md
+```
+
+---
+
+## Primeiros Passos
+
+Veja [docs/deployment.md](docs/deployment.md) para o guia completo de configuração.
+
+```bash
+# Clonar e instalar
+git clone <repo> && cd linkup
+npm install
+
+# Configurar ambiente
+cp .env.example .env   # preencher variáveis obrigatórias
+
+# Banco de dados
+npx sequelize-cli db:migrate
+node seed.js           # opcional: popular com dados de teste
+
+# Iniciar microserviço Python (terminal separado)
+cd python-search && pip install -r requirements.txt && python app.py
+
+# Iniciar aplicação
+npm run dev            # desenvolvimento
+npm start              # produção
 ```
 
 ---
 
 ## Documentação Técnica
 
-| Documento                                          | Conteúdo                                                            |
-| -------------------------------------------------- | ------------------------------------------------------------------- |
-| [`docs/architecture.md`](docs/architecture.md)     | Arquitetura em camadas, diagramas Mermaid, ADRs e decisões técnicas |
-| [`docs/business-rules.md`](docs/business-rules.md) | Regras de negócio numeradas por módulo (RN-001...)                  |
-
----
-
-## Segurança
-
-O projeto passou por auditoria de segurança completa, incluindo:
-
-- Proteção CSRF com `csrf-csrf` (stateless double-submit)
-- Rate limiting por endpoint sensível (login, registro, IA, upload)
-- Sanitização global de inputs (`sanitizeInputs` middleware)
-- Headers de segurança via Helmet com CSP restritiva
-- Cookies com `httpOnly`, `sameSite: strict` e `secure` em produção
-- Prevenção de enumeração de usuários nas rotas de autenticação
-- XSS prevention com `escHtml()` nos templates de PDF
-- `userId` via sessão no Socket.io (sem exposição em cliente)
-- 0 vulnerabilidades críticas reportadas pelo `npm audit`
+| Documento | Descrição |
+|---|---|
+| [docs/api.md](docs/api.md) | Referência da API REST — endpoints, payloads, status HTTP |
+| [docs/architecture.md](docs/architecture.md) | Arquitetura do sistema, fluxos de dados, ADRs |
+| [docs/engineering-principles.md](docs/engineering-principles.md) | Padrões de engenharia e princípios de design |
+| [docs/deployment.md](docs/deployment.md) | Configuração de ambiente e deploy em produção |
 
 ---
 
 ## Licença
 
-Distribuído sob a licença **MIT**. Consulte o arquivo `LICENSE` para detalhes.
+MIT — veja [LICENSE](LICENSE).
 
 ---
 
 <div align="center">
 
-Desenvolvido por **Thiago Henrique Queiroz Muniz Silva** — TCC em Engenharia de Software · 2026
+Desenvolvido por **Thiago Henrique Queiroz Muniz Silva**
 
 </div>
