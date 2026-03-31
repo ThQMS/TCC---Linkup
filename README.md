@@ -274,6 +274,7 @@ As features de IA são a alavanca principal de monetização — cada chamada de
 - [x] 4 cron jobs: alertas, expiração, limpeza, redescoberta
 
 ### v1.1 — Planejado
+- [x] Suíte de testes Jest — 89 testes cobrindo services críticos (SQLite in-memory, fake timers)
 - [ ] Redis session store + Socket.io adapter para implantação multi-instância
 - [ ] Fila Bull para jobs de IA (desacoplar do ciclo de requisição)
 - [ ] Integração pgvector (eliminar dependência do microserviço Python)
@@ -374,6 +375,31 @@ npm start              # produção
 
 ---
 
+## Testes
+
+```bash
+npm test                # todos os testes
+npm run test:watch      # modo interativo
+npm run test:coverage   # com relatório de cobertura
+```
+
+**89 testes** distribuídos em 6 suites cobrindo as regras de negócio críticas:
+
+| Suite | Testes | Cobre |
+|---|---|---|
+| `applicationService` | 23 | Criação de candidatura, status, etapas, feedback em lote |
+| `ghostJobCleanup` | 9 | Detecção de vagas inativas há 21+ dias e encerramento automático |
+| `talentRediscoveryService` | 17 | `calcFitScore`, redescoberta para empresa, reativar contato |
+| `revisitOpportunities` | 9 | Notificação de oportunidades revisitadas para candidato |
+| `similarCandidates` | 15 | Candidatos sugeridos, convite, prevenção de duplicata |
+| `jobs.routes` | 16 | Integração `POST /apply` — route → controller → service → banco |
+
+**Infraestrutura:** Jest 29 · Supertest · SQLite em memória (sem PostgreSQL local necessário) · timers falsos (`jest.useFakeTimers`) onde aplicável.
+
+Documentação completa da suíte: [`docs/testing.md`](docs/testing.md)
+
+---
+
 ## Documentação Técnica
 
 | Documento | Descrição |
@@ -382,6 +408,7 @@ npm start              # produção
 | [docs/architecture.md](docs/architecture.md) | Arquitetura do sistema, fluxos de dados, ADRs |
 | [docs/engineering-principles.md](docs/engineering-principles.md) | Padrões de engenharia e princípios de design |
 | [docs/deployment.md](docs/deployment.md) | Configuração de ambiente e deploy em produção |
+| [docs/testing.md](docs/testing.md) | Suíte de testes — arquitetura, cobertura e convenções |
 
 ---
 
