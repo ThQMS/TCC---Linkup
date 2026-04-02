@@ -294,3 +294,7 @@ const MAX_CANDIDATES_NOTIFY = 50;
 ```
 
 Isso torna as decisões de negócio visíveis e fáceis de ajustar sem buscar números mágicos espalhados pelo código.
+
+## 12. Persistência de Sessão
+
+Sessões são armazenadas no PostgreSQL via `connect-pg-simple`, não na MemoryStore padrão do `express-session`. Isso garante que sessões sobrevivam a restarts do servidor e que o "Lembrar de mim" (cookie de 30 dias definido em `authController`) funcione corretamente entre reinicializações. A tabela `session` é criada automaticamente via `createTableIfMissing: true`. A conexão reutiliza as variáveis `DB_*` do `.env` sem precisar de `DATABASE_URL` separada.

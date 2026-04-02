@@ -20,7 +20,7 @@ async function getBlockedCompanyIds(user) {
 /**
  * Runs the full search (semantic → SQL fallback) and returns { rows, totalCount, semanticUsed }.
  */
-async function searchJobs({ search, modality, city, salary, skill, page, blockedCompanyIds }) {
+async function searchJobs({ search, modality, city, salary, skill, isPcd, page, blockedCompanyIds }) {
     const offset = (page - 1) * LIMIT;
     let filteredRows = [];
     let totalCount   = 0;
@@ -31,6 +31,7 @@ async function searchJobs({ search, modality, city, salary, skill, page, blocked
             status: 'aberta',
             ...(modality && modality !== 'todos' ? { modality } : {}),
             ...(city && city !== 'todos' ? { city: { [Op.like]: `%${city}%` } } : {}),
+            ...(isPcd ? { isPcd: true } : {}),
             ...(blockedCompanyIds.length > 0 ? { UserId: { [Op.notIn]: blockedCompanyIds } } : {})
         };
 
@@ -64,6 +65,7 @@ async function searchJobs({ search, modality, city, salary, skill, page, blocked
         if (search)   conditions.push({ [Op.or]: [{ title: { [Op.like]: `%${search}%` } }, { company: { [Op.like]: `%${search}%` } }] });
         if (modality && modality !== 'todos') conditions.push({ modality });
         if (city     && city     !== 'todos') conditions.push({ city: { [Op.like]: `%${city}%` } });
+        if (isPcd)                            conditions.push({ isPcd: true });
         if (blockedCompanyIds.length > 0)     conditions.push({ UserId: { [Op.notIn]: blockedCompanyIds } });
 
         const whereClause = conditions.length > 0 ? { [Op.and]: conditions } : {};
@@ -112,21 +114,22 @@ async function attachBadges(rows) {
 async function getSuggestions(user, candidateResume) {
     try {
         const applications = await Application.findAll({ where: { userId: user.id }, attributes: ['jobId'] });
-        return getSuggestedJobs(candidateResume, applications.map(a => a.jobId));
+        return getSuggestedJobs(candidateResume, applications.map(a => a.jobId), !!user.isPcd);
     } catch (e) { return []; }
 }
 
 /**
  * Builds pagination data.
  */
-function buildPagination({ page, totalCount, search, modality, salary, city, skill }) {
+function buildPagination({ page, totalCount, search, modality, salary, city, skill, isPcd }) {
     const totalPages    = Math.ceil(totalCount / LIMIT);
     const searchParam   = search   ? `&job=${search}`       : '';
     const modalityParam = modality && modality !== 'todos' ? `&modality=${modality}` : '';
     const salaryParam   = salary   && salary   !== 'todos' ? `&salary=${salary}`     : '';
     const cityParam     = city     && city     !== 'todos' ? `&city=${city}`         : '';
     const skillParam    = skill    && skill    !== 'todos' ? `&skill=${skill}`       : '';
-    const extraParams   = `${searchParam}${modalityParam}${salaryParam}${cityParam}${skillParam}`;
+    const pcdParam      = isPcd ? `&isPcd=1` : '';
+    const extraParams   = `${searchParam}${modalityParam}${salaryParam}${cityParam}${skillParam}${pcdParam}`;
 
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {

@@ -28,16 +28,17 @@ exports.home = async (req, res) => {
     const salary   = req.query.salary;
     const city     = req.query.city;
     const skill    = req.query.skill;
+    const isPcd    = req.query.isPcd === '1';
     const page     = parseInt(req.query.page, 10) || 1;
 
     try {
         const isCandidate      = req.user.userType === 'candidato';
-        const hasNoFilters     = !search && !modality && !salary && !city && !skill && page === 1;
+        const hasNoFilters     = !search && !modality && !salary && !city && !skill && !isPcd && page === 1;
         const blockedCompanyIds = await getBlockedCompanyIds(req.user);
 
-        const { rows, totalCount, semanticUsed } = await searchJobs({ search, modality, city, salary, skill, page, blockedCompanyIds });
+        const { rows, totalCount, semanticUsed } = await searchJobs({ search, modality, city, salary, skill, isPcd, page, blockedCompanyIds });
         const jobsWithBadge = await attachBadges(rows);
-        const pagination    = buildPagination({ page, totalCount, search, modality, salary, city, skill });
+        const pagination    = buildPagination({ page, totalCount, search, modality, salary, city, skill, isPcd });
 
         let candidateResume = null;
         if (isCandidate) {
@@ -58,7 +59,7 @@ exports.home = async (req, res) => {
             jobs: jobsWithBadge,
             suggestedJobs, hasSuggestions: suggestedJobs.length > 0,
             search, modality: modality || 'todos', salary: salary || 'todos',
-            city: city || 'todos', skill: skill || 'todos',
+            city: city || 'todos', skill: skill || 'todos', isPcd,
             currentPage: page, totalJobs: totalCount,
             isCandidate, userSkills, semanticUsed,
             ...pagination

@@ -197,6 +197,27 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 
 ---
 
+**RN-308 — Perfil PCD do candidato**
+**Descrição:** Candidatos podem declarar que são PCD no perfil (checkbox "Sou PCD") e informar opcionalmente o tipo de deficiência (Visual, Auditiva, Física/Motora, Intelectual, Múltipla, Outra). Nenhum laudo ou documento é exigido.
+**Justificativa:** Permite matching inclusivo sem criar barreiras burocráticas. A autodeclaração é suficiente para fins de matching e visibilidade.
+**Impacto:** Campos `isPcd` (BOOLEAN, default `false`) e `pcdType` (STRING nullable) no modelo `User` (migration `20260402000001`). `profileController.postUpdate` salva os campos apenas para `userType === 'candidato'`. Se `isPcd` for desmarcado, `pcdType` é limpo automaticamente.
+
+---
+
+**RN-309 — Boost de compatibilidade PCD no matching**
+**Descrição:** Quando um candidato PCD se candidata a uma vaga marcada como PCD, o score de compatibilidade recebe um acréscimo de +20 pontos (limitado a 100). O boost é aplicado na redescoberta de talentos e nas oportunidades revisitadas.
+**Justificativa:** Aumenta a visibilidade de candidatos PCD em vagas que os buscam ativamente, sem afetar o matching de vagas não-PCD.
+**Impacto:** Função `applyPcdBoost(score, candidate, job)` em `talentRediscoveryService.js`. Aplicada após `calcFitScore` em `findTalentsForJob` e `notifyRevisitedOpportunities`. Candidato buscado com atributo `isPcd` incluído.
+
+---
+
+**RN-310 — Filtro de busca por vagas PCD**
+**Descrição:** A busca de vagas na home oferece filtro "Vagas PCD" no painel de filtros. Quando ativado, retorna apenas vagas com `isPcd = true`. O filtro é combinável com os demais (modalidade, cidade, salário). Chips ativos e badge de contagem refletem o estado do filtro.
+**Justificativa:** Candidatos PCD devem conseguir encontrar vagas relevantes sem precisar ler cada descrição individualmente.
+**Impacto:** Parâmetro `isPcd` em `searchService.searchJobs` e `buildPagination`. `homeController.home` lê `req.query.isPcd === '1'`. Pill interativa em `index.handlebars` com `aria-pressed` e `aria-label`.
+
+---
+
 ## 4. Pipeline de Etapas
 
 ---
@@ -492,9 +513,9 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 ---
 
 **RN-1002 — Sugestões de vagas personalizadas na home**
-**Descrição:** A home exibe sugestões de vagas para o candidato autenticado baseadas no conteúdo do currículo. Vagas de empresas bloqueadas e vagas já candidatadas são excluídas.
-**Justificativa:** Reduz o esforço de descoberta para o candidato e aumenta a relevância do feed principal.
-**Impacto:** `jobSearch.getSuggestedJobs` usa keyword matching ponderado (habilidades 3×, cargos 2×, palavras gerais 1×) contra o currículo. Retorna até 3 sugestões.
+**Descrição:** A home exibe sugestões de vagas para o candidato autenticado baseadas no conteúdo do currículo. Vagas de empresas bloqueadas, vagas já candidatadas e vagas PCD (quando o candidato não é PCD) são excluídas. A seção não exibe badge de IA — o mecanismo é keyword matching, não IA generativa.
+**Justificativa:** Reduz o esforço de descoberta para o candidato e aumenta a relevância do feed principal. Candidatos não-PCD não devem ver vagas exclusivas PCD nas sugestões.
+**Impacto:** `jobSearch.getSuggestedJobs(resume, appliedJobIds, candidateIsPcd)` usa keyword matching ponderado (habilidades 3×, cargos 2×) contra o currículo. Score mínimo `>= 2` para aparecer nas sugestões. Vagas com `isPcd = true` são excluídas via `WHERE isPcd = false` quando `candidateIsPcd = false`. Retorna até 3 sugestões. `generalKeywords` (nomes de empresa, curso, resumo) foram removidos por gerarem matches espúrios entre áreas não relacionadas.
 
 ---
 

@@ -557,7 +557,7 @@ Inicializado em `server.js`, compartilhado com `src/config/socket.js`. `userId` 
 
 | Área | Limitação | Mitigação |
 |---|---|---|
-| Sessões | In-process; falha em multi-instância | Redis session store (`connect-redis`) |
+| Sessões | PostgreSQL via `connect-pg-simple`; falha em multi-instância sem sticky sessions | Redis session store (`connect-redis`) |
 | Socket.io | Adapter in-process | `@socket.io/redis-adapter` |
 | Cron jobs | Todas as instâncias executam simultaneamente | Processo worker Bull/BullMQ |
 | Capacidade de IA | Plano gratuito Groq: 30 RPM / 1.000 req/dia | Cache layer; dashboard de capacidade; alerta em 80% |

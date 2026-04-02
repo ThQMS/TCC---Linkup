@@ -26,7 +26,7 @@ Saída esperada:
 
 ```
 Test Suites: 7 passed, 7 total
-Tests:       106 passed, 106 total
+Tests:       114 passed, 114 total
 Time:        ~5s
 ```
 
@@ -159,9 +159,9 @@ Regra: vaga aberta sem atividade há mais de 21 dias → encerrar automaticament
 
 > **Nota técnica:** a detecção usa `updatedAt` da vaga como proxy de "última atividade". Uma implementação mais robusta verificaria também a data da última movimentação de candidatura.
 
-### `talentRediscoveryService.test.js` — 17 testes
+### `talentRediscoveryService.test.js` — 25 testes
 
-Cobre `calcFitScore`, `findTalentsForJob` e `reactivateContact`.
+Cobre `calcFitScore`, `applyPcdBoost`, `findTalentsForJob` e `reactivateContact`.
 
 | Cenário | Verificação |
 |---|---|
@@ -178,6 +178,14 @@ Cobre `calcFitScore`, `findTalentsForJob` e `reactivateContact`.
 | Ordenação | Resultado do maior para o menor fit |
 | Permissão | Empresa sem ownership → erro |
 | `reactivateContact` | Notificação criada + e-mail enviado |
+| `applyPcdBoost` candidato+vaga PCD | Score recebe +20 pts |
+| `applyPcdBoost` candidato não-PCD | Sem boost |
+| `applyPcdBoost` vaga não-PCD | Sem boost |
+| `applyPcdBoost` cap 100 | Score 95 → 100, nunca ultrapassa |
+| `applyPcdBoost` candidato null | Sem boost (sem crash) |
+| `applyPcdBoost` vaga null | Sem boost (sem crash) |
+| Candidato PCD borderline (70%) em vaga PCD | 70 + 20 = 90 ≥ 88 → aparece nos resultados |
+| Candidato PCD borderline (70%) em vaga não-PCD | 70 < 88 → excluído dos resultados |
 
 ### `revisitOpportunities.test.js` — 9 testes
 

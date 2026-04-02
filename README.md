@@ -52,6 +52,9 @@ Combina um microserviço Python (sentence-transformers + BM25 + Reciprocal Rank 
 ### Redescoberta de Talentos
 Quando uma vaga é publicada, a plataforma escaneia automaticamente a base histórica de candidatos da empresa (janela de 6 meses) e exibe candidatos com fit ≥ 88% que estão disponíveis no momento. Dispara notificações no app e e-mails transacionais. Elimina o custo de reanúncio de posições que a base existente já cobre.
 
+### Inclusão de PCD (Pessoa com Deficiência)
+Candidatos podem declarar que são PCD no perfil (checkbox + tipo de deficiência opcional, sem exigência de laudo). Empresas marcam vagas como prioritárias/exclusivas para PCD na criação da vaga. A busca de vagas oferece filtro dedicado "Vagas PCD". No matching automático, candidatos PCD que se candidatam a vagas PCD recebem um boost de +20 pontos no score de compatibilidade, aumentando a visibilidade no redescoberta de talentos.
+
 ### Cancelamento de Candidatura pelo Candidato
 Candidatos podem cancelar candidaturas com status **Pendente** diretamente em "Minhas Candidaturas". A ação exibe um modal de confirmação (Alpine.js, sem recarregar a página), atualiza o status para `cancelado`, notifica a empresa em tempo real via Socket.io e dispara um e-mail transacional automático. O card de candidatura é atualizado instantaneamente sem reload. Candidaturas canceladas são excluídas do funil de fechamento em massa para evitar e-mails de feedback redundantes.
 
@@ -277,9 +280,11 @@ As features de IA são a alavanca principal de monetização — cada chamada de
 - ✅ Checklists de onboarding por perfil
 - ✅ Rate limiting, CSRF, Helmet CSP, audit logging
 - ✅ 4 cron jobs: alertas, expiração, limpeza, redescoberta
+- ✅ Suporte a PCD: perfil candidato (autodeclaração + tipo), filtro de busca, boost +20pts no matching
+- ✅ Sessão persistente no PostgreSQL via connect-pg-simple ("Lembrar de mim" funcional)
 
 ### v1.1 — Planejado
-- ✅ Suíte de testes Jest — 106 testes cobrindo services críticos (SQLite in-memory, fake timers)
+- ✅ Suíte de testes Jest — 114 testes cobrindo services críticos (SQLite in-memory, fake timers)
 - ⬜ Redis session store + Socket.io adapter para implantação multi-instância
 - ⬜ Fila Bull para jobs de IA (desacoplar do ciclo de requisição)
 - ⬜ Integração pgvector (eliminar dependência do microserviço Python)

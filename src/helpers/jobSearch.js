@@ -33,7 +33,7 @@ async function semanticSearch(query, jobs) {
     }
 }
 
-async function getSuggestedJobs(resume, appliedJobIds = []) {
+async function getSuggestedJobs(resume, appliedJobIds = [], candidateIsPcd = false) {
     try {
         if (!resume) return [];
         const { skills, experiences, education, summary } = parseResume(resume);
@@ -50,17 +50,14 @@ async function getSuggestedJobs(resume, appliedJobIds = []) {
             .map(r => r.toLowerCase().trim())
             .filter(r => r.length > 2);
 
-        // Palavras gerais: formação, empresa, resumo (1x)
-        const generalKeywords = [
-            ...experiences.map(e => e.company),
-            ...education.map(e => e.course),
-            summary
-        ].join(' ').toLowerCase().split(/[\s,;\/\-\(\)]+/).map(w => w.trim()).filter(w => w.length > 3);
-
-        if (skillKeywords.length === 0 && roleKeywords.length === 0 && generalKeywords.length === 0) return [];
+        if (skillKeywords.length === 0 && roleKeywords.length === 0) return [];
 
         const allJobs = await Job.findAll({
-            where: { status: 'aberta', id: { [Op.notIn]: appliedJobIds.length > 0 ? appliedJobIds : [0] } },
+            where: {
+                status: 'aberta',
+                id: { [Op.notIn]: appliedJobIds.length > 0 ? appliedJobIds : [0] },
+                ...(!candidateIsPcd ? { isPcd: false } : {})
+            },
             order: [['createdAt', 'DESC']],
             limit: 100
         });
@@ -80,15 +77,11 @@ async function getSuggestedJobs(resume, appliedJobIds = []) {
                 return acc + words.filter(w => jobTitle.includes(w)).length * 2;
             }, 0);
 
-            // Geral: +1 por match em qualquer campo
-            const generalScore = generalKeywords.reduce((acc, kw) =>
-                acc + (jobFullText.includes(kw) ? 1 : 0), 0);
-
-            return { job: job.toJSON(), score: skillScore + titleScore + generalScore };
+            return { job: job.toJSON(), score: skillScore + titleScore };
         });
 
         return scored
-            .filter(s => s.score > 0)
+            .filter(s => s.score >= 2)
             .sort((a, b) => b.score - a.score)
             .slice(0, 3)
             .map(s => s.job);

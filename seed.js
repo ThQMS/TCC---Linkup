@@ -66,11 +66,55 @@ const empresas = [
         companySize: '201-500',
         website: 'https://construa.linkup.dev',
         linkedinCompany: 'https://linkedin.com/company/construa-linkup'
+    },
+    
+    {
+        name: 'Infrastack',
+        email: 'contato@infrastack.linkup.dev',
+        bio: 'Especialistas em infraestrutura cloud-native, automação e práticas DevOps/SRE. Ajudamos times de engenharia a escalar com segurança e confiabilidade.',
+        city: 'Porto Alegre, RS',
+        sector: 'Infraestrutura / DevOps',
+        companySize: '11-50',
+        website: 'https://infrastack.linkup.dev',
+        linkedinCompany: 'https://linkedin.com/company/infrastack-linkup'
+    },
+    
+    {
+        name: 'FinCore Soluções',
+        email: 'vagas@fincore.linkup.dev',
+        bio: 'Fintech focada em Open Finance, crédito inteligente e controladoria digital. Combinamos dados e tecnologia para transformar decisões financeiras.',
+        city: 'Rio de Janeiro, RJ',
+        sector: 'Fintech / Serviços Financeiros',
+        companySize: '51-200',
+        website: 'https://fincore.linkup.dev',
+        linkedinCompany: 'https://linkedin.com/company/fincore-linkup'
+    },
+   
+    {
+        name: 'BIM Construtora',
+        email: 'rh@bimconstrutora.linkup.dev',
+        bio: 'Construtora referência em metodologia BIM no Sul do Brasil. Atuamos em obras residenciais e comerciais de médio e grande porte com tecnologia de ponta.',
+        city: 'Porto Alegre, RS',
+        sector: 'Construção Civil / BIM',
+        companySize: '201-500',
+        website: 'https://bimconstrutora.linkup.dev',
+        linkedinCompany: 'https://linkedin.com/company/bimconstrutora-linkup'
+    },
+    
+    {
+        name: 'HealthData Tech',
+        email: 'talentos@healthdata.linkup.dev',
+        bio: 'Startup de saúde digital que transforma dados clínicos em inteligência para hospitais e operadoras de saúde. Stack moderna, impacto real.',
+        city: 'São Paulo, SP',
+        sector: 'Health Tech / Dados em Saúde',
+        companySize: '11-50',
+        website: 'https://healthdata.linkup.dev',
+        linkedinCompany: 'https://linkedin.com/company/healthdata-linkup'
     }
 ];
 
 const candidatos = [
-    // 0
+    
     {
         name: 'Ana Paula Ferreira',
         email: 'ana.ferreira@gmail.com',
@@ -92,7 +136,7 @@ const candidatos = [
             ])
         }
     },
-    // 1
+   
     {
         name: 'Carlos Eduardo Lima',
         email: 'carlos.lima@hotmail.com',
@@ -114,7 +158,7 @@ const candidatos = [
             ])
         }
     },
-    // 2
+    
     {
         name: 'Juliana Costa Mendes',
         email: 'ju.mendes@gmail.com',
@@ -136,7 +180,7 @@ const candidatos = [
             ])
         }
     },
-    // 3
+    
     {
         name: 'Roberto Alves Santos',
         email: 'roberto.santos@outlook.com',
@@ -158,7 +202,7 @@ const candidatos = [
             ])
         }
     },
-    // 4
+    
     {
         name: 'Fernanda Oliveira',
         email: 'fernanda.oliveira@gmail.com',
@@ -179,7 +223,7 @@ const candidatos = [
             ])
         }
     },
-    // 5
+   
     {
         name: 'Marcos Vinicius Rocha',
         email: 'marcos.rocha@gmail.com',
@@ -202,7 +246,7 @@ const candidatos = [
             ])
         }
     },
-    // 6
+   
     {
         name: 'Beatriz Almeida',
         email: 'beatriz.almeida@gmail.com',
@@ -225,7 +269,7 @@ const candidatos = [
             ])
         }
     },
-    // 7
+    
     {
         name: 'Rafael Sousa Nunes',
         email: 'rafael.nunes@outlook.com',
@@ -247,7 +291,7 @@ const candidatos = [
             ])
         }
     },
-    // 8 — novo candidato backend (similar ao Carlos, para testar "similares")
+    
     {
         name: 'Lucas Henrique Silva',
         email: 'lucas.silva@gmail.com',
@@ -269,7 +313,7 @@ const candidatos = [
             ])
         }
     },
-    // 9 — nova candidata frontend (similar à Ana, para testar "similares")
+    
     {
         name: 'Sofia Torres Campos',
         email: 'sofia.torres@gmail.com',
@@ -293,9 +337,9 @@ const candidatos = [
     }
 ];
 
-// stages: array de strings com as etapas do processo seletivo (opcional)
+
 const vagas = [
-    // TechBridge (0) — índice 0
+
     {
         empresaIndex: 0,
         title: 'Desenvolvedor Frontend React',
@@ -307,7 +351,7 @@ const vagas = [
         contractType: 'pj',
         stages: ['Triagem', 'Entrevista Técnica', 'Entrevista RH']
     },
-    // TechBridge (0) — índice 1
+  
     {
         empresaIndex: 0,
         title: 'Desenvolvedor Backend Node.js',
@@ -319,7 +363,7 @@ const vagas = [
         contractType: 'clt',
         stages: ['Triagem', 'Teste Técnico', 'Entrevista Final']
     },
-    // TechBridge (0) — índice 2
+    
     {
         empresaIndex: 0,
         title: 'Tech Lead Frontend',
@@ -331,7 +375,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // Nexus Digital (1) — índice 3
+    
     {
         empresaIndex: 1,
         title: 'UX/UI Designer',
@@ -343,7 +387,7 @@ const vagas = [
         contractType: 'pj',
         stages: ['Triagem', 'Apresentação de Portfolio', 'Desafio Prático', 'Entrevista RH']
     },
-    // Nexus Digital (1) — índice 4
+   
     {
         empresaIndex: 1,
         title: 'Desenvolvedor React + Next.js',
@@ -355,7 +399,7 @@ const vagas = [
         contractType: 'freelancer',
         stages: []
     },
-    // Nexus Digital (1) — índice 5
+    
     {
         empresaIndex: 1,
         title: 'Analista de Marketing Digital',
@@ -367,7 +411,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // Nexus Digital (1) — índice 6
+    
     {
         empresaIndex: 1,
         title: 'Gerente de Conteúdo',
@@ -379,7 +423,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // CloudOps (2) — índice 7
+   
     {
         empresaIndex: 2,
         title: 'DevOps Engineer',
@@ -391,7 +435,7 @@ const vagas = [
         contractType: 'pj',
         stages: ['Triagem', 'Entrevista Técnica', 'Case Prático', 'Proposta']
     },
-    // CloudOps (2) — índice 8
+    
     {
         empresaIndex: 2,
         title: 'Analista de Segurança da Informação',
@@ -403,7 +447,7 @@ const vagas = [
         contractType: 'clt',
         stages: ['Triagem', 'Entrevista Técnica', 'Entrevista com CISO']
     },
-    // CloudOps (2) — índice 9
+  
     {
         empresaIndex: 2,
         title: 'Engenheiro de Dados',
@@ -415,7 +459,7 @@ const vagas = [
         contractType: 'pj',
         stages: []
     },
-    // Vitalmed (3) — índice 10
+   
     {
         empresaIndex: 3,
         title: 'Analista de RH — Recrutamento e Seleção',
@@ -427,7 +471,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // Vitalmed (3) — índice 11
+    
     {
         empresaIndex: 3,
         title: 'Analista Financeiro — Controladoria',
@@ -439,7 +483,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // Vitalmed (3) — índice 12
+   
     {
         empresaIndex: 3,
         title: 'Coordenador de Tecnologia da Informação',
@@ -451,7 +495,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // Rumo Educação (4) — índice 13
+    
     {
         empresaIndex: 4,
         title: 'Desenvolvedor Fullstack — Plataforma EAD',
@@ -463,7 +507,7 @@ const vagas = [
         contractType: 'pj',
         stages: ['Triagem', 'Desafio Técnico', 'Entrevista com CTO']
     },
-    // Rumo Educação (4) — índice 14
+    
     {
         empresaIndex: 4,
         title: 'Especialista em Design Instrucional',
@@ -475,7 +519,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // Rumo Educação (4) — índice 15
+   
     {
         empresaIndex: 4,
         title: 'Analista de Marketing — Growth',
@@ -487,7 +531,7 @@ const vagas = [
         contractType: 'pj',
         stages: []
     },
-    // Construa Engenharia (5) — índice 16
+  
     {
         empresaIndex: 5,
         title: 'Engenheiro Civil — Gestão de Obras',
@@ -499,7 +543,7 @@ const vagas = [
         contractType: 'clt',
         stages: ['Triagem', 'Entrevista Técnica', 'Entrevista com Diretor']
     },
-    // Construa Engenharia (5) — índice 17
+   
     {
         empresaIndex: 5,
         title: 'Analista de RH — Departamento Pessoal',
@@ -511,7 +555,7 @@ const vagas = [
         contractType: 'clt',
         stages: []
     },
-    // Construa Engenharia (5) — índice 18
+    
     {
         empresaIndex: 5,
         title: 'Analista Financeiro — Controladoria de Obras',
@@ -522,11 +566,145 @@ const vagas = [
         salary: '4.500 - 6.500', modality: 'presencial', city: 'Campo Grande', status: 'aberta', views: 29,
         contractType: 'temporario',
         stages: []
+    },
+
+  
+    {
+        empresaIndex: 6,
+        title: 'Engenheiro DevOps — Kubernetes & CI/CD',
+        description: 'Automação de pipelines CI/CD, gestão de clusters Kubernetes e infraestrutura como código com Terraform e Ansible.',
+        requirements: 'Kubernetes, Docker, CI/CD com GitHub Actions ou GitLab CI, Terraform, Ansible, Linux, AWS, Python. Monitoramento com Prometheus e Grafana.',
+        benefits: 'Home office 100%, vale refeição R$50/dia, plano de saúde Bradesco, stock options, budget para certificações AWS/CKA.',
+        differential: 'Certificação CKA ou AWS Solutions Architect. Experiência com GitOps e ArgoCD.',
+        salary: '9.000 - 14.000', modality: 'remoto', city: 'Remoto', status: 'aberta', views: 88,
+        isPcd: false, contractType: 'clt',
+        stages: ['Triagem', 'Entrevista Técnica', 'Case Prático']
+    },
+  
+    {
+        empresaIndex: 6,
+        title: 'SRE Engineer — AWS & Terraform',
+        description: 'Garantir confiabilidade, performance e escalabilidade dos sistemas em produção. Trabalho com AWS, Terraform, Python e Linux para automatizar operações e definir SLOs e SLAs.',
+        requirements: 'AWS (EC2, EKS, RDS, Lambda), Terraform, Python, Linux, Docker, Kubernetes. Visão SRE: SLI, SLO, error budget. Ansible desejável.',
+        benefits: 'Remote-first, flexibilidade de horário, plano de saúde, PLR, budget R$3.000/ano para certificações.',
+        differential: 'Experiência com Chaos Engineering, OpenTelemetry e pipelines CI/CD complexos.',
+        salary: '11.000 - 16.000', modality: 'remoto', city: 'Remoto', status: 'aberta', views: 61,
+        isPcd: false, contractType: 'clt',
+        stages: []
+    },
+  
+    {
+        empresaIndex: 6,
+        title: 'Analista de Infraestrutura Cloud',
+        description: 'Vaga prioritária para PCD. Gestão e monitoramento de infraestrutura cloud, suporte a ambientes Linux e automação com Bash e Python.',
+        requirements: 'AWS ou Azure, Linux, Docker, redes (TCP/IP, DNS, HTTP), Bash, Python básico.',
+        benefits: 'Infraestrutura acessível, home office 3x por semana, plano de saúde, vale transporte e refeição.',
+        differential: 'Terraform ou Ansible. Certificação AWS Cloud Practitioner.',
+        salary: '5.000 - 8.000', modality: 'híbrido', city: 'Porto Alegre', status: 'aberta', views: 34,
+        isPcd: true, contractType: 'clt',
+        stages: []
+    },
+
+   
+    {
+        empresaIndex: 7,
+        title: 'Analista Financeiro — FP&A & Valuation',
+        description: 'Modelagem financeira, valuation, projeções orçamentárias, controladoria e relatórios IFRS para o time de FP&A.',
+        requirements: 'FP&A, valuation, controladoria, IFRS, Excel avançado, Power BI, SQL. SAP desejável. Graduação em Contabilidade, Economia ou Administração.',
+        benefits: 'Plano de saúde Amil, vale refeição, PLR semestral, gympass, home office 2x semana.',
+        differential: 'Certificação CFA ou CPA-20. Automação de relatórios com Python ou Power BI Service.',
+        salary: '7.000 - 10.000', modality: 'híbrido', city: 'Rio de Janeiro', status: 'aberta', views: 72,
+        isPcd: false, contractType: 'clt',
+        stages: ['Triagem', 'Teste Técnico', 'Entrevista com CFO']
+    },
+  
+    {
+        empresaIndex: 7,
+        title: 'Desenvolvedor Backend Python — Open Finance',
+        description: 'Construir APIs de Open Finance, integrar com o ecossistema do Banco Central e garantir segurança e performance das integrações financeiras.',
+        requirements: 'Python avançado, REST APIs, PostgreSQL, Docker, AWS. Segurança de APIs e OAuth2.',
+        benefits: 'Remote-first, stock options, plano de saúde Bradesco, R$2.000 de budget para estudos por ano.',
+        differential: 'Experiência com ecossistema Open Finance. FastAPI e Celery.',
+        salary: '8.000 - 13.000', modality: 'remoto', city: 'Remoto', status: 'aberta', views: 95,
+        isPcd: false, contractType: 'clt',
+        stages: []
+    },
+    
+    {
+        empresaIndex: 7,
+        title: 'Analista de Dados — SQL & Power BI',
+        description: 'Dashboards financeiros, automação de relatórios e apoio ao time de controladoria com SQL, Power BI e Excel avançado.',
+        requirements: 'SQL avançado, Power BI, Excel avançado, Python para automação. SAP desejável.',
+        benefits: 'Plano de saúde, vale refeição, PLR, home office 2x semana.',
+        differential: 'Power BI Service, Data Gateway e relatórios automatizados com Python.',
+        salary: '5.500 - 8.500', modality: 'híbrido', city: 'Rio de Janeiro', status: 'aberta', views: 48,
+        isPcd: false, contractType: 'clt',
+        stages: []
+    },
+
+  
+    {
+        empresaIndex: 8,
+        title: 'Engenheiro Civil — BIM & Revit',
+        description: 'Coordenar projetos em BIM, modelar no Revit e AutoCAD e gerenciar cronogramas com MS Project seguindo PMBOK.',
+        requirements: 'Engenharia Civil. BIM, Revit, AutoCAD, MS Project, PMBOK, orçamento de obras, NR-18.',
+        benefits: 'Plano de saúde, vale refeição, vale transporte, participação nos lucros, treinamentos BIM.',
+        differential: 'Certificação PMP ou CBIM. Navisworks para clash detection.',
+        salary: '7.000 - 11.000', modality: 'híbrido', city: 'Porto Alegre', status: 'aberta', views: 57,
+        isPcd: false, contractType: 'clt',
+        stages: ['Triagem', 'Entrevista Técnica', 'Entrevista com Diretor']
+    },
+   
+    {
+        empresaIndex: 8,
+        title: 'Coordenador de Obras — PMBOK & MS Project',
+        description: 'Liderar equipes em campo, controlar cronogramas com MS Project, gerenciar orçamento de obras e garantir conformidade com NR-18 e PMBOK.',
+        requirements: 'Engenharia Civil ou Arquitetura. Gestão de equipes, PMBOK, MS Project, NR-18, orçamento de obras, AutoCAD. Mínimo 5 anos.',
+        benefits: 'Veículo da empresa, plano de saúde Unimed, PLR, convênio odontológico.',
+        differential: 'Certificação PMP e BIM 4D/5D para acompanhamento de obra.',
+        salary: '9.000 - 13.000', modality: 'presencial', city: 'Porto Alegre', status: 'aberta', views: 41,
+        isPcd: false, contractType: 'clt',
+        stages: []
+    },
+   
+    {
+        empresaIndex: 8,
+        title: 'Assistente Técnico de Obras — AutoCAD',
+        description: 'Vaga exclusiva para PCD. Apoiar o time de projetos com modelagem em AutoCAD, leitura de plantas e controles de orçamento de obras.',
+        requirements: 'Técnico em Edificações, Engenharia ou Arquitetura em andamento. AutoCAD, noções de orçamento de obras. NR-18 desejável.',
+        benefits: 'Ambiente acessível, plano de saúde, vale transporte, vale refeição, horário flexível.',
+        differential: 'BIM/Revit básico e MS Project.',
+        salary: '2.800 - 4.000', modality: 'presencial', city: 'Porto Alegre', status: 'aberta', views: 22,
+        isPcd: true, contractType: 'clt',
+        stages: []
+    },
+
+    {
+        empresaIndex: 9,
+        title: 'Desenvolvedor Fullstack — React & Vue.js',
+        description: 'Plataformas de saúde digital com React, Vue.js e Node.js no frontend e APIs REST no backend com PostgreSQL e Docker.',
+        requirements: 'React, Vue.js, Node.js, TypeScript, REST APIs, PostgreSQL, Docker, Git.',
+        benefits: 'Plano de saúde e odontológico Bradesco, vale refeição, home office 3x semana, stock options.',
+        differential: 'Experiência com HL7 FHIR, sistemas hospitalares ou telemedicina.',
+        salary: '8.000 - 12.000', modality: 'híbrido', city: 'São Paulo', status: 'aberta', views: 83,
+        isPcd: false, contractType: 'clt',
+        stages: ['Triagem', 'Desafio Técnico', 'Entrevista com CTO']
+    },
+    
+    {
+        empresaIndex: 9,
+        title: 'Analista de RH — Employer Branding & T&D',
+        description: 'Vaga prioritária para PCD. Employer branding, recrutamento e seleção com LinkedIn Recruiter e programas de T&D com indicadores em Power BI e Excel.',
+        requirements: 'Recrutamento e seleção, employer branding, LinkedIn Recruiter, Excel avançado, Power BI, entrevista por competências.',
+        benefits: 'Escritório acessível, plano de saúde, vale refeição, horário flexível, gympass.',
+        differential: 'ATS, NPS de candidatos e dashboards de people analytics.',
+        salary: '4.500 - 6.500', modality: 'híbrido', city: 'São Paulo', status: 'aberta', views: 31,
+        isPcd: true, contractType: 'clt',
+        stages: []
     }
 ];
 
-// Formato: [candIdx, vagaIdx, status, currentStage | null]
-// Vagas com etapas: 0 (Frontend React), 1 (Backend Node), 3 (UX/UI), 7 (DevOps), 8 (Segurança), 13 (Fullstack EAD), 16 (Engenheiro Civil)
+
 const candidaturas = [
     // ── Vaga 0: Frontend React (TechBridge) — 5 candidatos em etapas diferentes ──
     [0, 0,  'aprovado',   'Entrevista RH'],        // Ana: passou por todas as etapas, aprovada
@@ -566,6 +744,17 @@ const candidaturas = [
     [7, 18, 'pendente',   null],
     [9, 4,  'pendente',   null],                   // Sofia: candidata ao React+Next.js
     [1, 9,  'aprovado',   null],                   // Carlos: aprovado em Engenheiro de Dados
+
+    // ── Novas vagas ──
+    [3, 19, 'em análise', 'Entrevista Técnica'],   // Roberto (DevOps) → Engenheiro DevOps Infrastack
+    [3, 20, 'pendente',   null],                   // Roberto → SRE Engineer
+    [6, 22, 'em análise', 'Teste Técnico'],        // Beatriz (Financeiro) → FP&A & Valuation
+    [6, 24, 'pendente',   null],                   // Beatriz → Analista de Dados SQL
+    [7, 25, 'pendente',   null],                   // Rafael (Civil) → Engenheiro Civil BIM
+    [7, 26, 'pendente',   null],                   // Rafael → Coordenador de Obras
+    [0, 28, 'pendente',   null],                   // Ana (React/Vue.js) → Fullstack React & Vue.js
+    [4, 28, 'pendente',   null],                   // Fernanda → Fullstack React & Vue.js
+    [5, 29, 'pendente',   null],                   // Marcos (RH) → Analista RH HealthData
 ];
 
 const favoritos = [
@@ -633,7 +822,7 @@ async function seed() {
                 title: vaga.title, company: empresa.name, description: vaga.description,
                 requirements: vaga.requirements, benefits: vaga.benefits, differential: vaga.differential,
                 salary: vaga.salary, modality: vaga.modality, city: vaga.city, status: vaga.status,
-                contractType: vaga.contractType || null,
+                contractType: vaga.contractType || null, isPcd: vaga.isPcd || false,
                 views: vaga.views, email: empresa.email, UserId: empresa.id, new_job: false,
                 stages: JSON.stringify(vaga.stages || [])
             });
@@ -718,7 +907,7 @@ async function seed() {
 
         console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         console.log('✅ Seed concluído!\n');
-        console.log(`   🏢 ${empresasCreated.length} empresas (6 setores)`);
+        console.log(`   🏢 ${empresasCreated.length} empresas (10 setores)`);
         console.log(`   👤 ${candidatosCreated.length} candidatos`);
         console.log(`   💼 ${vagasCreated.length} vagas (${vagas.filter(v => v.stages && v.stages.length).length} com etapas)`);
         console.log(`   📨 ${candidaturas.length} candidaturas`);

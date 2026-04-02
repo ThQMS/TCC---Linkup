@@ -13,7 +13,8 @@ const { Job, Application, Notification } = require('../../src/models');
 const {
   calcFitScore,
   findTalentsForJob,
-  reactivateContact
+  reactivateContact,
+  applyPcdBoost
 } = require('../../src/services/talentRediscoveryService');
 const { useDatabase } = require('../helpers/db');
 const {
@@ -210,6 +211,88 @@ describe('findTalentsForJob — Redescoberta de talentos para empresa', () => {
     if (result.length >= 2) {
       expect(result[0].fitScore).toBeGreaterThanOrEqual(result[1].fitScore);
     }
+  });
+});
+
+describe('applyPcdBoost — Boost de inclusão PCD', () => {
+  test('+20 pts quando candidato e vaga são PCD', () => {
+    expect(applyPcdBoost(70, { isPcd: true }, { isPcd: true })).toBe(90);
+  });
+
+  test('Score sem candidato PCD não recebe boost', () => {
+    expect(applyPcdBoost(70, { isPcd: false }, { isPcd: true })).toBe(70);
+  });
+
+  test('Score sem vaga PCD não recebe boost', () => {
+    expect(applyPcdBoost(70, { isPcd: true }, { isPcd: false })).toBe(70);
+  });
+
+  test('Score é limitado a 100 mesmo com boost', () => {
+    expect(applyPcdBoost(95, { isPcd: true }, { isPcd: true })).toBe(100);
+  });
+
+  test('Candidato null não recebe boost', () => {
+    expect(applyPcdBoost(70, null, { isPcd: true })).toBe(70);
+  });
+
+  test('Vaga null não recebe boost', () => {
+    expect(applyPcdBoost(70, { isPcd: true }, null)).toBe(70);
+  });
+
+  test('Candidato PCD com score borderline aparece em vaga PCD via findTalentsForJob', async () => {
+    // Score base 70% (7 de 10 skills) → 70 + 20 = 90 >= 88 → incluído
+    const company   = await createCompany();
+    const candidate = await createCandidate({ availabilityStatus: 'actively_searching', isPcd: true });
+
+    await createResume(candidate.id, {
+      skills:      JSON.stringify(['node', 'javascript', 'python', 'django', 'flask', 'sqlalchemy', 'celery', 'redis', 'docker', 'aws']),
+      experiences: '[]'
+    });
+
+    const oldJob = await createJob(company.id, {
+      title:        'backend developer',
+      requirements: 'node javascript python django flask sqlalchemy celery',
+      isPcd:        true
+    });
+    await createApplication(oldJob.id, candidate.id);
+
+    const newJob = await createJob(company.id, {
+      title:        'backend developer',
+      requirements: 'node javascript python django flask sqlalchemy celery',
+      isPcd:        true
+    });
+
+    const result = await findTalentsForJob(newJob, company.id);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+    expect(result[0].candidate.id).toBe(candidate.id);
+    expect(result[0].fitScore).toBeGreaterThanOrEqual(88);
+  });
+
+  test('Candidato PCD com score borderline NÃO aparece em vaga não-PCD', async () => {
+    // Mesmo score 70% mas sem boost → 70 < 88 → excluído
+    const company   = await createCompany();
+    const candidate = await createCandidate({ availabilityStatus: 'actively_searching', isPcd: true });
+
+    await createResume(candidate.id, {
+      skills:      JSON.stringify(['node', 'javascript', 'python', 'django', 'flask', 'sqlalchemy', 'celery', 'redis', 'docker', 'aws']),
+      experiences: '[]'
+    });
+
+    const oldJob = await createJob(company.id, {
+      title:        'backend developer',
+      requirements: 'node javascript python django flask sqlalchemy celery',
+      isPcd:        false
+    });
+    await createApplication(oldJob.id, candidate.id);
+
+    const newJob = await createJob(company.id, {
+      title:        'backend developer',
+      requirements: 'node javascript python django flask sqlalchemy celery',
+      isPcd:        false
+    });
+
+    const result = await findTalentsForJob(newJob, company.id);
+    expect(result).toEqual([]);
   });
 });
 

@@ -607,6 +607,27 @@
           <input type="url" class="form-control" name="linkedin" value="{{user.linkedin}}" placeholder="https://linkedin.com/in/usuario"
             style="background:#1e1e1e;border:1px solid #2a2a2a;color:#e0e0e0;border-radius:8px;" />
         </div>
+        <div class="col-12">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:#e0e0e0;font-size:0.9rem;">
+            <input type="checkbox" name="isPcd" id="pcd-check" value="1" {{#if user.isPcd}}checked{{/if}}
+              onchange="document.getElementById('pcd-type-row').style.display=this.checked?'block':'none'"
+              style="width:18px;height:18px;accent-color:#e63946;cursor:pointer;">
+            Sou PCD (Pessoa com Deficiência)
+          </label>
+        </div>
+        <div class="col-12" id="pcd-type-row" style="display:{{#if user.isPcd}}block{{else}}none{{/if}};">
+          <label for="pcd-type-select" style="color:#666;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;">Tipo de deficiência (opcional)</label>
+          <select id="pcd-type-select" name="pcdType" class="form-control"
+            style="background:#1e1e1e;border:1px solid #2a2a2a;color:#e0e0e0;border-radius:8px;">
+            <option value="">Prefiro não informar</option>
+            <option value="Visual"         {{#if (eq user.pcdType 'Visual')}}selected{{/if}}>Visual</option>
+            <option value="Auditiva"       {{#if (eq user.pcdType 'Auditiva')}}selected{{/if}}>Auditiva</option>
+            <option value="Física/Motora"  {{#if (eq user.pcdType 'Física/Motora')}}selected{{/if}}>Física/Motora</option>
+            <option value="Intelectual"    {{#if (eq user.pcdType 'Intelectual')}}selected{{/if}}>Intelectual</option>
+            <option value="Múltipla"       {{#if (eq user.pcdType 'Múltipla')}}selected{{/if}}>Múltipla</option>
+            <option value="Outra"          {{#if (eq user.pcdType 'Outra')}}selected{{/if}}>Outra</option>
+          </select>
+        </div>
       </div>
       <div class="d-flex justify-content-end gap-2 mt-4">
         <button type="button" onclick="document.getElementById('editModal').style.display='none'"

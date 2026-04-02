@@ -28,6 +28,7 @@ const { isAvailable }    = require('./availabilityService');
 const FIT_THRESHOLD         = 88;   // % mínimo para acionar as features
 const LOOKBACK_MONTHS       = 6;    // janela de busca de candidaturas antigas
 const MAX_CANDIDATES_NOTIFY = 50;   // limite de candidatos processados por chamada
+const PCD_BOOST             = 20;   // boost quando candidato PCD candidata a vaga PCD
 
 // ─── Fit Score ─────────────────────────────────────────────────────────────────
 
@@ -66,6 +67,17 @@ function calcFitScore(resume, job) {
 
     const matched = [...candidateKeywords].filter(kw => jobWords.has(kw)).length;
     return Math.round((matched / candidateKeywords.size) * 100);
+}
+
+/**
+ * Aplica boost de inclusão PCD: +20 pts quando candidato é PCD e vaga é PCD.
+ * Resultado limitado a 100.
+ */
+function applyPcdBoost(score, candidate, job) {
+    if (candidate && candidate.isPcd && job && job.isPcd) {
+        return Math.min(100, score + PCD_BOOST);
+    }
+    return score;
 }
 
 // ─── Feature 1: Redescoberta de Talentos (para Empresa) ───────────────────────
@@ -136,14 +148,15 @@ async function findTalentsForJob(job, companyUserId) {
             if (results.length >= MAX_CANDIDATES_NOTIFY) break;
 
             const [candidate, resume] = await Promise.all([
-                User.findByPk(candidateId, { attributes: ['id', 'name', 'email', 'availabilityStatus', 'avatar'] }),
+                User.findByPk(candidateId, { attributes: ['id', 'name', 'email', 'availabilityStatus', 'avatar', 'isPcd'] }),
                 Resume.findOne({ where: { userId: candidateId } })
             ]);
 
             // Só candidatos disponíveis
             if (!candidate || !isAvailable(candidate)) continue;
 
-            const fitScore = calcFitScore(resume, job.toJSON ? job.toJSON() : job);
+            const jobJson  = job.toJSON ? job.toJSON() : job;
+            const fitScore = applyPcdBoost(calcFitScore(resume, jobJson), candidate, jobJson);
             if (fitScore < FIT_THRESHOLD) continue;
 
             results.push({
@@ -218,13 +231,14 @@ async function notifyRevisitedOpportunities(job, expressApp) {
             if (notified >= MAX_CANDIDATES_NOTIFY) break;
 
             const [candidate, resume] = await Promise.all([
-                User.findByPk(candidateId, { attributes: ['id', 'name', 'email', 'availabilityStatus'] }),
+                User.findByPk(candidateId, { attributes: ['id', 'name', 'email', 'availabilityStatus', 'isPcd'] }),
                 Resume.findOne({ where: { userId: candidateId } })
             ]);
 
             if (!candidate || !isAvailable(candidate)) continue;
 
-            const fitScore = calcFitScore(resume, job.toJSON ? job.toJSON() : job);
+            const jobJson  = job.toJSON ? job.toJSON() : job;
+            const fitScore = applyPcdBoost(calcFitScore(resume, jobJson), candidate, jobJson);
             if (fitScore < FIT_THRESHOLD) continue;
 
             const monthsAgo = _diffInMonths(lastAppDate);
@@ -427,6 +441,7 @@ function findSimilarCandidates(targetApplication, job, allApplications, resumeMa
 
 module.exports = {
     calcFitScore,
+    applyPcdBoost,
     findTalentsForJob,
     notifyRevisitedOpportunities,
     reactivateContact,

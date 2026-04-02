@@ -276,7 +276,7 @@ exports.postAvatar = async (req, res) => {
 };
 
 exports.postUpdate = async (req, res) => {
-    const { name, bio, city, github, linkedin, website, linkedinCompany, sector, companySize, phone, birthDate, address } = req.body;
+    const { name, bio, city, github, linkedin, website, linkedinCompany, sector, companySize, phone, birthDate, address, isPcd, pcdType } = req.body;
     try {
         const user = await User.findByPk(req.user.id);
         user.name      = name;
@@ -288,6 +288,8 @@ exports.postUpdate = async (req, res) => {
         if (user.userType === 'candidato') {
             user.github   = github;
             user.linkedin = linkedin;
+            user.isPcd    = isPcd === '1';
+            user.pcdType  = user.isPcd ? (pcdType || null) : null;
         } else {
             user.website         = website;
             user.linkedinCompany = linkedinCompany;

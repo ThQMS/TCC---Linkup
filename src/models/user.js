@@ -33,7 +33,9 @@ const User = db.define('User', {
     resetTokenExpires:  { type: DataTypes.DATE, allowNull: true },
     verifyToken:        { type: DataTypes.STRING, allowNull: true },
     verifyTokenExpires: { type: DataTypes.DATE, allowNull: true },
-    cnpj: { type: DataTypes.STRING, allowNull: true }
+    cnpj:    { type: DataTypes.STRING,  allowNull: true },
+    isPcd:   { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    pcdType: { type: DataTypes.STRING,  allowNull: true }
 });
 
 module.exports = User;

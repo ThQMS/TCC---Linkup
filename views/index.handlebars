@@ -7,6 +7,7 @@
       <input type="hidden" name="modality" id="modality-val" value="{{modality}}">
       <input type="hidden" name="salary"   id="salary-val"   value="{{salary}}">
       <input type="hidden" name="city"     id="city-val"     value="{{city}}">
+      <input type="hidden" name="isPcd"    id="ispcd-val"    value="{{#if isPcd}}1{{else}}0{{/if}}">
 
       <div class="sf-row">
         <div class="sf-search-wrap">
@@ -89,15 +90,21 @@
 
         </div>
 
-        <!-- FOOTER DO PAINEL -->
-        <div class="sf-panel-footer">
-          <button type="button" class="sf-clear-btn" onclick="clearAllFilters()">
-            <i class="bi bi-x-circle me-1"></i>Limpar tudo
-          </button>
-          <button type="submit" class="sf-apply-btn">
-            Ver vagas <i class="bi bi-arrow-right ms-1"></i>
-          </button>
+          <!-- INCLUSÃO PCD -->
+          <div class="sf-section" style="grid-column:1/-1;">
+            <p class="sf-section-title"><i class="bi bi-universal-access me-1"></i>Inclusão</p>
+            <div class="sf-pills">
+              <button type="button" id="pcd-pill"
+                class="sf-pill {{#if isPcd}}sf-pill-active{{/if}}"
+                onclick="togglePcd()"
+                aria-pressed="{{#if isPcd}}true{{else}}false{{/if}}"
+                aria-label="Filtrar vagas para Pessoa com Deficiência">
+                <i class="bi bi-person-wheelchair me-1"></i>Vagas PCD
+              </button>
+            </div>
+          </div>
         </div>
+
       </div>
     </form>
 
@@ -112,10 +119,9 @@
     {{#if hasSuggestions}}
     <div style="margin-bottom:32px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-        <i class="bi bi-robot" style="font-size:1.3rem;color:#a855f7;"></i>
+        <i class="bi bi-bookmark-star" style="font-size:1.3rem;color:#a855f7;"></i>
         <h2 style="font-size:1.1rem;font-weight:700;margin:0;">Vagas para você</h2>
-        <span style="background:#a855f7;color:white;font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:0.5px;">IA</span>
-        <span style="color:#888;font-size:0.85rem;">Baseado no seu currículo</span>
+        <span style="color:#888;font-size:0.85rem;">Baseadas no seu currículo</span>
       </div>
       <div class="row g-3">
         {{#each suggestedJobs}}
@@ -657,10 +663,12 @@ function updateBadge() {
     const modality = document.getElementById('modality-val').value;
     const salary   = document.getElementById('salary-val').value;
     const city     = document.getElementById('city-val').value;
+    const pcd      = document.getElementById('ispcd-val').value;
     let count = 0;
     if (modality && modality !== 'todos') count++;
     if (salary   && salary   !== 'todos') count++;
     if (city     && city     !== 'todos') count++;
+    if (pcd === '1') count++;
     const badge = document.getElementById('filter-badge');
     if (count > 0) {
         badge.textContent = count;
@@ -671,11 +679,22 @@ function updateBadge() {
     renderChips();
 }
 
+function togglePcd() {
+    const input = document.getElementById('ispcd-val');
+    const pill  = document.getElementById('pcd-pill');
+    const active = input.value === '1';
+    input.value = active ? '0' : '1';
+    pill.classList.toggle('sf-pill-active', !active);
+    pill.setAttribute('aria-pressed', String(!active));
+    updateBadge();
+}
+
 function clearAllFilters() {
     document.getElementById('modality-val').value = 'todos';
     document.getElementById('salary-val').value   = 'todos';
     document.getElementById('city-val').value     = 'todos';
     document.getElementById('city-input').value   = '';
+    document.getElementById('ispcd-val').value    = '0';
     document.querySelectorAll('.sf-pill').forEach(p => p.classList.remove('sf-pill-active'));
     document.querySelectorAll('.sf-option').forEach(o => o.classList.remove('sf-option-active'));
     document.querySelector('.sf-option input[value="todos"]')?.closest('.sf-option')?.classList.add('sf-option-active');
@@ -698,10 +717,18 @@ function removeFilter(type) {
 const MODALITY_LABELS = { presencial: 'Presencial', hibrido: 'Híbrido', homeoffice: 'Home Office' };
 const SALARY_LABELS   = { '1000': 'Até R$ 1.000', '2000': 'Até R$ 2.000', '3000': 'Até R$ 3.000', '5000': 'Até R$ 5.000', combinar: 'A combinar' };
 
+function removeFilterPcd() {
+    document.getElementById('ispcd-val').value = '0';
+    document.getElementById('pcd-pill')?.classList.remove('sf-pill-active');
+    updateBadge();
+    document.getElementById('filter-form').submit();
+}
+
 function renderChips() {
     const modality = document.getElementById('modality-val').value;
     const salary   = document.getElementById('salary-val').value;
     const city     = document.getElementById('city-val').value;
+    const pcd      = document.getElementById('ispcd-val').value;
     const row      = document.getElementById('active-chips');
     let html = '';
     if (modality && modality !== 'todos')
@@ -710,6 +737,8 @@ function renderChips() {
         html += `<span class="sf-chip" onclick="removeFilter('salary')"><i class="bi bi-cash-coin"></i>${SALARY_LABELS[salary]||salary}<i class="bi bi-x sf-chip-x"></i></span>`;
     if (city && city !== 'todos')
         html += `<span class="sf-chip" onclick="removeFilter('city')"><i class="bi bi-geo-alt"></i>${city}<i class="bi bi-x sf-chip-x"></i></span>`;
+    if (pcd === '1')
+        html += `<span class="sf-chip" onclick="removeFilterPcd()"><i class="bi bi-universal-access"></i>Vagas PCD<i class="bi bi-x sf-chip-x"></i></span>`;
     row.innerHTML = html;
     row.style.display = html ? 'flex' : 'none';
 }

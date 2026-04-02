@@ -164,6 +164,7 @@
     .features { padding: 100px 60px; max-width: 1200px; margin: 0 auto; }
     .features-header { margin-bottom: 56px; }
     .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .features-grid > .feature-card:last-child:nth-child(3n+1) { grid-column: 2; }
 
     .feature-card {
       background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
@@ -409,6 +410,7 @@
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-people"></i></div><h3>Redescoberta de Talentos</h3><p>Ao abrir uma vaga, o sistema busca automaticamente candidatos anteriores com fit alto que ainda estão disponíveis — sem busca manual.</p></div>
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-arrow-repeat"></i></div><h3>Oportunidades Revisitadas</h3><p>Quando uma empresa reabre uma vaga compatível com seu perfil, você é notificado automaticamente — sem precisar monitorar manualmente.</p></div>
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-person-plus-fill"></i></div><h3>Candidatos Similares</h3><p>A IA encontra candidatos com alto fit que nunca se inscreveram na vaga e os apresenta para contato proativo — expandindo o alcance além das candidaturas recebidas.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-universal-access"></i></div><h3>Inclusão PCD</h3><p>Candidatos PCD recebem um boost de compatibilidade em vagas com cotas para deficiência (Lei 8.213/91). Filtre vagas PCD e sinalize seu perfil para ser encontrado pelas empresas certas.</p></div>
     </div>
   </section>
 
@@ -480,6 +482,7 @@
               <span class="avail-pills-label">Seu status de disponibilidade</span>
               <span class="avail-pill active"><i class="bi bi-search"></i> Buscando ativamente</span>
               <span class="avail-pill"><i class="bi bi-hand-thumbs-up"></i> Aberto a oportunidades</span>
+              <span class="avail-pill"><i class="bi bi-briefcase"></i> Em processo seletivo</span>
               <span class="avail-pill"><i class="bi bi-pause-circle"></i> Não disponível</span>
             </div>
           </div>
@@ -577,7 +580,7 @@
   <!-- FOOTER -->
   <footer>
     <a href="/" class="nav-logo"><span class="nav-logo-dot"></span>Link<span>Up</span></a>
-    <p class="footer-text">© 2025 LinkUp — Projeto TCC</p>
+    <p class="footer-text">© 2026 LinkUp — Projeto TCC</p>
   </footer>
 
   <script>
