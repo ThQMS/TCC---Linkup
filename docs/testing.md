@@ -25,8 +25,8 @@ npm run test:coverage # com relatório de cobertura de código
 Saída esperada:
 
 ```
-Test Suites: 6 passed, 6 total
-Tests:       89 passed, 89 total
+Test Suites: 7 passed, 7 total
+Tests:       106 passed, 106 total
 Time:        ~5s
 ```
 
@@ -105,11 +105,12 @@ tests/
 │   └── factories.js         # createCandidate/Company/Job/Resume/Application
 │
 ├── unit/
-│   ├── applicationService.test.js      # Ciclo de vida de candidaturas
-│   ├── ghostJobCleanup.test.js         # Regra dos 21 dias (anti ghost job)
+│   ├── applicationService.test.js       # Ciclo de vida de candidaturas
+│   ├── ghostJobCleanup.test.js          # Regra dos 21 dias (anti ghost job)
 │   ├── talentRediscoveryService.test.js # Redescoberta de talentos (empresa)
-│   ├── revisitOpportunities.test.js    # Oportunidades revisitadas (candidato)
-│   └── similarCandidates.test.js       # Candidatos sugeridos/similares
+│   ├── revisitOpportunities.test.js     # Oportunidades revisitadas (candidato)
+│   ├── similarCandidates.test.js        # Candidatos sugeridos/similares
+│   └── availabilityService.test.js      # Sistema de 4 status de disponibilidade
 │
 └── integration/
     └── jobs.routes.test.js             # POST /jobs/apply/:id (stack completa)
@@ -212,6 +213,32 @@ Cobre `findSuggestedCandidates` e `contactSuggestedCandidate`.
 | Socket emitido | `sendSocket` chamado com título correto |
 | Convite duplicado | Bloqueado sem criar nova notificação |
 | Falha de e-mail | `ok: true` (`.catch()` interno) |
+
+### `availabilityService.test.js` — 17 testes
+
+Cobre `isAvailable`, `setAvailability`, `checkAndUpdateAvailability` e `getAvailableCandidateIds` — o núcleo do sistema de disponibilidade de candidatos.
+
+| Cenário | Verificação |
+|---|---|
+| `actively_searching` | `isAvailable()` retorna `true` |
+| `open_to_opportunities` | `isAvailable()` retorna `true` |
+| `in_selection_process` | `isAvailable()` retorna `true` (ainda contactável) |
+| `not_available` | `isAvailable()` retorna `false` |
+| `AVAILABLE_STATUSES` | Contém exatamente 3 status (não inclui `not_available`) |
+| Atualizar para disponível | `openToWork` sincronizado para `true` |
+| Atualizar para `not_available` | `openToWork` sincronizado para `false` |
+| Todos os status disponíveis | Todos sincronizam `openToWork=true` |
+| Status inválido | Lança erro; banco não é alterado |
+| Usuário inexistente | `checkAndUpdateAvailability` retorna `changed: false` |
+| Empresa | Nunca sofre alteração automática de status |
+| Regra: aprovado em candidatura | Notificação criada; status NÃO muda automaticamente |
+| Regra: inativo 60+ dias (`actively_searching`) | Downgrade para `open_to_opportunities` |
+| Regra: inativo mas já em baixa prioridade | Sem downgrade duplo |
+| Candidatura recente protege contra downgrade | Status preservado com atividade nos últimos 30 dias |
+| `getAvailableCandidateIds` | Inclui os 3 disponíveis; exclui `not_available` e não verificados |
+| Pool vazio | Retorna `[]` quando nenhum candidato está disponível |
+
+> **Nota de design:** `checkAndUpdateAvailability` (Regra 1) cria uma notificação *sugestiva* ao candidato aprovado — não força `not_available` automaticamente. Isso respeita a autonomia do candidato, que pode estar participando de múltiplos processos.
 
 ### `jobs.routes.test.js` — 16 testes
 

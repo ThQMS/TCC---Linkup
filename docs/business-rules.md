@@ -95,10 +95,31 @@ Cada regra segue o formato:
 
 ---
 
-**RN-203 — Status de disponibilidade do candidato**
-**Descrição:** Candidatos podem definir seu status de disponibilidade: `actively_searching`, `open_to_opportunities` ou `not_available`. O status é verificado pelas features de redescoberta de talentos e candidatos sugeridos — apenas candidatos disponíveis são considerados.
-**Justificativa:** Evita contatar candidatos que não estão abertos a oportunidades, reduzindo ruído tanto para o candidato quanto para a empresa.
-**Impacto:** `availabilityService.isAvailable()` é chamado antes de qualquer notificação de redescoberta ou sugestão. Campo `availabilityStatus` no modelo `User`.
+**RN-203 — Status de disponibilidade do candidato (4 níveis)**
+**Descrição:** Candidatos definem um dos quatro status de disponibilidade:
+- `actively_searching` — Desempregado, buscando ativamente. Prioridade máxima nas buscas. Default para novas contas.
+- `open_to_opportunities` — Empregado, mas aberto a propostas (salário, remoto, crescimento). Prioridade média.
+- `in_selection_process` — Participando de processos seletivos, ainda pode ser contactado. Prioridade reduzida.
+- `not_available` — Não deseja contato. **Excluído** das features de redescoberta e candidatos sugeridos.
+
+Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_process` são considerados "disponíveis" (`isAvailable() = true`) e podem aparecer em redescoberta e sugestões. Candidatos com `not_available` são invisíveis para essas features.
+**Justificativa:** Quatro status refletem a realidade do mercado de trabalho com mais precisão que um simples toggle on/off, reduzindo ruído para empresas e respeitando a situação atual do candidato.
+**Impacto:** `availabilityService.isAvailable()` filtra candidatos antes de redescoberta (`talentRediscoveryService`) e sugestões (`similarCandidatesService`). `setAvailability()` sincroniza o campo legado `openToWork`. Rota `POST /profile/availability-status`. Campo `availabilityStatus` no modelo `User` (migration `20260401000002`).
+**Cobertura de testes:** `tests/unit/availabilityService.test.js` — 17 testes validando `isAvailable`, `setAvailability`, regras automáticas e pool de candidatos.
+
+---
+
+**RN-203-A — Downgrade automático por inatividade**
+**Descrição:** Candidatos com status `actively_searching` que não apresentam atividade (candidatura, atualização de currículo ou login) nos últimos 30 dias são automaticamente rebaixados para `open_to_opportunities` após 60 dias de inatividade total. Candidatos já em `open_to_opportunities` ou inferior não sofrem novo downgrade.
+**Justificativa:** Evita que o topo da lista de busca seja ocupado por candidatos que pararam de usar a plataforma, reduzindo ruído para recrutadores.
+**Impacto:** `availabilityService.checkAndUpdateAvailability()` → `_hasRecentActivity()`. Executado pelo cron de disponibilidade em background.
+
+---
+
+**RN-203-B — Sugestão de indisponibilidade após aprovação**
+**Descrição:** Quando um candidato é aprovado em uma candidatura, o sistema cria uma notificação sugestiva perguntando se ele deseja atualizar seu status para `not_available`. O status **não é alterado automaticamente** — a decisão final é do candidato.
+**Justificativa:** Respeita a autonomia do candidato, que pode estar em múltiplos processos seletivos simultâneos. Forçar `not_available` seria invasivo e potencialmente incorreto.
+**Impacto:** `availabilityService._notifySuggestUnavailable()` cria `Notification` com link para `/profile#availability`. Socket.io emite evento se o candidato estiver online.
 
 ---
 
@@ -248,9 +269,9 @@ Cada regra segue o formato:
 ---
 
 **RN-505 — Ciclo de vida do status de candidatura**
-**Descrição:** O status de uma candidatura assume os valores: `pendente` (padrão ao criar), `aprovado`, `rejeitado`, `contratado` e `expirado`. A empresa atualiza o status pelo pipeline; o sistema atualiza para `expirado` via cron.
-**Justificativa:** Mantém o histórico do processo seletivo e permite que o candidato acompanhe sua jornada em tempo real.
-**Impacto:** `applicationService.updateApplicationStatus` persiste o novo status e cria notificação ao candidato. Mudança para `rejeitado` dispara e-mail de feedback via IA. Mudança para `contratado` dispara e-mail de parabéns.
+**Descrição:** O status de uma candidatura assume os valores: `pendente` (padrão ao criar), `em análise`, `aprovado`, `rejeitado`, `contratado`, `expirado` e `cancelado`. A empresa atualiza os status do pipeline; o candidato pode cancelar enquanto `pendente`; o sistema atualiza para `expirado` via cron.
+**Justificativa:** Mantém o histórico completo do processo seletivo e permite que ambas as partes acompanhem a jornada em tempo real.
+**Impacto:** `applicationService.updateApplicationStatus` persiste status da empresa. `applicationService.cancelApplication` persiste cancelamento pelo candidato (ver RN-508). Mudança para `rejeitado` dispara feedback IA. Mudança para `contratado` dispara e-mail de parabéns.
 
 ---
 
@@ -258,6 +279,13 @@ Cada regra segue o formato:
 **Descrição:** Candidaturas com status `pendente` que não receberam movimentação após N dias são marcadas como `expirado` pelo cron `applicationsExpiryJob`.
 **Justificativa:** Mantém o pipeline limpo e evita que candidatos aguardem indefinidamente por respostas de vagas inativas.
 **Impacto:** `applicationsExpiryJob` executa diariamente, atualiza `status` e cria notificação para o candidato.
+
+---
+
+**RN-508 — Cancelamento de candidatura pelo candidato**
+**Descrição:** O candidato pode cancelar sua própria candidatura desde que o status seja `pendente`. Ao cancelar: (1) o status é atualizado para `cancelado` e `canceledAt` é registrado; (2) uma notificação in-app é criada para o dono da vaga; (3) uma notificação em tempo real é enviada via Socket.io para a empresa; (4) um e-mail transacional é disparado fire-and-forget para o endereço da vaga. Candidaturas com status `cancelado` são excluídas do envio de feedback em massa ao encerrar a vaga.
+**Justificativa:** Permite que o candidato retire uma candidatura equivocada ou redundante sem depender da empresa. Notificar a empresa evita que ela invista tempo avaliando um candidato que já desistiu. Registrar `canceledAt` preserva o histórico para métricas futuras.
+**Impacto:** `applicationService.cancelApplication` — valida o status, persiste a atualização, cria notificação, chama `sendSocketNotification` e dispara `_sendCancellationEmail`. `applicationService.sendBulkClosingFeedback` exclui `cancelado` do `Op.notIn`. `jobsController.cancelApplication` retorna JSON `{ ok: true }` consumido pelo Alpine.js no frontend. Rota: `POST /jobs/cancel/:applicationId`.
 
 ---
 

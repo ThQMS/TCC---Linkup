@@ -1,3 +1,22 @@
+<style>
+/* ── Dashboard Responsivo ── */
+@media (max-width:575px){
+  /* KPI: números menores em telas muito pequenas */
+  .kpi-card .kpi-num { font-size:1.6rem !important; }
+  .kpi-card .kpi-lbl { font-size:0.78rem !important; }
+  /* Gráfico: menos padding */
+  .chart-box { padding:16px !important; }
+  /* Job rows: badges em linha com scroll horizontal */
+  .job-row-badges { overflow-x:auto; padding-bottom:4px; flex-wrap:nowrap !important; }
+  /* Forçar quebra no layout da linha de vaga */
+  .job-row-right { width:100% !important; margin-top:10px; justify-content:flex-start !important; }
+}
+@media (max-width:400px){
+  /* Cards de KPI: 2 por linha em telas muito pequenas */
+  .kpi-card .kpi-num { font-size:1.4rem !important; }
+}
+</style>
+
 <div style="padding-top:80px;padding-bottom:60px;">
   <div class="container" style="max-width:1000px;">
 
@@ -27,27 +46,27 @@
     <!-- CARDS KPI PRINCIPAIS -->
     <div class="row g-3 mb-4">
       <div class="col-6 col-md-3">
-        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
-          <div style="font-size:2rem;font-weight:700;color:#f03e3e;">{{jobsCount}}</div>
-          <div style="font-size:0.85rem;color:#888;">Vagas</div>
+        <div class="kpi-card" style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div class="kpi-num" style="font-size:2rem;font-weight:700;color:#f03e3e;">{{jobsCount}}</div>
+          <div class="kpi-lbl" style="font-size:0.85rem;color:#888;">Vagas</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
-        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
-          <div style="font-size:2rem;font-weight:700;color:#f03e3e;">{{totalCandidaturas}}</div>
-          <div style="font-size:0.85rem;color:#888;">Total Candidaturas</div>
+        <div class="kpi-card" style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div class="kpi-num" style="font-size:2rem;font-weight:700;color:#f03e3e;">{{totalCandidaturas}}</div>
+          <div class="kpi-lbl" style="font-size:0.85rem;color:#888;">Candidaturas</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
-        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
-          <div style="font-size:2rem;font-weight:700;color:#4caf50;">{{totalAceitos}}</div>
-          <div style="font-size:0.85rem;color:#888;">Aceitos</div>
+        <div class="kpi-card" style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div class="kpi-num" style="font-size:2rem;font-weight:700;color:#4caf50;">{{totalAceitos}}</div>
+          <div class="kpi-lbl" style="font-size:0.85rem;color:#888;">Aceitos</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
-        <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
-          <div style="font-size:2rem;font-weight:700;color:#ffc107;">{{totalPendentes}}</div>
-          <div style="font-size:0.85rem;color:#888;">Pendentes</div>
+        <div class="kpi-card" style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
+          <div class="kpi-num" style="font-size:2rem;font-weight:700;color:#ffc107;">{{totalPendentes}}</div>
+          <div class="kpi-lbl" style="font-size:0.85rem;color:#888;">Pendentes</div>
         </div>
       </div>
     </div>
@@ -132,7 +151,7 @@
 
     <!-- GRÁFICO -->
     {{#if jobsData.length}}
-    <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:24px;">
+    <div class="chart-box" style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;margin-bottom:24px;overflow:hidden;">
       <h5 style="color:#f03e3e;font-weight:700;margin-bottom:20px;">
         <i class="bi bi-bar-chart me-2"></i>Candidaturas por Vaga
       </h5>
@@ -169,15 +188,17 @@
                 </span>
               </div>
             </div>
-            <div class="d-flex gap-2 flex-wrap align-items-center mt-2 mt-md-0">
-              <span style="background:#1a3a1a;color:#4caf50;border:1px solid #4caf50;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-check-circle-fill me-1"></i>{{this.aprovado}}</span>
-              <span style="background:#2a2a1a;color:#ffc107;border:1px solid #ffc107;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-hourglass-split me-1"></i>{{this.pendente}}</span>
-              <span style="background:#3a1a1a;color:#f03e3e;border:1px solid #f03e3e;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-x-circle-fill me-1"></i>{{this.rejeitado}}</span>
-              {{#if this.expirado}}
-              <span style="background:#2a1a00;color:#f57c00;border:1px solid #f57c00;border-radius:20px;padding:3px 10px;font-size:0.75rem;"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{this.expirado}} exp.</span>
-              {{/if}}
+            <div class="job-row-right d-flex gap-2 flex-wrap align-items-center mt-2 mt-md-0">
+              <div class="job-row-badges d-flex gap-2 align-items-center flex-wrap">
+                <span style="background:#1a3a1a;color:#4caf50;border:1px solid #4caf50;border-radius:20px;padding:3px 10px;font-size:0.75rem;white-space:nowrap;"><i class="bi bi-check-circle-fill me-1"></i>{{this.aprovado}}</span>
+                <span style="background:#2a2a1a;color:#ffc107;border:1px solid #ffc107;border-radius:20px;padding:3px 10px;font-size:0.75rem;white-space:nowrap;"><i class="bi bi-hourglass-split me-1"></i>{{this.pendente}}</span>
+                <span style="background:#3a1a1a;color:#f03e3e;border:1px solid #f03e3e;border-radius:20px;padding:3px 10px;font-size:0.75rem;white-space:nowrap;"><i class="bi bi-x-circle-fill me-1"></i>{{this.rejeitado}}</span>
+                {{#if this.expirado}}
+                <span style="background:#2a1a00;color:#f57c00;border:1px solid #f57c00;border-radius:20px;padding:3px 10px;font-size:0.75rem;white-space:nowrap;"><i class="bi bi-exclamation-triangle-fill me-1"></i>{{this.expirado}} exp.</span>
+                {{/if}}
+              </div>
               <a href="/jobs/applications/{{this.id}}"
-                style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:6px 14px;text-decoration:none;font-size:0.85rem;font-weight:600;white-space:nowrap;">
+                style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:6px 14px;text-decoration:none;font-size:0.85rem;font-weight:600;white-space:nowrap;flex-shrink:0;">
                 Ver Candidatos
               </a>
             </div>

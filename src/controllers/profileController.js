@@ -15,6 +15,7 @@ function escapeHtml(str) {
 }
 const { calcularMetricas }    = require('../services/responsividadeService');
 const { getChecklistStatus }  = require('../services/onboardingService');
+const { setAvailability, STATUS: AVAIL_STATUS } = require('../services/availabilityService');
 
 const IMAGE_MAGIC_BYTES = {
     jpeg: [Buffer.from([0xFF, 0xD8, 0xFF])],
@@ -342,18 +343,27 @@ exports.getCandidateDashboard = async (req, res) => {
     }
 };
 
-exports.postOpenToWork = async (req, res) => {
+exports.postAvailabilityStatus = async (req, res) => {
     try {
         const user = await User.findByPk(req.user.id);
-        if (user.userType !== 'candidato') return res.status(403).json({ ok: false });
-        user.openToWork = !user.openToWork;
-        await user.save();
-        res.json({ ok: true, openToWork: user.openToWork });
-    } catch (err) { res.status(500).json({ ok: false }); }
+        if (!user || user.userType !== 'candidato') return res.status(403).json({ ok: false });
+
+        const { status } = req.body;
+        if (!status) return res.status(400).json({ ok: false, error: 'Status não informado.' });
+
+        // Delega validação e persistência ao service (valida enum, sincroniza openToWork)
+        await setAvailability(user.id, status);
+
+        logger.info('profileController', 'Disponibilidade atualizada', { userId: user.id, status });
+        res.json({ ok: true, availabilityStatus: status });
+    } catch (err) {
+        logger.error('profileController', 'Erro ao atualizar disponibilidade', { err: err.message });
+        res.status(400).json({ ok: false, error: err.message || 'Erro ao atualizar status.' });
+    }
 };
 
 // Campos públicos de candidato — nunca expor password, tokens, email, phone, birthDate, address
-const CANDIDATO_PUBLIC_FIELDS = ['id', 'name', 'avatar', 'bio', 'city', 'github', 'linkedin', 'openToWork', 'userType'];
+const CANDIDATO_PUBLIC_FIELDS = ['id', 'name', 'avatar', 'bio', 'city', 'github', 'linkedin', 'openToWork', 'availabilityStatus', 'userType'];
 
 exports.getPublicCandidate = async (req, res) => {
     try {

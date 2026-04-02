@@ -13,6 +13,7 @@ router.post('/delete/:id', ensureAuthenticated, ensureCompany, jobs.destroy);
 
 router.get('/login-to-apply/:id',   jobs.loginToApply);
 router.post('/apply/:id',           ensureAuthenticated, jobs.apply);
+router.post('/cancel/:applicationId', ensureAuthenticated, jobs.cancelApplication);
 router.post('/applications/status',    ensureAuthenticated, ensureCompany, jobs.changeApplicationStatus);
 router.post('/applications/stage',     ensureAuthenticated, ensureCompany, jobs.updateStage);
 router.post('/close/:id',              ensureAuthenticated, ensureCompany, jobs.closeJobWithFeedback);

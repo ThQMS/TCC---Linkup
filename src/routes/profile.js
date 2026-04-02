@@ -30,7 +30,7 @@ router.get('/empresa/:id',                                            profile.ge
 router.post('/avatar',             ensureAuthenticated, uploadLimiter, upload.single('avatar'), profile.postAvatar);
 router.post('/update',             ensureAuthenticated, validateProfile, (req, res, next) => handleValidationErrors(req, res, next, '/profile'), profile.postUpdate);
 router.get('/candidate/dashboard', ensureAuthenticated,              profile.getCandidateDashboard);
-router.post('/open-to-work',       ensureAuthenticated,              profile.postOpenToWork);
+router.post('/availability-status', ensureAuthenticated,              profile.postAvailabilityStatus);
 router.get('/c/:name',                                                profile.getPublicCandidate);
 
 module.exports = router;

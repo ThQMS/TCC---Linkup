@@ -124,24 +124,22 @@
   text-align: center;
   position: relative;
 }
-.pf-stat::before {
-  content: '';
+.pf-stat-bar {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
+  transition: background 0.35s ease;
 }
-.pf-stat-applications::before { background: #f03e3e; }
-.pf-stat-days::before         { background: #06b6d4; }
-.pf-stat-otw::before          { background: #4caf50; }
 .pf-stat-num {
   font-size: 1.6rem;
   font-weight: 800;
   line-height: 1;
   margin-bottom: 2px;
 }
+.pf-stat-applications .pf-stat-bar { background: #f03e3e; }
 .pf-stat-applications .pf-stat-num { color: #f03e3e; }
+.pf-stat-days .pf-stat-bar         { background: #06b6d4; }
 .pf-stat-days .pf-stat-num         { color: #06b6d4; }
-.pf-stat-otw  .pf-stat-num         { color: #4caf50; }
 .pf-stat-label { font-size: 0.75rem; color: #666; }
 
 /* BODY */
@@ -211,31 +209,50 @@
 .pf-info-label { font-size: 0.72rem; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
 .pf-info-value { font-size: 0.9rem; color: #e0e0e0; }
 
-/* OTW TOGGLE */
-.pf-otw-card {
-  background: #141414;
-  border: 1px solid #222;
-  border-radius: 14px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
+/* DISPONIBILIDADE — seletor de 4 status */
+.avail-option {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.pf-otw-label { font-size: 0.85rem; font-weight: 600; margin: 0 0 2px; }
-.pf-otw-sub   { font-size: 0.75rem; color: #555; margin: 0; }
-.pf-otw-toggle {
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 0.82rem;
-  font-weight: 600;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1.5px solid #222;
+  margin-bottom: 7px;
   cursor: pointer;
-  border: none;
-  transition: all 0.3s;
-  white-space: nowrap;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+.avail-option:last-child { margin-bottom: 0; }
+.avail-option:hover:not(.avail-selected) { border-color: #383838; }
+.avail-option.avail-selected.avail-s1 { border-color: #4caf50; background: rgba(76,175,80,0.06); }
+.avail-option.avail-selected.avail-s2 { border-color: #ffc107; background: rgba(255,193,7,0.06); }
+.avail-option.avail-selected.avail-s3 { border-color: #fd7e14; background: rgba(253,126,20,0.06); }
+.avail-option.avail-selected.avail-s4 { border-color: #f03e3e; background: rgba(240,62,62,0.06); }
+.avail-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
   flex-shrink: 0;
 }
+.avail-s1 .avail-icon { background: rgba(76,175,80,0.12); }
+.avail-s2 .avail-icon { background: rgba(255,193,7,0.12); }
+.avail-s3 .avail-icon { background: rgba(253,126,20,0.12); }
+.avail-s4 .avail-icon { background: rgba(240,62,62,0.12); }
+.avail-title { font-size: 0.79rem; font-weight: 700; color: #e0e0e0; line-height: 1.2; }
+.avail-desc  { font-size: 0.68rem; color: #555; margin-top: 1px; }
+.avail-dot {
+  margin-left: auto;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid #333;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.avail-selected.avail-s1 .avail-dot { background: #4caf50; border-color: #4caf50; }
+.avail-selected.avail-s2 .avail-dot { background: #ffc107; border-color: #ffc107; }
+.avail-selected.avail-s3 .avail-dot { background: #fd7e14; border-color: #fd7e14; }
+.avail-selected.avail-s4 .avail-dot { background: #f03e3e; border-color: #f03e3e; }
 
 /* TABS */
 .pf-tabs { display: flex; gap: 0; border-bottom: 1px solid #222; margin-bottom: 20px; }
@@ -305,9 +322,23 @@
           <div class="pf-badges">
             <span class="pf-badge-role"><i class="bi bi-person-badge"></i>Candidato</span>
             {{#if user.city}}<span class="pf-badge-city"><i class="bi bi-geo-alt"></i>{{user.city}}</span>{{/if}}
-            <span class="pf-badge-otw {{#if user.openToWork}}visible{{/if}}" id="otw-badge">
-              <i class="bi bi-circle-fill" style="font-size:0.5rem;"></i>Disponível para trabalhar
+            {{#if (eq user.availabilityStatus 'actively_searching')}}
+            <span class="pf-badge-otw visible" id="avail-badge" style="background:rgba(76,175,80,0.12);border-color:rgba(76,175,80,0.35);color:#4caf50;">
+              <i class="bi bi-circle-fill" style="font-size:0.5rem;"></i>Buscando Ativamente
             </span>
+            {{else if (eq user.availabilityStatus 'open_to_opportunities')}}
+            <span class="pf-badge-otw visible" id="avail-badge" style="background:rgba(255,193,7,0.12);border-color:rgba(255,193,7,0.35);color:#ffc107;">
+              <i class="bi bi-circle-fill" style="font-size:0.5rem;"></i>Aberto a Oportunidades
+            </span>
+            {{else if (eq user.availabilityStatus 'in_selection_process')}}
+            <span class="pf-badge-otw visible" id="avail-badge" style="background:rgba(253,126,20,0.12);border-color:rgba(253,126,20,0.35);color:#fd7e14;">
+              <i class="bi bi-circle-fill" style="font-size:0.5rem;"></i>Em Processo Seletivo
+            </span>
+            {{else}}
+            <span class="pf-badge-otw visible" id="avail-badge" style="background:rgba(240,62,62,0.08);border-color:rgba(240,62,62,0.3);color:#f03e3e;">
+              <i class="bi bi-circle-fill" style="font-size:0.5rem;"></i>Não Disponível
+            </span>
+            {{/if}}
           </div>
         </div>
 
@@ -330,8 +361,22 @@
           <div class="pf-stat-label">Dias na plataforma</div>
         </div>
         <div class="pf-stat pf-stat-otw">
-          <div class="pf-stat-num" id="otw-stat-text">{{#if user.openToWork}}Sim{{else}}Não{{/if}}</div>
-          <div class="pf-stat-label">Disponível</div>
+          <div class="pf-stat-bar" id="avail-stat-bar" style="
+            {{#if (eq user.availabilityStatus 'actively_searching')}}background:#4caf50;
+            {{else if (eq user.availabilityStatus 'open_to_opportunities')}}background:#ffc107;
+            {{else if (eq user.availabilityStatus 'in_selection_process')}}background:#fd7e14;
+            {{else}}background:#f03e3e;{{/if}}"></div>
+          <div class="pf-stat-num" id="avail-stat-text" style="font-size:0.85rem;line-height:1.2;padding-top:4px;transition:color 0.35s ease;
+            {{#if (eq user.availabilityStatus 'actively_searching')}}color:#4caf50;
+            {{else if (eq user.availabilityStatus 'open_to_opportunities')}}color:#ffc107;
+            {{else if (eq user.availabilityStatus 'in_selection_process')}}color:#fd7e14;
+            {{else}}color:#f03e3e;{{/if}}">
+            {{#if (eq user.availabilityStatus 'actively_searching')}}Ativo
+            {{else if (eq user.availabilityStatus 'open_to_opportunities')}}Aberto
+            {{else if (eq user.availabilityStatus 'in_selection_process')}}Processo
+            {{else}}Inativo{{/if}}
+          </div>
+          <div class="pf-stat-label">Disponibilidade</div>
         </div>
       </div>
 
@@ -349,17 +394,56 @@
     <!-- SIDEBAR -->
     <aside>
 
-      <!-- OPEN TO WORK -->
-      <div class="pf-otw-card">
-        <div>
-          <p class="pf-otw-label"><i class="bi bi-briefcase me-1" style="color:#4caf50;"></i>Disponível para trabalhar</p>
-          <p class="pf-otw-sub">Visível para recrutadores</p>
+      <!-- DISPONIBILIDADE -->
+      <div class="pf-card" id="avail-card">
+        <p class="pf-card-title"><i class="bi bi-person-check me-1"></i>Disponibilidade</p>
+        <p style="color:#555;font-size:0.72rem;margin:-6px 0 12px;line-height:1.5;">
+          Controla sua visibilidade para recrutadores.
+        </p>
+
+        <div class="avail-option avail-s1 {{#if (eq user.availabilityStatus 'actively_searching')}}avail-selected{{/if}}"
+          onclick="setAvailabilityStatus('actively_searching')"
+          title="Desempregado e buscando emprego ativamente. Maior prioridade nas buscas.">
+          <div class="avail-icon"><i class="bi bi-search" style="color:#4caf50;font-size:0.9rem;"></i></div>
+          <div>
+            <div class="avail-title">Buscando Ativamente</div>
+            <div class="avail-desc">Desempregado, prioridade máxima</div>
+          </div>
+          <div class="avail-dot"></div>
         </div>
-        <button id="otw-btn" class="pf-otw-toggle"
-          style="background:{{#if user.openToWork}}#4caf50{{else}}#1e1e1e{{/if}};color:{{#if user.openToWork}}white{{else}}#aaa{{/if}};border: 1px solid {{#if user.openToWork}}#4caf50{{else}}#333{{/if}};"
-          onclick="toggleOpenToWork()">
-          {{#if user.openToWork}}<i class="bi bi-check-circle-fill me-1"></i>Ativo{{else}}Ativar{{/if}}
-        </button>
+
+        <div class="avail-option avail-s2 {{#if (eq user.availabilityStatus 'open_to_opportunities')}}avail-selected{{/if}}"
+          onclick="setAvailabilityStatus('open_to_opportunities')"
+          title="Empregado, mas aberto a propostas melhores (salário, remoto, crescimento).">
+          <div class="avail-icon"><i class="bi bi-briefcase" style="color:#ffc107;font-size:0.9rem;"></i></div>
+          <div>
+            <div class="avail-title">Aberto a Oportunidades</div>
+            <div class="avail-desc">Empregado, aberto a propostas</div>
+          </div>
+          <div class="avail-dot"></div>
+        </div>
+
+        <div class="avail-option avail-s3 {{#if (eq user.availabilityStatus 'in_selection_process')}}avail-selected{{/if}}"
+          onclick="setAvailabilityStatus('in_selection_process')"
+          title="Participando de processos seletivos, mas ainda pode ser contactado.">
+          <div class="avail-icon"><i class="bi bi-hourglass-split" style="color:#fd7e14;font-size:0.9rem;"></i></div>
+          <div>
+            <div class="avail-title">Em Processo Seletivo</div>
+            <div class="avail-desc">Em processos, ainda contactável</div>
+          </div>
+          <div class="avail-dot"></div>
+        </div>
+
+        <div class="avail-option avail-s4 {{#if (eq user.availabilityStatus 'not_available')}}avail-selected{{/if}}"
+          onclick="setAvailabilityStatus('not_available')"
+          title="Não deseja receber contatos. Não aparece em buscas de recrutadores.">
+          <div class="avail-icon"><i class="bi bi-lock-fill" style="color:#f03e3e;font-size:0.9rem;"></i></div>
+          <div>
+            <div class="avail-title">Não Disponível</div>
+            <div class="avail-desc">Não desejo contato agora</div>
+          </div>
+          <div class="avail-dot"></div>
+        </div>
       </div>
 
       <!-- LINKS -->
@@ -544,33 +628,96 @@ function switchTab(id, btn) {
     btn.classList.add('active');
 }
 
-async function toggleOpenToWork() {
-    const btn      = document.getElementById('otw-btn');
-    const badge    = document.getElementById('otw-badge');
-    const statText = document.getElementById('otw-stat-text');
+// ── Disponibilidade: configuração dos 4 status ────────────────────────────────
+const _AVAIL_CFG = {
+    actively_searching:    {
+        slot: 'avail-s1',
+        statLabel: 'Ativo',
+        statColor: '#4caf50',
+        badgeLabel: 'Buscando Ativamente',
+        badgeStyle: 'background:rgba(76,175,80,0.12);border-color:rgba(76,175,80,0.35);color:#4caf50;',
+        showBadge: true
+    },
+    open_to_opportunities: {
+        slot: 'avail-s2',
+        statLabel: 'Aberto',
+        statColor: '#ffc107',
+        badgeLabel: 'Aberto a Oportunidades',
+        badgeStyle: 'background:rgba(255,193,7,0.12);border-color:rgba(255,193,7,0.35);color:#ffc107;',
+        showBadge: true
+    },
+    in_selection_process:  {
+        slot: 'avail-s3',
+        statLabel: 'Processo',
+        statColor: '#fd7e14',
+        badgeLabel: 'Em Processo Seletivo',
+        badgeStyle: 'background:rgba(253,126,20,0.12);border-color:rgba(253,126,20,0.35);color:#fd7e14;',
+        showBadge: true
+    },
+    not_available:         {
+        slot: 'avail-s4',
+        statLabel: 'Inativo',
+        statColor: '#f03e3e',
+        badgeLabel: 'Não Disponível',
+        badgeStyle: 'background:rgba(240,62,62,0.08);border-color:rgba(240,62,62,0.3);color:#f03e3e;',
+        showBadge: true
+    }
+};
+
+// Status atual vindo do servidor (usado para rollback em caso de erro)
+let _currentAvailStatus = '{{user.availabilityStatus}}';
+
+async function setAvailabilityStatus(status) {
+    if (status === _currentAvailStatus) return;
+
+    // Atualização otimista da UI
+    _applyAvailabilityUI(status);
+
     try {
-        const res  = await fetch('/profile/open-to-work', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{csrfToken}}' }
+        const res  = await fetch('/profile/availability-status', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{csrfToken}}' },
+            body:    JSON.stringify({ status })
         });
         const data = await res.json();
         if (data.ok) {
-            if (data.openToWork) {
-                btn.style.background   = '#4caf50';
-                btn.style.borderColor  = '#4caf50';
-                btn.style.color        = 'white';
-                btn.innerHTML          = '<i class="bi bi-check-circle-fill me-1"></i>Ativo';
-                badge.classList.add('visible');
-                if (statText) statText.textContent = 'Sim';
-            } else {
-                btn.style.background  = '#1e1e1e';
-                btn.style.borderColor = '#333';
-                btn.style.color       = '#aaa';
-                btn.innerHTML         = 'Ativar';
-                badge.classList.remove('visible');
-                if (statText) statText.textContent = 'Não';
-            }
+            _currentAvailStatus = status;   // confirma o novo estado
+        } else {
+            _applyAvailabilityUI(_currentAvailStatus); // rollback
         }
-    } catch(e) {}
+    } catch {
+        _applyAvailabilityUI(_currentAvailStatus);     // rollback em erro de rede
+    }
+}
+
+function _applyAvailabilityUI(status) {
+    const cfg = _AVAIL_CFG[status];
+    if (!cfg) return;
+
+    // Atualiza cards do seletor
+    document.querySelectorAll('.avail-option').forEach(el => el.classList.remove('avail-selected'));
+    const selected = document.querySelector(`.avail-option.${cfg.slot}`);
+    if (selected) selected.classList.add('avail-selected');
+
+    // Atualiza badge do header
+    const badge = document.getElementById('avail-badge');
+    if (badge) {
+        if (cfg.showBadge) {
+            badge.style.cssText = cfg.badgeStyle;
+            badge.innerHTML     = `<i class="bi bi-circle-fill" style="font-size:0.5rem;"></i>${cfg.badgeLabel}`;
+            badge.classList.add('visible');
+        } else {
+            badge.classList.remove('visible');
+        }
+    }
+
+    // Atualiza stat box (texto, cor do número e barra)
+    const stat = document.getElementById('avail-stat-text');
+    if (stat) {
+        stat.textContent  = cfg.statLabel;
+        stat.style.color  = cfg.statColor;
+    }
+    const bar = document.getElementById('avail-stat-bar');
+    if (bar) bar.style.background = cfg.statColor;
 }
 </script>

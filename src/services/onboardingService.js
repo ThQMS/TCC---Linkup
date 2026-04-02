@@ -10,7 +10,8 @@ const CANDIDATO_ITEMS = [
     { key: 'curriculo',   label: 'Criar seu currículo',               href: '/resume/create',        icon: 'bi-file-earmark-person-fill' },
     { key: 'candidatura', label: 'Candidatar-se a uma vaga',          href: '/',                     icon: 'bi-send-fill' },
     { key: 'ia',          label: 'Usar IA (compatibilidade ou chat)', href: '/',                     icon: 'bi-robot' },
-    { key: 'favorito',    label: 'Salvar uma vaga nos favoritos',     href: '/jobs/favorites',       icon: 'bi-heart-fill' },
+    { key: 'favorito',       label: 'Salvar uma vaga nos favoritos',     href: '/jobs/favorites',       icon: 'bi-heart-fill' },
+    { key: 'disponibilidade', label: 'Definir seu status de disponibilidade', href: '/profile',             icon: 'bi-circle-fill' },
 ];
 
 const EMPRESA_ITEMS = [
@@ -41,6 +42,8 @@ async function checkItem(key, user, isCandidato) {
                     return (await AiLog.count({ where: { userId: user.id } })) > 0;
                 case 'favorito':
                     return (await Favorite.count({ where: { userId: user.id } })) > 0;
+                case 'disponibilidade':
+                    return user.availabilityUpdatedAt !== null;
             }
         } else {
             switch (key) {

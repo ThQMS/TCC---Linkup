@@ -52,6 +52,9 @@ Combina um microserviço Python (sentence-transformers + BM25 + Reciprocal Rank 
 ### Redescoberta de Talentos
 Quando uma vaga é publicada, a plataforma escaneia automaticamente a base histórica de candidatos da empresa (janela de 6 meses) e exibe candidatos com fit ≥ 88% que estão disponíveis no momento. Dispara notificações no app e e-mails transacionais. Elimina o custo de reanúncio de posições que a base existente já cobre.
 
+### Cancelamento de Candidatura pelo Candidato
+Candidatos podem cancelar candidaturas com status **Pendente** diretamente em "Minhas Candidaturas". A ação exibe um modal de confirmação (Alpine.js, sem recarregar a página), atualiza o status para `cancelado`, notifica a empresa em tempo real via Socket.io e dispara um e-mail transacional automático. O card de candidatura é atualizado instantaneamente sem reload. Candidaturas canceladas são excluídas do funil de fechamento em massa para evitar e-mails de feedback redundantes.
+
 ### Pipeline de Contratação com Gestão de Etapas
 Empresas definem etapas customizadas por vaga (ex: Triagem → Entrevista Técnica → Proposta). Cada transição é registrada com timestamp. Quando a vaga é encerrada, o sistema gera feedback escrito por IA, personalizado por candidato, para todos os não contratados — reduzindo abandono e protegendo a marca empregadora.
 
@@ -86,7 +89,7 @@ O LinkUp é um monólito estruturado com um microserviço Python desacoplado par
 ```mermaid
 graph TB
     subgraph Cliente
-        Browser[Browser — Handlebars + Bootstrap 5 Dark]
+        Browser[Browser — Handlebars + Bootstrap 5 Dark + Alpine.js v3]
     end
 
     subgraph Core["Node.js Core — Express"]
@@ -149,8 +152,10 @@ stateDiagram-v2
     ProximaEtapa --> Contratado: Contratar
     Pendente --> Rejeitado: Desqualificar
     EtapaCustom --> Rejeitado: Desqualificar
+    Pendente --> Cancelado: Candidato cancela
     Contratado --> [*]
     Rejeitado --> [*]: Feedback IA disparado
+    Cancelado --> [*]: Empresa notificada
 ```
 
 ### Fluxo de Redescoberta de Talentos
@@ -199,7 +204,7 @@ Veja [`docs/architecture.md`](docs/architecture.md) e [`docs/engineering-princip
 | Transporte | Helmet.js — CSP, HSTS, X-Frame-Options, X-Content-Type-Options |
 | Autenticação | Passport.js local strategy; bcryptjs (10 salt rounds); baseado em sessão |
 | Sessões | `SESSION_SECRET` aleatório criptograficamente; TTL 24h; cookies `httpOnly` + `sameSite: strict` |
-| CSRF | `csrf-csrf` double-submit cookie; token injetado em todo formulário via middleware `globalLocals` |
+| CSRF | `csrf-csrf` double-submit cookie; token injetado em toda view via `globalLocals`; lido via header `x-csrf-token` em chamadas AJAX (Alpine.js) |
 | Entradas | Sanitização `express-validator`; remoção global de HTML via middleware `sanitizeInputs` |
 | Rate Limiting | Por endpoint: 10 logins/15min, 5 registros/hora, 10 chamadas IA/min, 3 uploads/min |
 | Validação de Empresa | Verificação de CNPJ + enforçamento de domínio de e-mail corporativo (`VALIDATE_COMPANY=true`) |
@@ -268,13 +273,13 @@ As features de IA são a alavanca principal de monetização — cada chamada de
 - [x] Dashboard de Métricas de IA com monitoramento de capacidade Groq
 - [x] Buscas salvas com alertas semanais por e-mail
 - [x] Score de responsividade da empresa
-- [x] Gestão de status de disponibilidade do candidato
+- [x] Sistema de disponibilidade com 4 status (Buscando Ativamente, Aberto, Em Processo, Não Disponível)
 - [x] Checklists de onboarding por perfil
 - [x] Rate limiting, CSRF, Helmet CSP, audit logging
 - [x] 4 cron jobs: alertas, expiração, limpeza, redescoberta
 
 ### v1.1 — Planejado
-- [x] Suíte de testes Jest — 89 testes cobrindo services críticos (SQLite in-memory, fake timers)
+- [x] Suíte de testes Jest — 106 testes cobrindo services críticos (SQLite in-memory, fake timers)
 - [ ] Redis session store + Socket.io adapter para implantação multi-instância
 - [ ] Fila Bull para jobs de IA (desacoplar do ciclo de requisição)
 - [ ] Integração pgvector (eliminar dependência do microserviço Python)
@@ -383,7 +388,7 @@ npm run test:watch      # modo interativo
 npm run test:coverage   # com relatório de cobertura
 ```
 
-**89 testes** distribuídos em 6 suites cobrindo as regras de negócio críticas:
+**106 testes** distribuídos em 7 suites cobrindo as regras de negócio críticas:
 
 | Suite | Testes | Cobre |
 |---|---|---|
@@ -392,6 +397,7 @@ npm run test:coverage   # com relatório de cobertura
 | `talentRediscoveryService` | 17 | `calcFitScore`, redescoberta para empresa, reativar contato |
 | `revisitOpportunities` | 9 | Notificação de oportunidades revisitadas para candidato |
 | `similarCandidates` | 15 | Candidatos sugeridos, convite, prevenção de duplicata |
+| `availabilityService` | 17 | Sistema de 4 status, sincronização `openToWork`, regras automáticas |
 | `jobs.routes` | 16 | Integração `POST /apply` — route → controller → service → banco |
 
 **Infraestrutura:** Jest 29 · Supertest · SQLite em memória (sem PostgreSQL local necessário) · timers falsos (`jest.useFakeTimers`) onde aplicável.

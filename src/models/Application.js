@@ -11,6 +11,7 @@ const Application = db.define('Application', {
   answersFeedback: { type: DataTypes.TEXT,                          allowNull: true },
   currentStage:    { type: DataTypes.STRING,  allowNull: true,     defaultValue: null },
   stageHistory:    { type: DataTypes.TEXT,    allowNull: true,     defaultValue: '[]' },
+  canceledAt:      { type: DataTypes.DATE,    allowNull: true,     defaultValue: null },
 });
 
 module.exports = Application;

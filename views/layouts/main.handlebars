@@ -9,6 +9,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css?v=5">
+    <!-- Alpine.js v3 — interatividade leve sem SPA -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <!-- CSRF token disponível globalmente para requisições AJAX -->
+    <meta name="csrf-token" content="{{csrfToken}}">
+    <style>
+      [x-cloak]{display:none!important;}
+      /* Navbar: compacta em desktop médio (992px–1199px) */
+      @media (min-width:992px) and (max-width:1199px){
+        .navbar .nav-link{font-size:.82rem!important;padding-left:.35rem!important;padding-right:.35rem!important;}
+        .navbar .btn-danger{font-size:.8rem!important;padding:5px 10px!important;}
+      }
+      /* Navbar: melhor espaçamento no collapse mobile */
+      @media (max-width:991px){
+        #navbarNav .nav-item+.nav-item{margin-top:2px;}
+        #navbarNav a[href="/notifications"]{border-radius:8px!important;}
+        #navbarNav a[href="/profile"]{border-radius:8px!important;padding:8px 12px!important;}
+      }
+    </style>
 </head>
 <body class="bg-dark text-white">
 
@@ -38,7 +56,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1 py-2 py-lg-0">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-1 gap-lg-2 py-2 py-lg-0">
 
                 {{#if hideNav}}
                     <li class="nav-item">
@@ -106,7 +124,7 @@
                     </li>
 
                     <!-- SININHO -->
-                    <li class="nav-item">
+                    <li class="nav-item mt-1 mt-lg-0">
                         <a href="/notifications"
                             style="position:relative;color:#888;text-decoration:none;padding:7px 9px;display:inline-flex;align-items:center;gap:8px;border-radius:8px;border:1px solid #2a2a2a;transition:all 0.2s;"
                             onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
@@ -127,7 +145,7 @@
                     </li>
 
                     <!-- PERFIL — pill com avatar -->
-                    <li class="nav-item">
+                    <li class="nav-item mt-1 mt-lg-0">
                         <a href="/profile"
                             style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border:1px solid #2a2a2a;border-radius:20px;text-decoration:none;color:#e0e0e0;font-size:0.85rem;transition:all 0.2s;"
                             onmouseover="this.style.borderColor='#f03e3e'"
@@ -332,8 +350,8 @@
             <div><div class="ob-feature-title">Bio profissional</div><div class="ob-feature-desc">Resumo visível para recrutadores que visitarem sua página pública.</div></div>
           </div>
           <div class="ob-feature-item">
-            <div class="ob-feature-icon" style="background:rgba(76,175,80,.1);color:#4caf50;"><i class="bi bi-toggle-on"></i></div>
-            <div><div class="ob-feature-title">Disponível para trabalhar</div><div class="ob-feature-desc">Sinalize sua disponibilidade e apareça para empresas em busca ativa de talentos.</div></div>
+            <div class="ob-feature-icon" style="background:rgba(76,175,80,.1);color:#4caf50;"><i class="bi bi-circle-fill"></i></div>
+            <div><div class="ob-feature-title">Status de disponibilidade</div><div class="ob-feature-desc">Escolha entre 4 status: Buscando Ativamente, Aberto a Oportunidades, Em Processo ou Não Disponível.</div></div>
           </div>
           {{else}}
           <div style="width:64px;height:64px;border-radius:16px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;">📊</div>

@@ -4,9 +4,10 @@
  * Gerencia o sistema inteligente de disponibilidade de candidatos.
  *
  * Status possíveis:
- *   'actively_searching'    → alta prioridade  (busca ativa)
- *   'open_to_opportunities' → média prioridade (aberto, mas não urgente)
- *   'not_available'         → não aparece nas features de redescoberta
+ *   'actively_searching'    → alta prioridade  (desempregado, busca ativa)
+ *   'open_to_opportunities' → média prioridade (empregado, aberto a propostas)
+ *   'in_selection_process'  → baixa prioridade (em processo, ainda contactável)
+ *   'not_available'         → excluído das features de redescoberta
  */
 
 const { Op }  = require('sequelize');
@@ -18,11 +19,20 @@ const logger  = require('../helpers/logger');
 const STATUS = Object.freeze({
     ACTIVELY_SEARCHING:    'actively_searching',
     OPEN_TO_OPPORTUNITIES: 'open_to_opportunities',
+    IN_SELECTION_PROCESS:  'in_selection_process',
     NOT_AVAILABLE:         'not_available'
 });
 
-/** Candidatos considerados "disponíveis" para as features de redescoberta. */
-const AVAILABLE_STATUSES = [STATUS.ACTIVELY_SEARCHING, STATUS.OPEN_TO_OPPORTUNITIES];
+/**
+ * Candidatos considerados "disponíveis" para as features de redescoberta.
+ * 'in_selection_process' é incluído pois o candidato ainda pode ser contactado,
+ * mas receberá menor prioridade que os demais por estar em outro processo.
+ */
+const AVAILABLE_STATUSES = [
+    STATUS.ACTIVELY_SEARCHING,
+    STATUS.OPEN_TO_OPPORTUNITIES,
+    STATUS.IN_SELECTION_PROCESS
+];
 
 const DAYS_INACTIVE_BEFORE_DOWNGRADE = 60; // dias sem atividade → reduz prioridade
 const DAYS_RECENT_ACTIVITY           = 30; // janela de "atividade recente"

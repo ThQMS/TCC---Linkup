@@ -13,7 +13,7 @@ const logAi      = require('../helpers/aiLog');
 const { getFromCache, setInCache } = require('../utils/aiCache');
 const parseResume = require('../helpers/parseResume');
 const { formatDate, applicationStatusBadge } = require('../helpers/pdfUtils');
-const { applyToJob, updateApplicationStatus, updateApplicationStage, sendBulkClosingFeedback } = require('../services/applicationService');
+const { applyToJob, cancelApplication, updateApplicationStatus, updateApplicationStage, sendBulkClosingFeedback } = require('../services/applicationService');
 const { findTalentsForJob, notifyRevisitedOpportunities, reactivateContact: _reactivateContact, findSimilarCandidates } = require('../services/talentRediscoveryService');
 const { findSuggestedCandidates, contactSuggestedCandidate } = require('../services/similarCandidatesService');
 
@@ -330,6 +330,38 @@ exports.myApplicationsPdf = async (req, res) => {
     } catch (err) {
         req.flash('error_msg', 'Erro ao gerar PDF.');
         res.redirect('/jobs/my-applications');
+    }
+};
+
+/*
+ * POST /jobs/cancel/:applicationId // Permite ao candidato cancelar uma candidatura com status 'pendente'.
+ */
+exports.cancelApplication = async (req, res) => {
+    try {
+        const applicationId = parseInt(req.params.applicationId, 10);
+        if (!applicationId) return res.status(400).json({ ok: false, error: 'ID inválido.' });
+
+        const application = await Application.findOne({
+            where: { id: applicationId, userId: req.user.id }
+        });
+        if (!application) {
+            return res.status(404).json({ ok: false, error: 'Candidatura não encontrada.' });
+        }
+
+        const job = await Job.findByPk(application.jobId);
+        if (!job) {
+            return res.status(404).json({ ok: false, error: 'Vaga não encontrada.' });
+        }
+
+        await cancelApplication({ application, user: req.user, job, expressApp: req.app });
+
+        logger.info('jobsController', 'Candidatura cancelada pelo candidato', {
+            applicationId, userId: req.user.id, jobId: job.id
+        });
+        return res.json({ ok: true });
+    } catch (err) {
+        logger.error('jobsController', 'Erro ao cancelar candidatura', { err: err.message });
+        return res.status(400).json({ ok: false, error: err.message || 'Erro ao cancelar candidatura.' });
     }
 };
 
@@ -650,7 +682,7 @@ exports.closeJobWithFeedback = async (req, res) => {
     }
 };
 
-// ── Candidatos similares ──────────────────────────────────────────────────────
+// ── Candidatos similares 
 
 exports.getSimilarCandidates = async (req, res) => {
     const applicationId = parseInt(req.params.id, 10);
@@ -679,7 +711,7 @@ exports.getSimilarCandidates = async (req, res) => {
     }
 };
 
-// ── Candidatos Sugeridos (não candidatos com alto fit) ────────────────────────
+// ── Candidatos Sugeridos (não candidatos com alto fit) 
 
 exports.getSuggestedCandidates = async (req, res) => {
     const jobId = parseInt(req.params.jobId, 10);

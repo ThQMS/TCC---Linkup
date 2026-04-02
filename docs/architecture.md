@@ -33,6 +33,7 @@ A escolha por MPA (Multi-Page Application) server-side rendering foi deliberada:
 | Tempo Real | Socket.io 4 | Notificações push sem polling |
 | Jobs Agendados | node-cron 4 | Alertas, expiração, cleanup, redescoberta |
 | E-mail | Nodemailer + Gmail SMTP | Verificação, recuperação, alertas, feedback |
+| Interatividade Frontend | Alpine.js v3 | Modais, transições e chamadas AJAX leves sem SPA |
 
 ---
 
@@ -40,6 +41,11 @@ A escolha por MPA (Multi-Page Application) server-side rendering foi deliberada:
 
 ```mermaid
 graph TB
+    subgraph Client["Camada de Apresentação"]
+        Alpine[Alpine.js v3\nModais · AJAX · Transições]
+        HBS[Handlebars SSR\nBootstrap 5 Dark]
+    end
+
     subgraph HTTP["Camada HTTP / WebSocket"]
         Routes[Rotas\nsrc/routes/]
         MW[Middleware\nauth · csrf · rate-limit · validação · auditoria]
@@ -58,6 +64,9 @@ graph TB
         Models[Modelos Sequelize\nsrc/models/]
         PG[(PostgreSQL 16)]
     end
+
+    Alpine -->|fetch + x-csrf-token header| Routes
+    HBS --> Alpine
 
     subgraph External["Fronteiras Externas"]
         Groq[Groq API\nLLaMA 3.3 70B]
@@ -534,8 +543,13 @@ Inicializado em `server.js`, compartilhado com `src/config/socket.js`. `userId` 
 
 ### ADR-007 — MPA com SSR em vez de SPA
 **Contexto:** necessidade de proteção CSRF simples; conteúdo gerado por IA renderizado com segurança; reatividade limitada ao necessário.
-**Decisão:** Handlebars server-rendered + Socket.io para casos de tempo real.
-**Consequências:** navegação por full-page reload (exceto notificações). CSRF trivial. Sem complexidade de estado no cliente.
+**Decisão:** Handlebars server-rendered + Socket.io para casos de tempo real + Alpine.js v3 para interatividade pontual (modais, chamadas AJAX, transições de estado).
+**Consequências:** navegação por full-page reload na maioria dos casos; ações isoladas (ex: cancelar candidatura) executam sem reload via Alpine.js + fetch. CSRF trivial — token exposto em `<meta>` e lido por Alpine via `document.querySelector`. Estado de componente restrito ao escopo do `x-data`, sem store global complexo.
+
+### ADR-008 — Alpine.js v3 para Interatividade Leve
+**Contexto:** interações específicas (confirmação de cancelamento, modais de ação) necessitam de feedback instantâneo sem recarregar a página, mas não justificam a adoção de um framework SPA completo.
+**Decisão:** Alpine.js v3 carregado via CDN com `defer`. Componentes definidos com `Alpine.data()` no evento `alpine:init`. O token CSRF é transmitido via header `x-csrf-token` nas chamadas `fetch`.
+**Consequências:** zero build step adicional; compatível 100% com Handlebars (Alpine opera no DOM já renderizado); bundle adicionado ao cliente ~14KB (gzipped). Reatividade de granularidade fina sem afetar o SSR.
 
 ---
 

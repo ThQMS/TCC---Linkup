@@ -25,9 +25,9 @@ const User = db.define('User', {
     onboardingComplete:  { type: DataTypes.BOOLEAN, defaultValue: false },
     checklistDismissed:  { type: DataTypes.BOOLEAN, defaultValue: false },
     openToWork:         { type: DataTypes.BOOLEAN, defaultValue: false },
-    // Sistema de disponibilidade inteligente
-    // Valores: 'actively_searching' | 'open_to_opportunities' | 'not_available'
-    availabilityStatus:    { type: DataTypes.STRING, allowNull: false, defaultValue: 'not_available' },
+    // Sistema de disponibilidade inteligente (4 status)
+    // Valores: 'actively_searching' | 'open_to_opportunities' | 'in_selection_process' | 'not_available'
+    availabilityStatus:    { type: DataTypes.STRING, allowNull: false, defaultValue: 'actively_searching' },
     availabilityUpdatedAt: { type: DataTypes.DATE,   allowNull: true },
     resetToken:         { type: DataTypes.STRING, allowNull: true },
     resetTokenExpires:  { type: DataTypes.DATE, allowNull: true },

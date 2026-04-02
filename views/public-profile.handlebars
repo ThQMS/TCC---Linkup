@@ -14,9 +14,17 @@
         <div class="flex-grow-1">
           <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
             <h1 style="font-size:1.6rem;font-weight:800;margin:0;">{{candidate.name}}</h1>
-            {{#if candidate.openToWork}}
-              <span style="background:#1a3a1a;border:1px solid #4caf50;color:#4caf50;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">
-                💼 Aberto para oportunidades
+            {{#if (eq candidate.availabilityStatus 'actively_searching')}}
+              <span style="background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.4);color:#4caf50;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                <i class="bi bi-search" style="font-size:0.6rem;"></i>Buscando Ativamente
+              </span>
+            {{else if (eq candidate.availabilityStatus 'open_to_opportunities')}}
+              <span style="background:rgba(255,193,7,0.12);border:1px solid rgba(255,193,7,0.4);color:#ffc107;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                <i class="bi bi-briefcase" style="font-size:0.6rem;"></i>Aberto a Oportunidades
+              </span>
+            {{else if (eq candidate.availabilityStatus 'in_selection_process')}}
+              <span style="background:rgba(253,126,20,0.12);border:1px solid rgba(253,126,20,0.4);color:#fd7e14;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                <i class="bi bi-hourglass-split" style="font-size:0.6rem;"></i>Em Processo Seletivo
               </span>
             {{/if}}
           </div>

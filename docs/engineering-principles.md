@@ -176,7 +176,7 @@ try {
 
 Decisões de segurança são arquiteturais, não retroativas.
 
-**CSRF em todo formulário:** o token é injetado via `globalLocals.js` em 100% das respostas — o desenvolvedor não precisa lembrar de adicionar. O middleware `csrf-csrf` rejeita automaticamente qualquer POST sem token válido.
+**CSRF em todo formulário e chamada AJAX:** o token é injetado via `globalLocals.js` em 100% das respostas e exposto em `<meta name="csrf-token">` no layout. O middleware `csrf-csrf` rejeita automaticamente qualquer POST sem token válido. Chamadas AJAX via Alpine.js leem o token do `<meta>` e o transmitem no header `x-csrf-token` — fluxo idêntico ao de formulários tradicionais, sem configuração adicional.
 
 **Sanitização global de entrada:** `sanitizeInputs` middleware remove HTML de todos os campos antes de qualquer controller ver os dados. Não há `strip_tags` espalhado pelo código — acontece uma vez, na camada correta.
 
@@ -230,7 +230,38 @@ Toda chamada HTTP externa tem timeout configurado. Sem timeout, uma dependência
 
 ---
 
-## 10. Convenções de Código
+## 10. Alpine.js — Interatividade Sem SPA
+
+O projeto adota uma filosofia **MPA-first** (Multi-Page Application): navegação e renderização são server-side. Porém, algumas interações — confirmações destrutivas, modais de ação, feedback instantâneo — são impraticáveis com redirect completo.
+
+**Critério de uso do Alpine.js:** use Alpine quando a interação exigir (a) estado local de UI (modal aberto/fechado, loading), (b) atualização parcial do DOM sem reload, ou (c) chamada AJAX que não justifica fetch manual puro em `<script>`. **Não use** Alpine para fluxos que precisam de navegação (redirect faz isso melhor) ou para gerenciar estado global complexo.
+
+**Padrão de componente Alpine:**
+```javascript
+// Definição em alpine:init — mantém os componentes nomeados e testáveis
+document.addEventListener('alpine:init', () => {
+  Alpine.data('nomeDoComponente', () => ({
+    // Estado local
+    modal: { open: false, loading: false, done: false },
+
+    // Método com CSRF via meta tag — sem depender de variável global
+    async doAcao() {
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      const r = await fetch('/rota', {
+        method: 'POST',
+        headers: { 'x-csrf-token': csrf, 'Content-Type': 'application/json' }
+      });
+      // ...
+    }
+  }));
+});
+```
+
+**Por que não Vue/React:** o custo de um SPA (build pipeline, gerenciamento de estado, hidratação, manutenção de bundle) é desproporcional à quantidade de interatividade necessária. Alpine (~14KB) resolve os casos de uso sem nenhum step de build adicional.
+
+---
+
+## 11. Convenções de Código
 
 ### Nomenclatura
 - Controllers: `[domínio]Controller.js` — `jobsController.js`, `authController.js`

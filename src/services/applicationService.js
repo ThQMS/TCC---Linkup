@@ -132,11 +132,82 @@ async function updateApplicationStage({ application, stageName, expressApp }) {
  * Ao encerrar uma vaga, envia feedback construtivo via IA para todos os
  * candidatos que não foram contratados. Atualiza status para 'expirado'.
  */
+/**
+
+ *
+ * @param {object} opts
+ * @param {object} opts.application - Instância Sequelize da candidatura
+ * @param {object} opts.user        - Candidato autenticado (req.user)
+ * @param {object} opts.job         - Instância Sequelize da vaga
+ * @param {object} opts.expressApp  - req.app (para Socket.io)
+ */
+async function cancelApplication({ application, user, job, expressApp }) {
+    if (application.status !== 'pendente') {
+        throw new Error('Apenas candidaturas com status "pendente" podem ser canceladas.');
+    }
+
+    // 1. Atualiza status e registra o timestamp do cancelamento
+    await application.update({ status: 'cancelado', canceledAt: new Date() });
+
+    // 2. Notificação in-app para o dono da vaga
+    const jobOwner = await User.findByPk(job.UserId);
+    if (jobOwner) {
+        await Notification.create({
+            userId:  jobOwner.id,
+            message: user.name + ' cancelou a candidatura para a vaga "' + job.title + '".',
+            type:    'warning',
+            link:    '/jobs/applications/' + job.id
+        });
+
+        // 3. Notificação em tempo real via Socket.io para a empresa
+        sendSocketNotification(expressApp, jobOwner.id, {
+            title:   'Candidatura cancelada',
+            message: user.name + ' cancelou a candidatura para ' + job.title
+        });
+    }
+
+    // 4. E-mail para a empresa — fire-and-forget (não bloqueia a resposta)
+    _sendCancellationEmail({ user, job, jobOwnerEmail: job.email }).catch((e) => {
+        logger.error('applicationService', 'Erro ao enviar e-mail de cancelamento', { err: e.message });
+    });
+}
+
+async function _sendCancellationEmail({ user, job, jobOwnerEmail }) {
+    if (!jobOwnerEmail) return;
+    const BASE = process.env.BASE_URL || 'http://localhost:3000';
+    await transporter.sendMail({
+        from:    `"LinkUp" <${process.env.GMAIL_USER}>`,
+        to:      jobOwnerEmail,
+        subject: `Candidatura cancelada: ${escHtml(user.name)} — ${escHtml(job.title)}`,
+        html:
+            `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+               <div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;">
+                 <h2 style="color:#f03e3e;margin:0;">Link<span style="color:white;">Up</span></h2>
+               </div>
+               <div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;">
+                 <h3 style="margin:0 0 16px;color:#1a1a1a;">Candidatura cancelada pelo candidato</h3>
+                 <p style="color:#444;line-height:1.7;">
+                   <strong>${escHtml(user.name)}</strong> cancelou a candidatura para a vaga
+                   <strong>${escHtml(job.title)}</strong> em sua empresa.
+                 </p>
+                 <p style="color:#666;font-size:0.9rem;line-height:1.6;">
+                   A candidatura foi removida do processo seletivo e não constará mais nas estatísticas de candidatos ativos.
+                 </p>
+                 <a href="${BASE}/jobs/applications/${job.id}"
+                    style="display:inline-block;background:#f03e3e;color:white;padding:11px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">
+                   Ver Candidatos da Vaga
+                 </a>
+               </div>
+             </div>`
+    });
+}
+
 async function sendBulkClosingFeedback(job) {
     try {
         const { Op } = require('sequelize');
+        // Exclui contratados, expirados e candidaturas já canceladas pelo candidato
         const pending = await Application.findAll({
-            where: { jobId: job.id, status: { [Op.notIn]: ['contratado', 'expirado'] } }
+            where: { jobId: job.id, status: { [Op.notIn]: ['contratado', 'expirado', 'cancelado'] } }
         });
         for (const app of pending) {
             await app.update({ status: 'expirado' });
@@ -268,4 +339,4 @@ async function _sendCongratsEmail(job, candidateId) {
     }
 }
 
-module.exports = { applyToJob, updateApplicationStatus, updateApplicationStage, sendBulkClosingFeedback };
+module.exports = { applyToJob, cancelApplication, updateApplicationStatus, updateApplicationStage, sendBulkClosingFeedback };

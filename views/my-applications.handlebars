@@ -7,6 +7,7 @@
 .appl-card.s-expirado   {border-left-color:#444;}
 .appl-card.s-analise    {border-left-color:#06b6d4;}
 .appl-card.s-pendente   {border-left-color:#ffc107;}
+.appl-card.s-cancelado  {border-left-color:#555;}
 .appl-logo{width:46px;height:46px;border-radius:10px;border:1px solid #2a2a2a;background:#111;display:flex;align-items:center;justify-content:center;color:#555;flex-shrink:0;}
 .appl-pill{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:0.72rem;}
 .appl-status{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:5px 14px;font-size:0.8rem;font-weight:700;}
@@ -14,11 +15,15 @@
 .appl-link:hover{border-color:#f03e3e;color:#f03e3e;}
 .appl-back{display:inline-flex;align-items:center;gap:6px;color:#888;text-decoration:none;font-size:0.87rem;border:1px solid #2a2a2a;border-radius:8px;padding:7px 14px;transition:all 0.2s;}
 .appl-back:hover{border-color:#f03e3e;color:#f03e3e;}
+/* Botão de cancelar — destaque discreto com amarelo-laranja */
+.btn-cancel-appl{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1px solid rgba(255,193,7,0.35);color:#b38600;border-radius:8px;padding:7px 14px;font-size:0.82rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-cancel-appl:hover{border-color:#ffc107;color:#ffc107;background:rgba(255,193,7,0.06);}
 @media(max-width:576px){
   .appl-card{padding:16px;}
   .appl-card>div:last-child{width:100%;justify-content:space-between;}
   .appl-status{font-size:0.74rem;padding:4px 10px;}
   .appl-pill{font-size:0.68rem;}
+  .appl-actions{flex-wrap:wrap;gap:8px!important;}
 }
 </style>
 
@@ -57,7 +62,9 @@
           {{else if (eq this.status 'rejeitado')}}s-rejeitado
           {{else if (eq this.status 'expirado')}}s-expirado
           {{else if (eq this.status 'em análise')}}s-analise
-          {{else}}s-pendente{{/if}}">
+          {{else if (eq this.status 'cancelado')}}s-cancelado
+          {{else}}s-pendente{{/if}}"
+          id="appl-card-{{this.id}}">
 
           <div class="d-flex align-items-center gap-3 flex-wrap" style="flex:1;min-width:0;">
             <div class="appl-logo">
@@ -86,17 +93,30 @@
             </div>
           </div>
 
-          <div class="d-flex align-items-center gap-3 flex-shrink-0 flex-wrap">
-            <span class="appl-status
-              {{#if (eq this.status 'contratado')}}   " style="background:rgba(76,175,80,0.12);color:#4caf50;border:1px solid rgba(76,175,80,0.3);">  <i class="bi bi-award-fill"></i>Contratado(a)
-              {{else if (eq this.status 'aprovado')}} " style="background:rgba(76,175,80,0.1);color:#66bb6a;border:1px solid rgba(76,175,80,0.25);">  <i class="bi bi-check-circle-fill"></i>Aprovado
-              {{else if (eq this.status 'rejeitado')}} " style="background:rgba(240,62,62,0.08);color:#f03e3e;border:1px solid rgba(240,62,62,0.25);">  <i class="bi bi-x-circle-fill"></i>Não selecionado
-              {{else if (eq this.status 'expirado')}} " style="background:#1e1e1e;color:#555;border:1px solid #333;">  <i class="bi bi-dash-circle"></i>Encerrada
-              {{else if (eq this.status 'em análise')}} " style="background:rgba(6,182,212,0.07);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);">  <i class="bi bi-search"></i>Em análise
-              {{else}} " style="background:rgba(255,193,7,0.07);color:#ffc107;border:1px solid rgba(255,193,7,0.25);">  <i class="bi bi-hourglass-split"></i>Aguardando
+          <!-- STATUS + AÇÕES -->
+          <div class="d-flex align-items-center gap-3 flex-shrink-0 flex-wrap appl-actions">
+            <span class="appl-status" data-status-badge
+              {{#if (eq this.status 'contratado')}}   style="background:rgba(76,175,80,0.12);color:#4caf50;border:1px solid rgba(76,175,80,0.3);">  <i class="bi bi-award-fill"></i>Contratado(a)
+              {{else if (eq this.status 'aprovado')}} style="background:rgba(76,175,80,0.1);color:#66bb6a;border:1px solid rgba(76,175,80,0.25);">  <i class="bi bi-check-circle-fill"></i>Aprovado
+              {{else if (eq this.status 'rejeitado')}} style="background:rgba(240,62,62,0.08);color:#f03e3e;border:1px solid rgba(240,62,62,0.25);">  <i class="bi bi-x-circle-fill"></i>Não selecionado
+              {{else if (eq this.status 'expirado')}} style="background:#1e1e1e;color:#555;border:1px solid #333;">  <i class="bi bi-dash-circle"></i>Encerrada
+              {{else if (eq this.status 'em análise')}} style="background:rgba(6,182,212,0.07);color:#06b6d4;border:1px solid rgba(6,182,212,0.25);">  <i class="bi bi-search"></i>Em análise
+              {{else if (eq this.status 'cancelado')}} style="background:rgba(100,100,100,0.07);color:#777;border:1px solid rgba(100,100,100,0.2);">  <i class="bi bi-slash-circle"></i>Cancelado
+              {{else}} style="background:rgba(255,193,7,0.07);color:#ffc107;border:1px solid rgba(255,193,7,0.25);">  <i class="bi bi-hourglass-split"></i>Aguardando
               {{/if}}
             </span>
+
             <a href="/jobs/view/{{this.job.id}}" class="appl-link">Ver Vaga</a>
+
+            {{!-- Botão de cancelar: visível apenas quando status é 'pendente' --}}
+            {{#if (eq this.status 'pendente')}}
+            <button type="button" class="btn-cancel-appl" data-cancel-btn
+              data-appid="{{this.id}}"
+              data-jobtitle="{{this.job.title}}"
+              onclick="openCancelModal(Number(this.dataset.appid), this.dataset.jobtitle)">
+              <i class="bi bi-x-circle"></i>Cancelar
+            </button>
+            {{/if}}
           </div>
 
         </div>
@@ -120,3 +140,148 @@
 
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL DE CONFIRMAÇÃO DE CANCELAMENTO (JS puro)
+     display:none inicial — sem dependência de Alpine
+     ══════════════════════════════════════════════ -->
+<div id="cancelModal"
+  style="display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,0.82);padding:16px;backdrop-filter:blur(4px);"
+  onclick="if(event.target===this && !_cancelLoading) closeCancelModal()">
+
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100%;">
+
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:32px 28px;max-width:420px;width:100%;position:relative;"
+      onclick="event.stopPropagation()">
+
+      <!-- ESTADO: AGUARDANDO CONFIRMAÇÃO -->
+      <div id="cancelConfirm">
+        <div style="width:52px;height:52px;border-radius:12px;background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <i class="bi bi-exclamation-triangle-fill" style="color:#ffc107;font-size:1.4rem;"></i>
+        </div>
+
+        <h5 style="font-family:'Syne',sans-serif;font-weight:800;text-align:center;margin-bottom:10px;font-size:1.15rem;">
+          Cancelar candidatura?
+        </h5>
+        <p style="color:#888;text-align:center;font-size:0.88rem;line-height:1.6;margin-bottom:8px;">
+          Você está prestes a cancelar sua candidatura para
+        </p>
+        <p style="color:#e0e0e0;text-align:center;font-size:0.92rem;font-weight:700;margin-bottom:20px;">
+          "<span id="cancelJobTitle"></span>"
+        </p>
+
+        <div style="background:rgba(255,193,7,0.06);border:1px solid rgba(255,193,7,0.15);border-radius:8px;padding:12px 14px;margin-bottom:24px;font-size:0.82rem;color:#a38000;line-height:1.55;">
+          <i class="bi bi-info-circle me-1"></i>
+          A empresa será notificada por e-mail e em tempo real. Esta ação não pode ser desfeita.
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="button" id="cancelConfirmBtn" onclick="doCancel()"
+            style="flex:1;background:#ffc107;border:none;color:#111;border-radius:8px;padding:11px 16px;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <span id="cancelConfirmLabel"><i class="bi bi-x-circle me-1"></i>Confirmar Cancelamento</span>
+            <span id="cancelLoadingLabel" style="display:none;align-items:center;gap:8px;">
+              <span style="width:16px;height:16px;border:2px solid #111;border-top-color:transparent;border-radius:50%;display:inline-block;animation:spin 0.7s linear infinite;"></span>
+              Cancelando...
+            </span>
+          </button>
+          <button type="button" onclick="closeCancelModal()"
+            style="background:transparent;border:1px solid #2a2a2a;color:#888;border-radius:8px;padding:11px 16px;font-size:0.88rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;"
+            onmouseover="this.style.borderColor='#555';this.style.color='#ccc'"
+            onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#888'">
+            Voltar
+          </button>
+        </div>
+      </div>
+
+      <!-- ESTADO: SUCESSO -->
+      <div id="cancelSuccess" style="display:none;text-align:center;">
+        <div style="width:60px;height:60px;border-radius:50%;background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+          <i class="bi bi-check-lg" style="color:#4caf50;font-size:1.6rem;"></i>
+        </div>
+        <h5 style="font-family:'Syne',sans-serif;font-weight:800;margin-bottom:8px;">Candidatura cancelada</h5>
+        <p style="color:#666;font-size:0.87rem;line-height:1.6;">
+          A empresa foi notificada automaticamente. Esta candidatura não constará mais como ativa.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+let _cancelAppId  = null;
+let _cancelLoading = false;
+
+function openCancelModal(id, jobTitle) {
+  _cancelAppId   = id;
+  _cancelLoading = false;
+
+  document.getElementById('cancelJobTitle').textContent = jobTitle;
+  document.getElementById('cancelConfirm').style.display  = 'block';
+  document.getElementById('cancelSuccess').style.display  = 'none';
+  document.getElementById('cancelConfirmBtn').disabled    = false;
+  document.getElementById('cancelConfirmLabel').style.display = 'flex';
+  document.getElementById('cancelLoadingLabel').style.display = 'none';
+
+  document.getElementById('cancelModal').style.display = 'block';
+}
+
+function closeCancelModal() {
+  document.getElementById('cancelModal').style.display = 'none';
+}
+
+async function doCancel() {
+  if (_cancelLoading || !_cancelAppId) return;
+  _cancelLoading = true;
+
+  const btn = document.getElementById('cancelConfirmBtn');
+  btn.disabled = true;
+  document.getElementById('cancelConfirmLabel').style.display = 'none';
+  document.getElementById('cancelLoadingLabel').style.display = 'flex';
+
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+  try {
+    const r    = await fetch('/jobs/cancel/' + _cancelAppId, {
+      method:  'POST',
+      headers: { 'x-csrf-token': csrf, 'Content-Type': 'application/json' }
+    });
+    const data = await r.json();
+
+    if (data.ok) {
+      const card = document.getElementById('appl-card-' + _cancelAppId);
+      if (card) {
+        card.className = card.className.replace(/\bs-\w+\b/, 's-cancelado');
+
+        const badge = card.querySelector('[data-status-badge]');
+        if (badge) {
+          badge.style.cssText = 'background:rgba(100,100,100,0.07);color:#777;border:1px solid rgba(100,100,100,0.2);display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:5px 14px;font-size:0.8rem;font-weight:700;';
+          badge.innerHTML = '<i class="bi bi-slash-circle"></i>Cancelado';
+        }
+
+        const cancelBtn = card.querySelector('[data-cancel-btn]');
+        if (cancelBtn) cancelBtn.remove();
+      }
+
+      document.getElementById('cancelConfirm').style.display = 'none';
+      document.getElementById('cancelSuccess').style.display = 'block';
+      setTimeout(closeCancelModal, 2200);
+    } else {
+      _cancelLoading = false;
+      btn.disabled = false;
+      document.getElementById('cancelConfirmLabel').style.display = 'flex';
+      document.getElementById('cancelLoadingLabel').style.display = 'none';
+      alert(data.error || 'Não foi possível cancelar a candidatura.');
+    }
+  } catch {
+    _cancelLoading = false;
+    btn.disabled = false;
+    document.getElementById('cancelConfirmLabel').style.display = 'flex';
+    document.getElementById('cancelLoadingLabel').style.display = 'none';
+    alert('Erro de conexão. Tente novamente.');
+  }
+}
+</script>
