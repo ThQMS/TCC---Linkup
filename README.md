@@ -256,41 +256,41 @@ As features de IA são a alavanca principal de monetização — cada chamada de
 ## Roadmap
 
 ### v1.0 — Entregue
-- [x] Autenticação dual com verificação de e-mail
-- [x] CRUD de vagas — modalidade, tipo de contrato, flag PCD
-- [x] Busca semântica híbrida (microserviço Python, ranking RRF)
-- [x] Pipeline de contratação customizável com transições de etapa
-- [x] IA: carta de apresentação, tailoring de currículo, score de compatibilidade
-- [x] IA: simulação de entrevista com avaliação
-- [x] IA: ranqueamento e comparação de candidatos
-- [x] IA: Bias Auditor para descrições de vaga
-- [x] IA: chat contextual por vaga
-- [x] Redescoberta de talentos (automatizada + cron agendado)
-- [x] Candidatos similares (painel sugerido + por candidatura)
-- [x] Feedback de rejeição automatizado por IA ao encerrar vaga
-- [x] Notificações em tempo real via Socket.io
-- [x] Dashboards por perfil com exportação em PDF
-- [x] Dashboard de Métricas de IA com monitoramento de capacidade Groq
-- [x] Buscas salvas com alertas semanais por e-mail
-- [x] Score de responsividade da empresa
-- [x] Sistema de disponibilidade com 4 status (Buscando Ativamente, Aberto, Em Processo, Não Disponível)
-- [x] Checklists de onboarding por perfil
-- [x] Rate limiting, CSRF, Helmet CSP, audit logging
-- [x] 4 cron jobs: alertas, expiração, limpeza, redescoberta
+- ✅ Autenticação dual com verificação de e-mail
+- ✅ CRUD de vagas — modalidade, tipo de contrato, flag PCD
+- ✅ Busca semântica híbrida (microserviço Python, ranking RRF)
+- ✅ Pipeline de contratação customizável com transições de etapa
+- ✅ IA: carta de apresentação, tailoring de currículo, score de compatibilidade
+- ✅ IA: simulação de entrevista com avaliação
+- ✅ IA: ranqueamento e comparação de candidatos
+- ✅ IA: Bias Auditor para descrições de vaga
+- ✅ IA: chat contextual por vaga
+- ✅ Redescoberta de talentos (automatizada + cron agendado)
+- ✅ Candidatos similares (painel sugerido + por candidatura)
+- ✅ Feedback de rejeição automatizado por IA ao encerrar vaga
+- ✅ Notificações em tempo real via Socket.io
+- ✅ Dashboards por perfil com exportação em PDF
+- ✅ Dashboard de Métricas de IA com monitoramento de capacidade Groq
+- ✅ Buscas salvas com alertas semanais por e-mail
+- ✅ Score de responsividade da empresa
+- ✅ Sistema de disponibilidade com 4 status (Buscando Ativamente, Aberto, Em Processo, Não Disponível)
+- ✅ Checklists de onboarding por perfil
+- ✅ Rate limiting, CSRF, Helmet CSP, audit logging
+- ✅ 4 cron jobs: alertas, expiração, limpeza, redescoberta
 
 ### v1.1 — Planejado
-- [x] Suíte de testes Jest — 106 testes cobrindo services críticos (SQLite in-memory, fake timers)
-- [ ] Redis session store + Socket.io adapter para implantação multi-instância
-- [ ] Fila Bull para jobs de IA (desacoplar do ciclo de requisição)
-- [ ] Integração pgvector (eliminar dependência do microserviço Python)
-- [ ] Suporte a webhooks para integrações ATS
-- [ ] Contas de empresa multi-recrutador
+- ✅ Suíte de testes Jest — 106 testes cobrindo services críticos (SQLite in-memory, fake timers)
+- ⬜ Redis session store + Socket.io adapter para implantação multi-instância
+- ⬜ Fila Bull para jobs de IA (desacoplar do ciclo de requisição)
+- ⬜ Integração pgvector (eliminar dependência do microserviço Python)
+- ⬜ Suporte a webhooks para integrações ATS
+- ⬜ Contas de empresa multi-recrutador
 
 ### v2.0 — Planejado
-- [ ] PWA mobile-first
-- [ ] API pública com chaves com rate limit
-- [ ] Analytics anônimos do mercado de contratações (produto de dados B2B)
-- [ ] Ranqueamento baseado em ML (substituir ranqueamento LLM por modelo fine-tuned)
+- ⬜ PWA mobile-first
+- ⬜ API pública com chaves com rate limit
+- ⬜ Analytics anônimos do mercado de contratações (produto de dados B2B)
+- ⬜ Ranqueamento baseado em ML (substituir ranqueamento LLM por modelo fine-tuned)
 
 ---
 
