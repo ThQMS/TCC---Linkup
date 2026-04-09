@@ -6,7 +6,7 @@ O LinkUp expõe uma API HTTP server-rendered. Endpoints de dados e IA retornam J
 
 **Autenticação:** baseada em sessão via Passport.js. Endpoints protegidos exigem cookie de sessão válido.
 
-**CSRF:** todas as requisições `POST`/`DELETE` devem incluir o token `_csrf` (campo de formulário) ou o header `X-CSRF-Token` (AJAX). O token é injetado em cada página via middleware `globalLocals`.
+**CSRF:** todas as requisições `POST`/`DELETE` devem incluir o token `_csrf` (campo de formulário) ou o header `X-CSRF-Token` (AJAX). O token é injetado em cada página via middleware `globalLocals`. Em caso de token inválido ou expirado: requisições AJAX recebem `HTTP 403` com `{ "error": "Token de segurança expirado. Recarregue a página." }`; envios de formulário recebem redirect com flash `error_msg`.
 
 ---
 
@@ -300,7 +300,7 @@ Content-Type  application/json
 ---
 
 ### POST /jobs/compare-candidates
-Comparação lado a lado de 2 a 3 candidatos por IA.
+Comparação lado a lado de 2 a 3 candidatos por IA. Na UI, candidatos são selecionados via checkboxes customizados (dark theme); o modal de resultado exibe cards escuros individuais por candidato com score, análise, pontos fortes, lacunas e recomendação. Seleção de até 3 candidatos; o botão "Comparar" só aparece com 2 ou 3 selecionados.
 
 **Headers**
 ```
@@ -336,11 +336,11 @@ Content-Type  application/json
 ---
 
 ### GET /jobs/similar-candidates/:id
-Retorna candidatos similares ao candidato da candidatura informada.
+Retorna candidatos da plataforma com perfil similar ao candidato da candidatura informada, que **ainda não aplicaram** à mesma vaga. Exige conta empresa e propriedade da vaga.
 
 **Parâmetros**
 ```
-id  integer  obrigatório  ID da candidatura
+id  integer  obrigatório  ID da candidatura de referência
 ```
 
 **Resposta 200**
@@ -348,14 +348,22 @@ id  integer  obrigatório  ID da candidatura
 {
   "similar": [
     {
-      "applicationId": 55,
-      "candidate": { "name": "João Silva", "city": "São Paulo" },
+      "candidate": { "id": 22, "name": "João Silva", "city": "São Paulo" },
       "fitScore": 73,
-      "commonSkills": ["React", "TypeScript"],
-      "similarity": 61
+      "similarity": 61,
+      "combinedScore": 67,
+      "commonSkills": ["React", "TypeScript"]
     }
   ]
 }
+```
+
+Campos da resposta:
+```
+fitScore      integer  Compatibilidade do candidato externo com os requisitos da vaga (0-100)
+similarity    integer  Índice Jaccard entre as skills do candidato de referência e do externo (0-100)
+combinedScore integer  fitScore × 0.5 + similarity × 0.5 — usado para ordenação e threshold mínimo (≥ 20)
+commonSkills  array    Até 5 skills em comum com o candidato de referência
 ```
 
 ---

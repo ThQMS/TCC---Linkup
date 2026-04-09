@@ -70,7 +70,9 @@
             <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;overflow:hidden;margin-bottom:12px;">
               <div style="padding:14px 18px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
                 <span style="font-size:0.8rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;">Candidatura</span>
+                {{#if (or isCandidate isOwner)}}
                 <span style="background:#2a2a2a;color:#888;font-size:0.75rem;padding:3px 10px;border-radius:20px;"><i class="bi bi-people me-1"></i>{{#if applicantsCount}}{{applicantsCount}}{{else}}0{{/if}} candidato(s)</span>
+                {{/if}}
               </div>
               <div style="padding:16px 18px;">
                 {{#if isCandidate}}

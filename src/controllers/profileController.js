@@ -102,16 +102,18 @@ exports.getMyJobs = async (req, res) => {
             : [];
         const appMap = {};
         for (const a of apps) {
-            if (!appMap[a.jobId]) appMap[a.jobId] = { total: 0, pendentes: 0, aprovados: 0 };
+            if (!appMap[a.jobId]) appMap[a.jobId] = { total: 0, pendentes: 0, aprovados: 0, contratados: 0 };
             appMap[a.jobId].total++;
             if (['pendente', 'em análise'].includes(a.status)) appMap[a.jobId].pendentes++;
-            if (['aprovado', 'contratado'].includes(a.status))  appMap[a.jobId].aprovados++;
+            if (a.status === 'aprovado')   appMap[a.jobId].aprovados++;
+            if (a.status === 'contratado') appMap[a.jobId].contratados++;
         }
         const jobsData = jobs.map(j => ({
             ...j.toJSON(),
-            totalApps: (appMap[j.id] || {}).total     || 0,
-            pendentes: (appMap[j.id] || {}).pendentes || 0,
-            aprovados: (appMap[j.id] || {}).aprovados || 0
+            totalApps:   (appMap[j.id] || {}).total      || 0,
+            pendentes:   (appMap[j.id] || {}).pendentes  || 0,
+            aprovados:   (appMap[j.id] || {}).aprovados  || 0,
+            contratados: (appMap[j.id] || {}).contratados || 0
         }));
         res.render('my-jobs', { jobs: jobsData, csrfToken: res.locals.csrfToken });
     } catch (err) {

@@ -218,6 +218,13 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 
 ---
 
+**RN-311 — Contador de candidatos visível apenas para candidatos e dono da vaga**
+**Descrição:** O número de candidaturas recebidas por uma vaga ("N candidatos") exibido na página de detalhes da vaga (`/jobs/view/:id`) é visível apenas para: (a) candidatos de qualquer tipo, e (b) a própria empresa dona da vaga (`isOwner = req.user.id === job.UserId`). Empresas terceiras que visualizam vagas de concorrentes não veem o contador.
+**Justificativa:** O número de candidatos é informação competitiva. Um recrutador concorrente que vê "0 candidatos" em uma vaga rival tem vantagem estratégica desnecessária; ao mesmo tempo, candidatos se beneficiam de saber quanta concorrência enfrentam.
+**Impacto:** `jobsController.view` calcula `isOwner` e o passa ao template. `views/view.handlebars` envolve o bloco do contador em `{{#if (or isCandidate isOwner)}}` usando o helper `or`.
+
+---
+
 ## 4. Pipeline de Etapas
 
 ---
@@ -257,6 +264,27 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 
 ---
 
+**RN-406 — Visibilidade de etapas e ações condicionada ao status da candidatura**
+**Descrição:** Na página de candidatos de uma vaga, a exibição de etapas e os botões de ação seguem as seguintes regras:
+- **Badge de etapa atual** (`currentStage`): visível apenas quando status é `aprovado` ou `contratado`.
+- **Seletor "Mover para etapa"**: visível apenas quando status é `aprovado`.
+- **Botão "Aceitar"**: visível quando status **não é** `aprovado` (e não é terminal).
+- **Botão "Contratar"**: visível apenas quando status é `aprovado`.
+- **Botão "Recusar"**: visível quando status não é `aprovado`; estilo vermelho.
+- **Botão "Desclassificar"**: substituição do "Recusar" quando status é `aprovado`; exige confirmação via dialog. Estilo vermelho.
+
+**Justificativa:** Exibir "Contratar" antes de aceitar não faz sentido no fluxo. Mostrar etapas para candidatos ainda em análise cria informação prematura. Após aprovação, "Recusar" é conceitualmente inadequado — "Desclassificar" reflete o real contexto de remoção após seleção.
+**Impacto:** Condicionais no template `views/applications.handlebars` usando helpers `eq` e `or`. Helper `or` adicionado em `src/helpers/handlebars-helpers.js`.
+
+---
+
+**RN-406-A — Dica de status dispensável por sessão**
+**Descrição:** O banner informativo "Por que manter os status atualizados?" na página de candidatos pode ser dispensado pelo usuário via botão de fechar. O estado de dispensa é armazenado em `sessionStorage` (chave `status-tip-dismissed`) e persiste enquanto a aba/sessão estiver aberta. Ao reabrir o navegador ou iniciar nova sessão, o banner volta a aparecer.
+**Justificativa:** Dispensar permanentemente (em banco) seria excessivo para uma dica de UI. `sessionStorage` mantém o painel limpo durante uma sessão de trabalho sem modificar o estado do servidor.
+**Impacto:** `views/applications.handlebars` — função `dismissStatusTip()` grava `sessionStorage.setItem('status-tip-dismissed', '1')`. Script inline na página lê a chave e oculta o elemento antes da renderização, evitando flash.
+
+---
+
 ## 5. Candidaturas
 
 ---
@@ -291,8 +319,15 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 
 **RN-505 — Ciclo de vida do status de candidatura**
 **Descrição:** O status de uma candidatura assume os valores: `pendente` (padrão ao criar), `em análise`, `aprovado`, `rejeitado`, `contratado`, `expirado` e `cancelado`. A empresa atualiza os status do pipeline; o candidato pode cancelar enquanto `pendente`; o sistema atualiza para `expirado` via cron.
-**Justificativa:** Mantém o histórico completo do processo seletivo e permite que ambas as partes acompanhem a jornada em tempo real.
-**Impacto:** `applicationService.updateApplicationStatus` persiste status da empresa. `applicationService.cancelApplication` persiste cancelamento pelo candidato (ver RN-508). Mudança para `rejeitado` dispara feedback IA. Mudança para `contratado` dispara e-mail de parabéns.
+
+Transições de status e ações automáticas:
+- `→ aprovado`: notificação de parabéns ao candidato.
+- `→ rejeitado` (de `pendente`/`em análise`, ação "Recusar"): notificação "não selecionado" + e-mail de feedback construtivo gerado por IA com base nas skills vs. requisitos da vaga.
+- `→ rejeitado` (de `aprovado`, ação "Desclassificar"): notificação específica informando cancelamento da aprovação + e-mail empático gerado por IA sem sugestões de melhoria (candidato já havia sido aprovado).
+- `→ contratado`: notificação de parabéns ao candidato + e-mail comemorativo com sugestão de atualizar disponibilidade. **Adicionalmente, a empresa recebe notificação in-app em tempo real informando que a contratação foi registrada** (via Socket.io + `Notification.create()`).
+
+**Justificativa:** Mantém o histórico completo do processo seletivo e permite que ambas as partes acompanhem a jornada em tempo real. Diferenciar a comunicação entre "Recusar" e "Desclassificar" garante uma experiência mais profissional e adequada ao contexto de cada transição. Notificar a empresa na contratação confirma o registro e serve como gatilho para ações internas (ex: enviar documentação).
+**Impacto:** `applicationService.updateApplicationStatus` lê `application.status` antes de persistir o novo status para determinar se é uma desclassificação (`wasDisqualified = previousStatus === 'aprovado' && status === 'rejeitado'`). A flag é repassada a `_sendRejectionFeedback`, que seleciona o prompt de IA adequado. Para `status === 'contratado'`, além da notificação ao candidato, cria `Notification` e emite Socket.io para `job.UserId` (empresa). Rota: `POST /jobs/applications/status`.
 
 ---
 
@@ -307,6 +342,13 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 **Descrição:** O candidato pode cancelar sua própria candidatura desde que o status seja `pendente`. Ao cancelar: (1) o status é atualizado para `cancelado` e `canceledAt` é registrado; (2) uma notificação in-app é criada para o dono da vaga; (3) uma notificação em tempo real é enviada via Socket.io para a empresa; (4) um e-mail transacional é disparado fire-and-forget para o endereço da vaga. Candidaturas com status `cancelado` são excluídas do envio de feedback em massa ao encerrar a vaga.
 **Justificativa:** Permite que o candidato retire uma candidatura equivocada ou redundante sem depender da empresa. Notificar a empresa evita que ela invista tempo avaliando um candidato que já desistiu. Registrar `canceledAt` preserva o histórico para métricas futuras.
 **Impacto:** `applicationService.cancelApplication` — valida o status, persiste a atualização, cria notificação, chama `sendSocketNotification` e dispara `_sendCancellationEmail`. `applicationService.sendBulkClosingFeedback` exclui `cancelado` do `Op.notIn`. `jobsController.cancelApplication` retorna JSON `{ ok: true }` consumido pelo Alpine.js no frontend. Rota: `POST /jobs/cancel/:applicationId`.
+
+---
+
+**RN-509 — Badge "Contratação realizada" em Minhas Vagas**
+**Descrição:** Quando pelo menos um candidato de uma vaga atinge status `contratado`, a vaga exibe o badge "Contratação realizada" (ícone `bi-award-fill`, cor verde) na listagem "Minhas Vagas" da empresa. O contador individual de contratados também é exibido. A vaga não é encerrada automaticamente — a empresa pode manter a vaga aberta para contratar mais pessoas.
+**Justificativa:** Fornece visibilidade imediata sobre o resultado do processo seletivo sem forçar o encerramento prematuro de vagas com múltiplas vagas disponíveis.
+**Impacto:** `profileController.getMyJobs` separa `contratados` de `aprovados` no `appMap`. `views/my-jobs.handlebars` renderiza o badge condicionalmente e exibe o contador `contratados` em ciano no painel de métricas.
 
 ---
 
@@ -391,10 +433,10 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 
 ---
 
-**RN-611 — Threshold mínimo de exibição de candidatos similares**
-**Descrição:** Candidatos similares e candidatos sugeridos só são exibidos se o `fitScore` for ≥ 50% (por candidatura) ou o `combinedScore` for ≥ 50 (sugeridos). A ordenação privilegia `fitScore` com peso 70% e `similarity` com peso 30%.
-**Justificativa:** Exibir candidatos com fit abaixo de 50% gera ruído e reduz a confiança do recrutador na feature. O peso maior em `fitScore` garante que o alinhamento com a vaga domine sobre a similaridade entre candidatos.
-**Impacto:** `findSimilarCandidates` em `talentRediscoveryService.js` filtra por `fitScore >= 50`. `COMBINED_THRESHOLD = 50` em `similarCandidatesService.js`. Sort: `fitScore * 0.7 + similarity * 0.3`.
+**RN-611 — Threshold mínimo de exibição de candidatos similares e sugeridos**
+**Descrição:** Candidatos similares (RN-1004) são exibidos se `combinedScore = fitScore × 0.5 + similarity × 0.5 ≥ 20`. Candidatos sugeridos (RN-1005) exigem `combinedScore = fitScore × 0.6 + skillSimilarity × 0.4 ≥ 50`. Em ambos os casos a ordenação é decrescente por `combinedScore`.
+**Justificativa:** O threshold mais baixo para candidatos similares (20 vs 50) reflete o fato de que a busca já está ancorada em um candidato de referência com perfil compatível com a vaga. O threshold mais alto para sugeridos é mantido pois esses candidatos não têm nenhum vínculo com a vaga.
+**Impacto:** `findCandidatesSimilarTo` em `similarCandidatesService.js` usa `combinedScore >= 20`. `COMBINED_THRESHOLD = 50` mantido em `similarCandidatesService.js` para `findSuggestedCandidates`. `findSimilarCandidates` em `talentRediscoveryService.js` usa `(fitScore * 0.7 + similarity * 0.3) >= 20` (mantido para uso interno de comparação entre candidatos da mesma vaga).
 
 ---
 
@@ -456,9 +498,9 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 ---
 
 **RN-804 — Relatórios exportáveis em PDF**
-**Descrição:** O dashboard da empresa e a listagem de candidaturas do candidato podem ser exportados em PDF via endpoints dedicados.
+**Descrição:** O dashboard da empresa e a listagem de candidaturas do candidato podem ser exportados em PDF via endpoints dedicados. Templates de currículo (`/resume/view`) oferecem export client-side via jsPDF.
 **Justificativa:** Permite que empresas compartilhem relatórios offline e que candidatos tenham registro formal de suas atividades na plataforma.
-**Impacto:** `pdfService.js` centraliza a geração. `pdfUtils.js` sanitiza HTML antes de renderizar (prevenção de XSS nos dados do usuário).
+**Impacto:** `pdfService.js` centraliza a geração server-side. `pdfUtils.js` sanitiza HTML antes de renderizar (prevenção de XSS nos dados do usuário). A biblioteca jsPDF (v2.5.1, build UMD) é servida localmente em `public/js/jspdf.umd.min.js` — sem dependência de CDN externo — e carregada pelo template `views/resume-view.handlebars`. O CSP (`app.js`) inclui `"blob:"` em `scriptSrc` para permitir a geração do arquivo para download. Erros de carregamento da biblioteca exibem alerta ao usuário via `window._jspdfFailed`.
 
 ---
 
@@ -526,10 +568,16 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 
 ---
 
-**RN-1004 — Candidatos similares ao melhor candidato da vaga**
-**Descrição:** A empresa pode ver candidatos com perfil similar ao de qualquer candidato já inscrito na vaga. O sistema retorna até 3 perfis com `fitScore >= 50%`, ordenados por `fitScore * 0.7 + similarity * 0.3`.
-**Justificativa:** Amplia o pool de candidatos qualificados sem esforço adicional de busca por parte da empresa.
-**Impacto:** `GET /jobs/similar-candidates/:id` chama `findSimilarCandidates` em `talentRediscoveryService`. Exibido no card de cada candidatura com botão "Candidatos Similares".
+**RN-1004 — Candidatos similares buscados na plataforma (fora da vaga)**
+**Descrição:** A empresa pode clicar em "Candidatos Similares" no card de qualquer candidato inscrito. O sistema busca na plataforma inteira candidatos que **não aplicaram** à vaga e calcula:
+- `similarity`: Jaccard entre as skills do candidato de referência e as do candidato externo.
+- `fitScore`: compatibilidade do candidato externo com os requisitos da vaga.
+- `combinedScore = fitScore × 0.5 + similarity × 0.5`.
+
+Retorna até 3 perfis com `combinedScore ≥ 20`, ordenados de forma decrescente. O card exibe as duas métricas separadamente ("fit vaga" e "similaridade") para que a empresa possa avaliar o contexto de cada sugestão. Apenas candidatos disponíveis (`isAvailable = true`) são considerados.
+
+**Justificativa:** A busca por similares deve apresentar candidatos que a empresa ainda não está avaliando, ampliando o pool. Buscar dentro dos próprios inscritos da vaga resultava 100% das vezes em candidatos já visíveis na lista — sem valor prático. Exibir ambas as métricas permite à empresa diferenciar um candidato "similar ao perfil" de um candidato "fit com a vaga".
+**Impacto:** `GET /jobs/similar-candidates/:id` chama `findCandidatesSimilarTo(target.userId, job.id, req.user.id)` em `similarCandidatesService.js`. O template exibe `fitScore` ("fit vaga") e `similarity` ("similaridade") lado a lado no card.
 
 ---
 
@@ -559,9 +607,9 @@ Candidatos com `actively_searching`, `open_to_opportunities` ou `in_selection_pr
 ---
 
 **RN-1101 — CSRF obrigatório em todos os formulários POST**
-**Descrição:** Todo formulário que envia dados via POST deve incluir o token CSRF gerado por `csrf-csrf`. Requisições sem token ou com token inválido são rejeitadas com HTTP 403.
-**Justificativa:** Protege contra Cross-Site Request Forgery, onde um site malicioso forjaria ações em nome de um usuário autenticado.
-**Impacto:** `csrf-csrf` configurado em `app.js`. Token injetado em `res.locals.csrfToken` via `globalLocals` middleware em 100% das respostas.
+**Descrição:** Todo formulário que envia dados via POST deve incluir o token CSRF gerado por `csrf-csrf`. Requisições sem token ou com token inválido são rejeitadas com HTTP 403. O handler de erro CSRF diferencia requisições AJAX de requisições de formulário: AJAX recebe `{ "error": "Token de segurança expirado. Recarregue a página." }` com status 403; formulários recebem flash `error_msg` e redirect para `back`.
+**Justificativa:** Protege contra Cross-Site Request Forgery, onde um site malicioso forjaria ações em nome de um usuário autenticado. A diferenciação AJAX/formulário evita que o browser siga silenciosamente um redirect 302 em chamadas `fetch`, o que causaria o token de flash a aparecer em páginas não relacionadas.
+**Impacto:** `csrf-csrf` configurado em `app.js`. Token injetado em `res.locals.csrfToken` via `globalLocals` middleware em 100% das respostas. Handler de erro em `app.js` detecta AJAX por `req.xhr`, `Accept: application/json` ou `Content-Type: application/json`.
 
 ---
 

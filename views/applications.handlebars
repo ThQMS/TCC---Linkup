@@ -72,8 +72,8 @@
           E atualizar rápido é o que garante o <strong style="color:#4caf50;">Selo Empresa Responsiva</strong> no seu perfil.
         </p>
       </div>
-      <button onclick="document.getElementById('status-tip').style.display='none'"
-        style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;" title="Fechar">×</button>
+      <button onclick="dismissStatusTip()"
+        style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:0;flex-shrink:0;" title="Fechar e não mostrar novamente nesta sessão">×</button>
     </div>
     {{/if}}
     {{/if}}
@@ -93,9 +93,12 @@
     {{#if applicants.length}}
 
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
-        <p style="color:#888;font-size:0.85rem;margin:0;">{{applicants.length}} candidato(s)</p>
+        <div>
+          <p style="color:#888;font-size:0.85rem;margin:0;">{{applicants.length}} candidato(s)</p>
+          <p id="compare-hint" style="color:#555;font-size:0.75rem;margin:3px 0 0;"><i class="bi bi-check2-square me-1"></i>Marque 2 ou 3 candidatos para comparar com IA</p>
+        </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button id="compare-btn" onclick="compararSelecionados()" style="display:none;background:#06b6d4;border:none;color:white;border-radius:8px;padding:8px 18px;cursor:pointer;font-weight:600;font-size:0.85rem;">
+          <button id="compare-btn" onclick="compararSelecionados()" style="display:none;background:#06b6d4;border:none;color:white;border-radius:8px;padding:8px 18px;cursor:pointer;font-weight:600;font-size:0.85rem;transition:opacity 0.2s;">
             <i class="bi bi-scale me-1"></i>Comparar (<span id="selected-count">0</span>)
           </button>
           <button id="rank-btn" onclick="rankCandidates()"
@@ -116,7 +119,10 @@
 
               <div class="d-flex align-items-center gap-3">
                 <div class="rank-badge" style="display:none;width:32px;height:32px;border-radius:50%;background:#a855f7;color:white;font-weight:700;font-size:0.9rem;align-items:center;justify-content:center;flex-shrink:0;"></div>
-                <input type="checkbox" class="candidate-check" data-id="{{this.id}}" onchange="updateCompareBtn()" style="accent-color:#06b6d4;width:16px;height:16px;cursor:pointer;flex-shrink:0;">
+                <label style="position:relative;width:18px;height:18px;flex-shrink:0;cursor:pointer;" title="Selecionar para comparar">
+                  <input type="checkbox" class="candidate-check" data-id="{{this.id}}" onchange="updateCompareBtn()" style="position:absolute;opacity:0;width:0;height:0;">
+                  <span class="custom-check" style="position:absolute;inset:0;border-radius:5px;border:2px solid #3a3a3a;background:#1a1a1a;transition:all 0.15s;display:flex;align-items:center;justify-content:center;"></span>
+                </label>
                 <div style="width:50px;height:50px;border-radius:50%;border:2px solid #f03e3e;background:#2a2a2a;display:flex;align-items:center;justify-content:center;color:#f03e3e;font-size:1.3rem;flex-shrink:0;">
                   <i class="bi bi-person-fill"></i>
                 </div>
@@ -141,10 +147,12 @@
                 {{else}}
                   <span style="background:#2a2a2a;border:1px solid #555;color:#aaa;border-radius:20px;padding:4px 12px;font-size:0.8rem;"><i class="bi bi-hourglass-split me-1"></i>Em análise</span>
                 {{/if}}
+                {{#if (or (eq this.status 'aprovado') (eq this.status 'contratado'))}}
                 {{#if this.currentStage}}
                   <span class="current-stage-badge" style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.3);color:#06b6d4;border-radius:20px;padding:4px 10px;font-size:0.75rem;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;" title="{{this.currentStage}}">
                     <i class="bi bi-layers me-1"></i>{{this.currentStage}}
                   </span>
+                {{/if}}
                 {{/if}}
                 <div class="ia-score" style="display:none;text-align:right;">
                   <div class="score-value" style="font-size:1.4rem;font-weight:700;"></div>
@@ -182,6 +190,7 @@
             {{#unless (eq this.status 'rejeitado')}}
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center;">
 
+              {{#if (eq this.status 'aprovado')}}
               {{#if ../jobStages.length}}
               <form action="/jobs/applications/stage" method="POST" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0;">
                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
@@ -200,6 +209,7 @@
                 </div>
               </form>
               {{/if}}
+              {{/if}}
 
               {{#unless (eq this.status 'aprovado')}}
               <form action="/jobs/applications/status" method="POST" style="margin:0;">
@@ -214,6 +224,7 @@
               </form>
               {{/unless}}
 
+              {{#if (eq this.status 'aprovado')}}
               <form action="/jobs/applications/status" method="POST" style="margin:0;">
                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                 <input type="hidden" name="applicationId" value="{{this.id}}">
@@ -225,15 +236,25 @@
                   <i class="bi bi-award-fill me-1"></i>Contratar
                 </button>
               </form>
+              {{/if}}
 
               <form action="/jobs/applications/status" method="POST" style="margin:0;">
                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                 <input type="hidden" name="applicationId" value="{{this.id}}">
                 <input type="hidden" name="jobId" value="{{../job.id}}">
                 <input type="hidden" name="status" value="rejeitado">
-                <button type="submit" style="background:transparent;border:1px solid #3a3a3a;color:#666;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;" onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'" onmouseout="this.style.borderColor='#3a3a3a';this.style.color='#666'">
+                {{#if (eq this.status 'aprovado')}}
+                <button type="submit"
+                  onclick="return confirm('Desclassificar {{this.candidate.name}}? O candidato será removido do processo seletivo.')"
+                  style="background:rgba(240,62,62,0.1);border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='#f03e3e';this.style.color='white'" onmouseout="this.style.background='rgba(240,62,62,0.1)';this.style.color='#f03e3e'">
+                  <i class="bi bi-person-x me-1"></i>Desclassificar
+                </button>
+                {{else}}
+                <button type="submit"
+                  style="background:rgba(240,62,62,0.1);border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='#f03e3e';this.style.color='white'" onmouseout="this.style.background='rgba(240,62,62,0.1)';this.style.color='#f03e3e'">
                   <i class="bi bi-x-lg me-1"></i>Recusar
                 </button>
+                {{/if}}
               </form>
 
             </div>
@@ -267,9 +288,38 @@
   </div>
 </div>
 
+<style>
+.candidate-check:checked + .custom-check {
+  background: #06b6d4;
+  border-color: #06b6d4;
+}
+.candidate-check:checked + .custom-check::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+}
+label:hover .custom-check {
+  border-color: #06b6d4;
+}
+</style>
+
 <script>
 const APPLICATIONS_CSRF = '{{csrfToken}}';
 const APPLICATIONS_JOB_ID = '{{job.id}}';
+
+function dismissStatusTip() {
+    document.getElementById('status-tip').style.display = 'none';
+    sessionStorage.setItem('status-tip-dismissed', '1');
+}
+if (sessionStorage.getItem('status-tip-dismissed')) {
+    const tip = document.getElementById('status-tip');
+    if (tip) tip.style.display = 'none';
+}
 
 const _similarCache = {};
 async function toggleSimilares(applicationId, btn) {
@@ -291,7 +341,7 @@ async function toggleSimilares(applicationId, btn) {
         const res  = await fetch('/jobs/similar-candidates/' + applicationId);
         const data = await res.json();
         if (!data.similar || !data.similar.length) {
-            _similarCache[applicationId] = '<p style="color:#666;font-size:0.8rem;margin:6px 0;">Nenhum candidato similar encontrado nesta vaga.</p>';
+            _similarCache[applicationId] = '<p style="color:#666;font-size:0.8rem;margin:6px 0;">Nenhum candidato com perfil similar encontrado fora desta vaga no momento.</p>';
         } else {
             _similarCache[applicationId] = `
                 <div style="background:#141414;border:1px solid rgba(168,85,247,0.25);border-radius:12px;overflow:hidden;">
@@ -319,7 +369,11 @@ async function toggleSimilares(applicationId, btn) {
                       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                         <div style="text-align:center;min-width:54px;">
                           <div style="font-size:1.4rem;font-weight:800;color:${color};line-height:1;">${s.fitScore}%</div>
-                          <div style="color:#555;font-size:0.65rem;text-transform:uppercase;letter-spacing:.5px;">fit</div>
+                          <div style="color:#555;font-size:0.65rem;text-transform:uppercase;letter-spacing:.5px;">fit vaga</div>
+                        </div>
+                        <div style="text-align:center;min-width:54px;">
+                          <div style="font-size:1.4rem;font-weight:800;color:${s.similarity >= 60 ? '#4caf50' : s.similarity >= 30 ? '#ffc107' : '#888'};line-height:1;">${s.similarity}%</div>
+                          <div style="color:#555;font-size:0.65rem;text-transform:uppercase;letter-spacing:.5px;">similaridade</div>
                         </div>
                         <a href="/profile/c/${s.candidate.name ? s.candidate.name.replace(/\s+/g,'-') : ''}?fromJob=${APPLICATIONS_JOB_ID}" target="_blank"
                           style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);color:#a855f7;border-radius:8px;padding:7px 14px;font-size:0.8rem;font-weight:600;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;"
@@ -343,9 +397,12 @@ async function toggleSimilares(applicationId, btn) {
 
 function updateCompareBtn() {
     const checked = document.querySelectorAll('.candidate-check:checked');
-    const btn = document.getElementById('compare-btn');
-    document.getElementById('selected-count').textContent = checked.length;
-    btn.style.display = checked.length >= 2 && checked.length <= 3 ? 'inline-block' : 'none';
+    const btn  = document.getElementById('compare-btn');
+    const hint = document.getElementById('compare-hint');
+    const n = checked.length;
+    document.getElementById('selected-count').textContent = n;
+    btn.style.display  = n >= 2 && n <= 3 ? 'inline-block' : 'none';
+    if (hint) hint.style.display = n === 0 ? 'block' : 'none';
 }
 
 async function rankCandidates() {
@@ -423,31 +480,80 @@ async function compararSelecionados() {
 }
 
 function renderComparacao(data) {
-    if (data.error) return '<p style="color:#f03e3e;">' + data.error + '</p>';
+    if (data.error) return `<p style="color:#f03e3e;padding:12px;">${data.error}</p>`;
     const candidates = data.candidates || [];
-    const cols = candidates.map(c => `
-        <div style="flex:1;min-width:200px;">
-            <div style="text-align:center;margin-bottom:16px;">
-                <div style="width:48px;height:48px;border-radius:50%;background:#2a2a2a;border:2px solid ${c.recomendado?'#4caf50':'#2a2a2a'};display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
-                    <i class="bi bi-person" style="color:#aaa;font-size:1.2rem;"></i>
-                </div>
-                <p style="font-weight:700;margin:0;font-size:0.9rem;">${c.nome}</p>
-                <div style="font-size:1.5rem;font-weight:800;color:${c.score>=70?'#4caf50':c.score>=40?'#f59e0b':'#f03e3e'};margin-top:4px;">${c.score}%</div>
-                ${c.recomendado?'<span style="background:#1a3a1a;border:1px solid #4caf50;color:#4caf50;font-size:0.7rem;padding:2px 8px;border-radius:20px;"><i class=\'bi bi-star-fill me-1\'></i>Recomendado</span>':''}
-            </div>
-            <div style="font-size:0.8rem;color:#aaa;line-height:1.6;">${c.analise||''}</div>
-            <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;">
-                ${(c.pontos_fortes||[]).map(p=>`<span style="background:#1a2a1a;border:1px solid #4caf50;color:#4caf50;border-radius:20px;padding:2px 8px;font-size:0.72rem;">✓ ${p}</span>`).join('')}
-            </div>
-            <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
-                ${(c.lacunas||[]).map(l=>`<span style="background:#2a1a1a;border:1px solid #f03e3e;color:#f03e3e;border-radius:20px;padding:2px 8px;font-size:0.72rem;">✗ ${l}</span>`).join('')}
-            </div>
-        </div>`).join('<div style="width:1px;background:#2a2a2a;flex-shrink:0;"></div>');
 
-    return `<div style="display:flex;gap:20px;flex-wrap:wrap;">${cols}</div>
-        ${data.conclusao?`<div style="margin-top:20px;padding:14px;background:#1e1e1e;border-radius:10px;color:#aaa;font-size:0.85rem;line-height:1.7;border-left:3px solid #06b6d4;">${data.conclusao}</div>`:''}
-        <div style="display:flex;justify-content:flex-end;margin-top:16px;">
-            <button onclick="fecharComparacao()" style="background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;padding:8px 16px;cursor:pointer;">Fechar</button>
+    const cols = candidates.map(c => {
+        const scoreColor = c.score >= 70 ? '#4caf50' : c.score >= 40 ? '#f59e0b' : '#f03e3e';
+        const borderColor = c.recomendado ? '#4caf50' : '#2a2a2a';
+        const initial = c.nome ? c.nome.charAt(0).toUpperCase() : '?';
+        const barWidth = Math.max(4, Math.min(100, c.score || 0));
+
+        return `
+        <div style="flex:1;min-width:220px;background:#1a1a1a;border:1px solid ${borderColor};border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
+
+          <!-- Cabeçalho do candidato -->
+          <div style="padding:18px 18px 14px;border-bottom:1px solid #242424;${c.recomendado ? 'background:rgba(76,175,80,0.04);' : ''}">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              <div style="width:44px;height:44px;border-radius:50%;background:#242424;border:2px solid ${borderColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;font-size:1.1rem;color:${c.recomendado ? '#4caf50' : '#aaa'};">${initial}</div>
+              <div style="min-width:0;">
+                <div style="font-weight:700;font-size:0.95rem;color:#eee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
+                ${c.recomendado ? '<div style="font-size:0.72rem;color:#4caf50;margin-top:2px;"><i class="bi bi-star-fill" style="font-size:0.65rem;"></i> Mais recomendado</div>' : ''}
+              </div>
+            </div>
+
+            <!-- Score + barra -->
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px;">
+              <span style="font-size:2rem;font-weight:800;color:${scoreColor};line-height:1;">${c.score}</span>
+              <span style="font-size:1rem;font-weight:600;color:${scoreColor};">%</span>
+              <span style="font-size:0.72rem;color:#555;margin-left:2px;">compatibilidade</span>
+            </div>
+            <div style="height:5px;background:#2a2a2a;border-radius:99px;overflow:hidden;">
+              <div style="height:100%;width:${barWidth}%;background:${scoreColor};border-radius:99px;transition:width 0.6s ease;"></div>
+            </div>
+          </div>
+
+          <!-- Análise -->
+          <div style="padding:14px 18px;border-bottom:1px solid #242424;">
+            <div style="font-size:0.68rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;"><i class="bi bi-chat-square-text me-1"></i>Análise</div>
+            <div style="font-size:0.82rem;color:#aaa;line-height:1.65;">${c.analise || '—'}</div>
+          </div>
+
+          <!-- Pontos fortes -->
+          ${(c.pontos_fortes||[]).length ? `
+          <div style="padding:12px 18px;border-bottom:1px solid #242424;">
+            <div style="font-size:0.68rem;font-weight:700;color:#4caf50;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;"><i class="bi bi-check-circle me-1"></i>Pontos fortes</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              ${(c.pontos_fortes).map(p => `<span style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#ccc;"><span style="color:#4caf50;font-size:0.75rem;">✓</span>${p}</span>`).join('')}
+            </div>
+          </div>` : ''}
+
+          <!-- Lacunas -->
+          ${(c.lacunas||[]).length ? `
+          <div style="padding:12px 18px;">
+            <div style="font-size:0.68rem;font-weight:700;color:#f03e3e;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;"><i class="bi bi-exclamation-circle me-1"></i>Lacunas</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              ${(c.lacunas).map(l => `<span style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#ccc;"><span style="color:#f03e3e;font-size:0.75rem;">✗</span>${l}</span>`).join('')}
+            </div>
+          </div>` : ''}
+
+        </div>`;
+    }).join('');
+
+    const conclusaoHtml = data.conclusao ? `
+        <div style="margin-top:20px;background:#141414;border:1px solid #1e3a4a;border-radius:12px;overflow:hidden;">
+          <div style="padding:10px 18px;background:rgba(6,182,212,0.06);border-bottom:1px solid #1e3a4a;display:flex;align-items:center;gap:8px;">
+            <i class="bi bi-robot" style="color:#06b6d4;font-size:0.9rem;"></i>
+            <span style="font-size:0.72rem;font-weight:700;color:#06b6d4;text-transform:uppercase;letter-spacing:0.8px;">Recomendação Final da IA</span>
+          </div>
+          <div style="padding:14px 18px;font-size:0.85rem;color:#bbb;line-height:1.7;">${data.conclusao}</div>
+        </div>` : '';
+
+    return `
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;">${cols}</div>
+        ${conclusaoHtml}
+        <div style="display:flex;justify-content:flex-end;margin-top:18px;">
+          <button onclick="fecharComparacao()" style="background:transparent;border:1px solid #333;color:#888;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;" onmouseover="this.style.borderColor='#555';this.style.color='#ccc'" onmouseout="this.style.borderColor='#333';this.style.color='#888'">Fechar</button>
         </div>`;
 }
 

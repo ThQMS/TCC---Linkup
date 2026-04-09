@@ -15,7 +15,7 @@ const parseResume = require('../helpers/parseResume');
 const { formatDate, applicationStatusBadge } = require('../helpers/pdfUtils');
 const { applyToJob, cancelApplication, updateApplicationStatus, updateApplicationStage, sendBulkClosingFeedback } = require('../services/applicationService');
 const { findTalentsForJob, notifyRevisitedOpportunities, reactivateContact: _reactivateContact, findSimilarCandidates } = require('../services/talentRediscoveryService');
-const { findSuggestedCandidates, contactSuggestedCandidate } = require('../services/similarCandidatesService');
+const { findSuggestedCandidates, findCandidatesSimilarTo, contactSuggestedCandidate } = require('../services/similarCandidatesService');
 
 exports.showAdd = (req, res) => res.render('add', { csrfToken: res.locals.csrfToken });
 
@@ -66,9 +66,11 @@ exports.view = async (req, res) => {
             order: [['createdAt', 'DESC']]
         });
 
+        const isOwner = !!(req.user && req.user.id === job.UserId);
         res.render('view', {
             job: job.toJSON(), alreadyApplied, hasResume,
             isCandidate: req.user && req.user.userType === 'candidato',
+            isOwner,
             isFavorited, applicantsCount,
             similarJobs: similarJobs.map(j => j.toJSON()),
             csrfToken:   res.locals.csrfToken
@@ -693,17 +695,7 @@ exports.getSimilarCandidates = async (req, res) => {
         const job = await Job.findByPk(target.jobId);
         if (!job || job.UserId !== req.user.id) return res.status(403).json({ error: 'Sem permissão.' });
 
-        const applications = await Application.findAll({
-            where:   { jobId: job.id },
-            include: [{ model: User, as: 'candidate', attributes: ['id', 'name', 'email', 'city', 'avatar'] }]
-        });
-
-        const userIds   = applications.map(a => a.userId);
-        const resumes   = await Resume.findAll({ where: { userId: { [Op.in]: userIds } } });
-        const resumeMap = Object.fromEntries(resumes.map(r => [r.userId, r]));
-        const allData   = applications.map(a => ({ ...a.toJSON(), candidate: a.candidate ? a.candidate.toJSON() : {} }));
-
-        const similar = findSimilarCandidates(target.toJSON(), job.toJSON(), allData, resumeMap);
+        const similar = await findCandidatesSimilarTo(target.userId, job.id, req.user.id);
         res.json({ similar });
     } catch (e) {
         logger.error('jobsController', 'Erro ao buscar similares', { err: e.message });

@@ -11,7 +11,7 @@ app.use(require('helmet')({
     contentSecurityPolicy: {
         directives: {
             defaultSrc:    ["'self'"],
-            scriptSrc:     ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+            scriptSrc:     ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "blob:"],
             scriptSrcAttr: ["'unsafe-inline'"],
             styleSrc:      ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
             fontSrc:       ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
@@ -44,8 +44,10 @@ app.use((req, res) => res.status(404).render('404', { layout: false }));
 
 app.use((err, req, res, next) => {
     if (err.code === 'EBADCSRFTOKEN') {
+        const isAjax = req.xhr || (req.headers.accept || '').includes('application/json') || (req.headers['content-type'] || '').includes('application/json');
+        if (isAjax) return res.status(403).json({ error: 'Token de segurança expirado. Recarregue a página.' });
         req.flash('error_msg', 'Token de segurança expirado. Tente novamente.');
-        return res.redirect('/login');
+        return res.redirect('back');
     }
     logger.error('app', 'Erro não tratado', { err: err.message, stack: err.stack });
     res.status(500).render('500', { layout: false });

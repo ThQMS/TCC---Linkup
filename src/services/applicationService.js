@@ -67,22 +67,31 @@ async function applyToJob({ job, user, resume, answers, coverLetter }) {
  * @param {object} opts.expressApp  - req.app (para Socket.io)
  */
 async function updateApplicationStatus({ application, job, status, expressApp }) {
+    const previousStatus = application.status;
     await application.update({ status });
 
-    const isApproved  = status === 'aprovado';
-    const isRejected  = status === 'rejeitado';
-    const isContrated = status === 'contratado';
+    const isApproved       = status === 'aprovado';
+    const isRejected       = status === 'rejeitado';
+    const isContrated      = status === 'contratado';
+    const wasDisqualified  = isRejected && previousStatus === 'aprovado';
 
     if (isApproved || isRejected || isContrated) {
+        let notificationMessage;
+        if (isContrated) {
+            notificationMessage = 'Parabéns! Você foi contratado(a) para a vaga "' + job.title + '" na ' + job.company + '! 🎉';
+        } else if (isApproved) {
+            notificationMessage = 'Parabéns! Sua candidatura para "' + job.title + '" foi aprovada! 🎉';
+        } else if (wasDisqualified) {
+            notificationMessage = 'Informamos que sua aprovação para a vaga "' + job.title + '" em ' + job.company + ' foi cancelada. Agradecemos sua participação no processo seletivo.';
+        } else {
+            notificationMessage = 'Sua candidatura para "' + job.title + '" não foi selecionada desta vez. Continue explorando oportunidades!';
+        }
+
         await Notification.create({
             userId:  application.userId,
-            message: isContrated
-                ? 'Parabéns! Você foi contratado(a) para a vaga "' + job.title + '" na ' + job.company + '! 🎉'
-                : isApproved
-                    ? 'Parabéns! Sua candidatura para "' + job.title + '" foi aprovada! 🎉'
-                    : 'Sua candidatura para "' + job.title + '" não foi aprovada desta vez.',
-            type: (isApproved || isContrated) ? 'success' : 'danger',
-            link: '/jobs/view/' + job.id
+            message: notificationMessage,
+            type:    (isApproved || isContrated) ? 'success' : 'danger',
+            link:    '/jobs/view/' + job.id
         });
     }
 
@@ -91,8 +100,21 @@ async function updateApplicationStatus({ application, job, status, expressApp })
         message: 'Candidatura para ' + job.title + ': ' + status
     });
 
+    if (isContrated) {
+        await Notification.create({
+            userId:  job.UserId,
+            message: 'Contratação realizada! ' + (await User.findByPk(application.userId).then(u => u ? u.name : 'Candidato')) + ' foi contratado(a) para "' + job.title + '". Lembre-se de encerrar a vaga se a posição foi preenchida.',
+            type:    'success',
+            link:    '/jobs/applications/' + job.id
+        });
+        sendSocketNotification(expressApp, job.UserId, {
+            title:   'Contratação realizada!',
+            message: 'Encerre a vaga "' + job.title + '" se a posição foi preenchida.'
+        });
+    }
+
     if (isRejected) {
-        _sendRejectionFeedback(job, application.userId);
+        _sendRejectionFeedback(job, application.userId, wasDisqualified);
     }
     if (isContrated) {
         _sendCongratsEmail(job, application.userId);
@@ -246,26 +268,34 @@ async function _scoreOpenAnswers(job, answersJson, userId) {
     }
 }
 
-async function _sendRejectionFeedback(job, candidateId) {
+async function _sendRejectionFeedback(job, candidateId, wasDisqualified = false) {
     try {
         const candidate = await User.findByPk(candidateId);
         if (!candidate) return;
         const resume = await Resume.findOne({ where: { userId: candidateId } });
         const { skills, experiences: exps } = parseResume(resume);
 
+        const prompt = wasDisqualified
+            ? 'Gere uma mensagem profissional e empática informando que o candidato foi desclassificado após ter sido aprovado em um processo seletivo.\n\nVAGA: ' + job.title + ' na ' + job.company + '\n\nINSTRUÇÕES:\n- Tom respeitoso e profissional\n- Máximo 3 parágrafos\n- Explique que imprevistos podem ocorrer em processos seletivos\n- Encoraje o candidato a continuar buscando oportunidades\n- Português brasileiro\n- Comece com "Olá, ' + candidate.name + ',"'
+            : 'Gere um feedback de rejeição construtivo e respeitoso.\n\nVAGA: ' + job.title + ' na ' + job.company + '\nREQUISITOS: ' + (job.requirements || 'Não informados') + '\n\nCANDIDATO:\nHabilidades: ' + (skills.join(', ') || 'Não informadas') + '\nExperiências: ' + (exps.map(e => e.role).join(', ') || 'Não informadas') + '\n\nINSTRUÇÕES:\n- Tom respeitoso\n- Máximo 3 parágrafos\n- Sem falsas esperanças\n- Sugira como melhorar\n- Português brasileiro\n- Comece com "Olá, ' + candidate.name + ',"';
+
         const feedback = await chatComplete(
-            [{ role: 'user', content: 'Gere um feedback de rejeição construtivo e respeitoso.\n\nVAGA: ' + job.title + ' na ' + job.company + '\nREQUISITOS: ' + (job.requirements || 'Não informados') + '\n\nCANDIDATO:\nHabilidades: ' + (skills.join(', ') || 'Não informadas') + '\nExperiências: ' + (exps.map(e => e.role).join(', ') || 'Não informadas') + '\n\nINSTRUÇÕES:\n- Tom respeitoso\n- Máximo 3 parágrafos\n- Sem falsas esperanças\n- Sugira como melhorar\n- Português brasileiro\n- Comece com "Olá, ' + candidate.name + ',"' }],
+            [{ role: 'user', content: prompt }],
             { max_tokens: 400, temperature: 0.7 }
         );
         if (!feedback) return;
 
+        const subject = wasDisqualified
+            ? `Atualização sobre sua aprovação — ${job.title}`
+            : `Atualização sobre sua candidatura — ${job.title}`;
+
         await transporter.sendMail({
             from:    `"LinkUp" <${process.env.GMAIL_USER}>`,
             to:      candidate.email,
-            subject: `Atualização sobre sua candidatura — ${job.title}`,
+            subject,
             html:    `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;"><div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;"><h2 style="color:#f03e3e;margin:0;">Link<span style="color:white;">Up</span></h2></div><div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;"><p style="white-space:pre-wrap;">${feedback}</p><p style="color:#888;font-size:0.85rem;margin-top:16px;">Continue explorando novas oportunidades no LinkUp.</p><a href="${process.env.BASE_URL || 'http://localhost:3000'}" style="display:inline-block;background:#f03e3e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">Ver Vagas</a></div></div>`
         });
-        logger.info('applicationService', 'E-mail de auto-feedback enviado', { candidateId: candidate.id });
+        logger.info('applicationService', 'E-mail de feedback enviado', { candidateId: candidate.id, wasDisqualified });
     } catch (e) {
         logger.error('applicationService', 'Erro no auto-feedback', { err: e.message });
     }

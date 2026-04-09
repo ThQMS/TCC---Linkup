@@ -123,6 +123,107 @@ async function findSuggestedCandidates(jobId, companyUserId) {
     }
 }
 
+// ─── Buscar candidatos similares a um candidato específico (fora da vaga) ────────
+
+/**
+ * Encontra candidatos da plataforma que são similares a um candidato específico
+ * e que ainda NÃO se candidataram à vaga informada.
+ *
+ * Similaridade = Jaccard entre skills do alvo e do candidato externo.
+ * combinedScore = fitScore (vaga) × 0.5 + similarity (perfil) × 0.5
+ *
+ * @param {number} targetUserId  - userId do candidato de referência
+ * @param {number} jobId         - ID da vaga (para excluir já-candidatos)
+ * @param {number} companyUserId - ID da empresa (ownership)
+ * @returns {Promise<Array<{candidate, fitScore, similarity, combinedScore, commonSkills}>>}
+ */
+async function findCandidatesSimilarTo(targetUserId, jobId, companyUserId) {
+    try {
+        const [job, targetResume] = await Promise.all([
+            Job.findByPk(jobId),
+            Resume.findOne({ where: { userId: targetUserId } })
+        ]);
+
+        if (!job || job.UserId !== companyUserId) return [];
+
+        const { skills: targetSkills } = parseResume(targetResume);
+        const targetSkillSet = new Set(targetSkills.map(s => s.toLowerCase().trim()));
+
+        // IDs que já se candidataram a esta vaga (inclui o próprio candidato alvo)
+        const existingApps = await Application.findAll({
+            where:      { jobId },
+            attributes: ['userId']
+        });
+        const appliedIds = new Set(existingApps.map(a => a.userId));
+        appliedIds.add(companyUserId);
+
+        const appliedIdsArr = [...appliedIds];
+        const candidates = await User.findAll({
+            where: {
+                userType: 'candidato',
+                id:       { [Op.notIn]: appliedIdsArr.length ? appliedIdsArr : [0] }
+            },
+            attributes: ['id', 'name', 'email', 'city', 'avatar', 'availabilityStatus'],
+            limit:       MAX_SCAN
+        });
+
+        if (candidates.length === 0) return [];
+
+        const candidateIds = candidates.map(u => u.id);
+        const resumes      = await Resume.findAll({ where: { userId: { [Op.in]: candidateIds } } });
+        const resumeMap    = Object.fromEntries(resumes.map(r => [r.userId, r]));
+
+        const jobJson = job.toJSON();
+        const results = [];
+
+        for (const user of candidates) {
+            if (!isAvailable(user)) continue;
+
+            const resume = resumeMap[user.id];
+            if (!resume) continue;
+
+            const { skills } = parseResume(resume);
+            const skillSet = new Set(skills.map(s => s.toLowerCase().trim()));
+
+            let similarity = 0;
+            if (targetSkillSet.size > 0 && skillSet.size > 0) {
+                const common = [...targetSkillSet].filter(s => skillSet.has(s));
+                const union  = new Set([...targetSkillSet, ...skillSet]);
+                similarity   = Math.round((common.length / union.size) * 100);
+            }
+
+            const fitScore     = calcFitScore(resume, jobJson);
+            const combinedScore = Math.round(fitScore * 0.5 + similarity * 0.5);
+            if (combinedScore < 20) continue;
+
+            const commonSkills = targetSkills
+                .filter(s => skillSet.has(s.toLowerCase().trim()))
+                .slice(0, 5);
+
+            results.push({
+                candidate: {
+                    id:     user.id,
+                    name:   user.name,
+                    email:  user.email,
+                    city:   user.city   || null,
+                    avatar: user.avatar || null
+                },
+                fitScore,
+                similarity,
+                combinedScore,
+                commonSkills
+            });
+        }
+
+        return results
+            .sort((a, b) => b.combinedScore - a.combinedScore)
+            .slice(0, MAX_RESULTS);
+    } catch (err) {
+        logger.error('similarCandidatesService', 'Erro em findCandidatesSimilarTo', { targetUserId, jobId, err: err.message });
+        return [];
+    }
+}
+
 // ─── Contatar candidato sugerido ───────────────────────────────────────────────
 
 /**
@@ -204,4 +305,4 @@ async function contactSuggestedCandidate(jobId, candidateId, companyUserId, expr
     }
 }
 
-module.exports = { findSuggestedCandidates, contactSuggestedCandidate };
+module.exports = { findSuggestedCandidates, findCandidatesSimilarTo, contactSuggestedCandidate };

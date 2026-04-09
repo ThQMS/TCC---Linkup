@@ -434,7 +434,7 @@ function findSimilarCandidates(targetApplication, job, allApplications, resumeMa
     });
 
     return scored
-        .filter(s => s.fitScore >= 50)
+        .filter(s => (s.fitScore * 0.7 + s.similarity * 0.3) >= 20)
         .sort((a, b) => (b.fitScore * 0.7 + b.similarity * 0.3) - (a.fitScore * 0.7 + a.similarity * 0.3))
         .slice(0, limit);
 }

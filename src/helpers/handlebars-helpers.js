@@ -2,6 +2,8 @@ module.exports = {
 
     eq: (v1, v2) => v1 === v2,
 
+    or: (a, b) => a || b,
+
     isOwner: (loggedInUserId, jobOwnerId) => loggedInUserId === jobOwnerId,
 
     isRecruiter: (userType) => userType === 'recrutador' || userType === 'empresa',

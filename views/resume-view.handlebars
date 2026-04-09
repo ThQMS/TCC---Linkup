@@ -301,9 +301,16 @@ function selectTemplate(key, name) {
 }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/js/jspdf.umd.min.js"
+  onerror="window._jspdfFailed=true"></script>
 <script>
-const { jsPDF } = window.jspdf;
+let jsPDF;
+try {
+  if (window._jspdfFailed || !window.jspdf) throw new Error('jsPDF não carregou');
+  jsPDF = window.jspdf.jsPDF;
+} catch(e) {
+  console.error('jsPDF não disponível:', e);
+}
 
 function hex2rgb(hex) {
   hex = hex.replace('#','');
@@ -665,10 +672,24 @@ function buildCreative(d) {
 }
 
 function exportPDF() {
-  const d = RESUME_DATA;
-  if(selectedTemplate==='refined')  buildRefined(d);
-  if(selectedTemplate==='elegant')  buildElegant(d);
-  if(selectedTemplate==='twocol')   buildTwoCol(d);
-  if(selectedTemplate==='creative') buildCreative(d);
+  if (!jsPDF) {
+    alert('Erro: biblioteca de PDF não carregou. Verifique sua conexão com a internet e tente novamente.');
+    return;
+  }
+  const btn = document.querySelector('button[onclick="exportPDF()"]');
+  const originalHtml = btn ? btn.innerHTML : '';
+  try {
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Gerando...'; }
+    const d = RESUME_DATA;
+    if (selectedTemplate === 'refined')  buildRefined(d);
+    if (selectedTemplate === 'elegant')  buildElegant(d);
+    if (selectedTemplate === 'twocol')   buildTwoCol(d);
+    if (selectedTemplate === 'creative') buildCreative(d);
+  } catch(e) {
+    console.error('Erro ao gerar PDF:', e);
+    alert('Erro ao gerar o PDF: ' + e.message + '\n\nVerifique o console para mais detalhes.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
+  }
 }
 </script>

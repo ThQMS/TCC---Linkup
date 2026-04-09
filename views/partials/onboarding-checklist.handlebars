@@ -99,7 +99,7 @@
     window.dismissChecklist = function () {
         fetch('/onboarding/checklist/dismiss', {
             method:  'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{../csrfToken}}' }
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '{{csrfToken}}' }
         }).finally(() => {
             const card = document.getElementById('onboarding-checklist-card');
             if (card) {
