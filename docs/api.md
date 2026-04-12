@@ -1,6 +1,10 @@
 # Referência da API — LinkUp
 
-> **Documentação interativa completa:** com o servidor rodando, acesse `http://localhost:3000/api-docs` para a referência Swagger UI com todos os 61 endpoints, schemas de request/response e agrupamento por domínio. Este arquivo cobre os endpoints principais de forma estática.
+> **Documentação interativa completa:** visualize o spec OpenAPI 3.0 diretamente no navegador — sem precisar rodar o servidor:
+> - [Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/ThQMS/TCC---Linkup/main/docs/api.json)
+> - [Redocly](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/ThQMS/TCC---Linkup/main/docs/api.json)
+>
+> O spec ([`docs/api.json`](api.json)) cobre todos os 61 endpoints com schemas de request/response e agrupamento por domínio. Para atualizar após mudanças nas rotas: `npm run docs:export`.
 
 O LinkUp expõe uma API HTTP server-rendered. Endpoints de dados e IA retornam JSON; envios de formulário retornam redirecionamentos com mensagens flash.
 

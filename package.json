@@ -12,7 +12,8 @@
     "seed:docker": "docker compose exec app node seed.js",
     "test": "jest --config tests/jest.config.js",
     "test:watch": "jest --config tests/jest.config.js --watch",
-    "test:coverage": "jest --config tests/jest.config.js --coverage"
+    "test:coverage": "jest --config tests/jest.config.js --coverage",
+    "docs:export": "node scripts/export-swagger.js"
   },
   "keywords": [
     "dev",

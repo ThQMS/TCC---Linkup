@@ -13,6 +13,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
 [![CI](https://github.com/ThQMS/TCC---Linkup/actions/workflows/ci.yml/badge.svg)](https://github.com/ThQMS/TCC---Linkup/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/Licença-MIT-green?style=for-the-badge)](LICENSE)
+[![API Docs](https://img.shields.io/badge/API_Docs-OpenAPI_3.0-85EA2D?style=for-the-badge&logo=swagger&logoColor=white)](https://editor.swagger.io/?url=https://raw.githubusercontent.com/ThQMS/TCC---Linkup/main/docs/api.json)
 
 </div>
 
@@ -375,7 +376,7 @@ Siga o guia completo em [`docs/getting-started-docker.md`](docs/getting-started-
 3. `docker compose build && docker compose up -d`
 4. `docker compose exec app npx sequelize-cli db:migrate`
 5. Acesse `http://localhost:3000`
-6. Documentação interativa da API em `http://localhost:3000/api-docs`
+6. Documentação da API: [Swagger Editor online](https://editor.swagger.io/?url=https://raw.githubusercontent.com/ThQMS/TCC---Linkup/main/docs/api.json) (sem servidor) ou `http://localhost:3000/api-docs` (com servidor rodando)
 
 ---
 
@@ -470,7 +471,7 @@ Documentação completa da suíte: [`docs/testing.md`](docs/testing.md)
 | [docs/engineering-principles.md](docs/engineering-principles.md) | Padrões de engenharia e princípios de design |
 | [docs/api.md](docs/api.md) | Referência estática da API — endpoints e payloads |
 | [docs/testing.md](docs/testing.md) | Suíte de testes — arquitetura, cobertura e convenções |
-| `localhost:3000/api-docs` | Documentação interativa da API (Swagger UI — requer servidor rodando) |
+| [docs/api.json](docs/api.json) | OpenAPI 3.0 spec (gerado por `npm run docs:export`) — visualize em [Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/ThQMS/TCC---Linkup/main/docs/api.json) ou [Redocly](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/ThQMS/TCC---Linkup/main/docs/api.json) |
 
 ---
 
