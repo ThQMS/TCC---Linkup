@@ -26,23 +26,6 @@ const options = {
         ],
         components: {
             schemas: {
-                Job: {
-                    type: 'object',
-                    properties: {
-                        id:           { type: 'integer' },
-                        title:        { type: 'string', example: 'Desenvolvedor React' },
-                        company:      { type: 'string', example: 'TechBridge' },
-                        description:  { type: 'string' },
-                        requirements: { type: 'string' },
-                        benefits:     { type: 'string' },
-                        differential: { type: 'string' },
-                        salary:       { type: 'string', example: '7.000 - 10.000' },
-                        modality:     { type: 'string', enum: ['remoto', 'presencial', 'híbrido'] },
-                        status:       { type: 'string', enum: ['aberta', 'pausada', 'encerrada'] },
-                        isPcd:        { type: 'boolean' },
-                        views:        { type: 'integer' }
-                    }
-                },
                 AiCompatibilityResponse: {
                     type: 'object',
                     properties: {
