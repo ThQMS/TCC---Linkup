@@ -9,7 +9,7 @@ exports.tailor = async (req, res) => {
         if (req.user.userType !== 'candidato') return res.status(403).json({ error: 'Apenas candidatos.' });
 
         const job = await Job.findByPk(parseInt(req.params.jobId, 10));
-        if (!job) return res.status(404).json({ error: 'Vaga não encontrada.' });
+        if (!job || job.status !== 'aberta') return res.status(404).json({ error: 'Vaga não encontrada.' });
 
         const resume = await Resume.findOne({ where: { userId: req.user.id } });
         if (!resume) return res.status(400).json({ error: 'Crie seu currículo antes de usar esta funcionalidade.' });

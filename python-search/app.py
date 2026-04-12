@@ -52,5 +52,8 @@ def cache_clear():
     return jsonify({ 'ok': True })
 
 if __name__ == '__main__':
-    print('[LINKUP SEARCH] Iniciando microservico na porta 5001...')
-    app.run(host='127.0.0.1', port=5001, debug=False)
+    import os
+    port = int(os.environ.get('PORT', 5001))
+    host = os.environ.get('HOST', '127.0.0.1')
+    print(f'[LINKUP SEARCH] Iniciando microservico em {host}:{port}...')
+    app.run(host=host, port=port, debug=False)

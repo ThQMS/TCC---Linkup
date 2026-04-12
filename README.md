@@ -4,12 +4,14 @@
 
 **Infraestrutura inteligente de recrutamento para o mercado brasileiro.**
 
-[![Node.js](https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io)
 [![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3_70B-F55036?style=for-the-badge)](https://groq.com)
 [![Python](https://img.shields.io/badge/Python_Flask-Busca_Semântica-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
+[![CI](https://github.com/ThQMS/TCC---Linkup/actions/workflows/ci.yml/badge.svg)](https://github.com/ThQMS/TCC---Linkup/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/Licença-MIT-green?style=for-the-badge)](LICENSE)
 
 </div>
@@ -62,7 +64,7 @@ Candidatos podem cancelar candidaturas com status **Pendente** diretamente em "M
 Empresas definem etapas customizadas por vaga (ex: Triagem → Entrevista Técnica → Proposta). Cada transição é registrada com timestamp. Quando a vaga é encerrada, o sistema gera feedback escrito por IA, personalizado por candidato, para todos os não contratados — reduzindo abandono e protegendo a marca empregadora.
 
 ### Suite de Features de IA (Groq / LLaMA 3.3 70B)
-Nove features distintas alimentadas por IA, cada uma medida e registrada:
+11 features distintas alimentadas por IA, cada uma medida e registrada em `AiLog`:
 
 | Feature | Perfil | Descrição |
 |---|---|---|
@@ -70,10 +72,12 @@ Nove features distintas alimentadas por IA, cada uma medida e registrada:
 | Tailoring de Currículo | Candidato | Adapta o currículo aos requisitos da vaga |
 | Score de Compatibilidade | Candidato | Explica lacunas de fit antes de candidatar |
 | Simulação de Entrevista | Candidato | Perguntas por vaga com avaliação por IA |
+| Melhoria de Currículo | Candidato | Reescreve resumo e experiências com formato profissional/STAR via IA |
+| Importação de Currículo com IA | Candidato | Extrai dados automaticamente de um PDF de currículo via IA |
 | Ranqueamento de Candidatos | Empresa | Ranking por compatibilidade com justificativa |
 | Comparação de Candidatos | Empresa | Análise IA lado a lado de 2 a 3 candidatos |
 | Bias Auditor | Empresa | Detecta linguagem excludente na descrição da vaga |
-| Chat Contextual | Ambos | IA conversacional vinculada a uma vaga específica |
+| Chat Contextual | Candidato | IA conversacional vinculada a uma vaga específica, com contexto do perfil do candidato |
 | Melhoria de Vaga | Empresa | Sugestões para melhorar a qualidade e alcance da publicação |
 
 ### Dashboard de Métricas de IA
@@ -284,8 +288,9 @@ As features de IA são a alavanca principal de monetização — cada chamada de
 - ✅ Sessão persistente no PostgreSQL via connect-pg-simple ("Lembrar de mim" funcional)
 
 ### v1.1 — Planejado
-- ✅ Suíte de testes Jest — 114 testes cobrindo services críticos (SQLite in-memory, fake timers)
-- ⬜ Redis session store + Socket.io adapter para implantação multi-instância
+- ✅ Suíte de testes Jest — 172 testes cobrindo services críticos (SQLite in-memory, fake timers)
+- ✅ Pipeline CI com GitHub Actions — testes automáticos a cada push em qualquer branch
+- ✅ Socket.io Redis adapter condicional (`@socket.io/redis-adapter`) para implantação multi-instância
 - ⬜ Fila Bull para jobs de IA (desacoplar do ciclo de requisição)
 - ⬜ Integração pgvector (eliminar dependência do microserviço Python)
 - ⬜ Suporte a webhooks para integrações ATS
@@ -353,7 +358,7 @@ linkup/
 │   └── partials/
 ├── public/                    # Assets estáticos
 ├── python-search/             # Microserviço de busca semântica (Flask)
-├── migrations/                # Histórico de migrações do schema PostgreSQL (30 arquivos)
+├── migrations/                # Histórico de migrações do schema PostgreSQL (28 arquivos)
 └── docs/                      # Documentação técnica
 ```
 
@@ -361,27 +366,65 @@ linkup/
 
 ## Primeiros Passos
 
-Veja [docs/deployment.md](docs/deployment.md) para o guia completo de configuração.
+O LinkUp roda inteiramente via Docker — sem necessidade de instalar Node.js, Python ou PostgreSQL manualmente.
 
-```bash
-# Clonar e instalar
-git clone <repo> && cd linkup
-npm install
+Siga o guia completo em [`docs/getting-started-docker.md`](docs/getting-started-docker.md):
 
-# Configurar ambiente
-cp .env.example .env   # preencher variáveis obrigatórias
+1. Instale o Docker Desktop com backend WSL2
+2. Copie `.env.example` para `.env` e preencha as variáveis obrigatórias
+3. `docker compose build && docker compose up -d`
+4. `docker compose exec app npx sequelize-cli db:migrate`
+5. Acesse `http://localhost:3000`
+6. Documentação interativa da API em `http://localhost:3000/api-docs`
 
-# Banco de dados
-npx sequelize-cli db:migrate
-node seed.js           # opcional: popular com dados de teste
+---
 
-# Iniciar microserviço Python (terminal separado)
-cd python-search && pip install -r requirements.txt && python app.py
+## CI/CD
 
-# Iniciar aplicação
-npm run dev            # desenvolvimento
-npm start              # produção
+### Integração Contínua (CI) — Implementado
+
+O pipeline de CI roda automaticamente via **GitHub Actions** a cada push em qualquer branch e em todo Pull Request aberto para `main`.
+
 ```
+git push
+    ↓
+GitHub Actions sobe ubuntu-latest
+    ↓
+npm ci — instala dependências
+    ↓
+npm test — roda os 172 testes Jest (SQLite in-memory, sem dependências externas)
+    ↓
+✅ Verde: branch saudável   ❌ Vermelho: notificação por e-mail
+```
+
+Arquivo de configuração: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+
+### Entrega Contínua (CD) — Proposta Futura
+
+Com a infraestrutura Docker já definida (`Dockerfile` + `docker-compose.yml`), o caminho natural para CD é:
+
+| Etapa | Ferramenta | Descrição |
+|---|---|---|
+| Registry de imagens | Docker Hub ou GitHub Container Registry | Armazena as imagens buildadas |
+| Plataforma de deploy | Railway, Render ou VPS (DigitalOcean/Hetzner) | Hospeda os containers em produção |
+| Pipeline CD | GitHub Actions (job adicional) | Após CI verde na `main`: build da imagem, push para registry e deploy automático |
+| Secrets | GitHub Secrets | Credenciais de produção isoladas do código |
+
+**Fluxo completo proposto:**
+
+```
+Push na main → CI passa
+                  ↓
+            Build da imagem Docker
+                  ↓
+            Push para registry
+                  ↓
+            Deploy no servidor (zero-downtime com health check)
+                  ↓
+            Notificação de sucesso/falha
+```
+
+Esse pipeline preserva a separação já existente entre os três serviços (`app`, `db`, `search`), permitindo atualização independente de cada container sem derrubar os demais.
 
 ---
 
@@ -393,7 +436,7 @@ npm run test:watch      # modo interativo
 npm run test:coverage   # com relatório de cobertura
 ```
 
-**106 testes** distribuídos em 7 suites cobrindo as regras de negócio críticas:
+**172 testes** distribuídos em 10 suites cobrindo as regras de negócio críticas:
 
 | Suite | Testes | Cobre |
 |---|---|---|
@@ -404,6 +447,11 @@ npm run test:coverage   # com relatório de cobertura
 | `similarCandidates` | 15 | Candidatos sugeridos, convite, prevenção de duplicata |
 | `availabilityService` | 17 | Sistema de 4 status, sincronização `openToWork`, regras automáticas |
 | `jobs.routes` | 16 | Integração `POST /apply` — route → controller → service → banco |
+| `responsividadeService` | 14 | `calcularMetricas` (taxa, tempo médio, Selo Empresa Responsiva) |
+| `onboardingService` | 20 | Checklist de onboarding candidato (6 itens) e empresa (7 itens) |
+| `searchService` | 24 | Paginação, empresas bloqueadas, fallback SQL, badges de responsividade |
+
+**Cobertura:** statements 76% · branches 68% · functions 71% · lines 79%
 
 **Infraestrutura:** Jest 29 · Supertest · SQLite em memória (sem PostgreSQL local necessário) · timers falsos (`jest.useFakeTimers`) onde aplicável.
 
@@ -415,11 +463,14 @@ Documentação completa da suíte: [`docs/testing.md`](docs/testing.md)
 
 | Documento | Descrição |
 |---|---|
-| [docs/api.md](docs/api.md) | Referência da API REST — endpoints, payloads, status HTTP |
+| [docs/getting-started-docker.md](docs/getting-started-docker.md) | Guia de instalação passo a passo via Docker |
+| [docs/deployment.md](docs/deployment.md) | Variáveis de ambiente, scripts e deploy em produção |
 | [docs/architecture.md](docs/architecture.md) | Arquitetura do sistema, fluxos de dados, ADRs |
+| [docs/business-rules.md](docs/business-rules.md) | Regras de negócio documentadas por domínio |
 | [docs/engineering-principles.md](docs/engineering-principles.md) | Padrões de engenharia e princípios de design |
-| [docs/deployment.md](docs/deployment.md) | Configuração de ambiente e deploy em produção |
+| [docs/api.md](docs/api.md) | Referência estática da API — endpoints e payloads |
 | [docs/testing.md](docs/testing.md) | Suíte de testes — arquitetura, cobertura e convenções |
+| `localhost:3000/api-docs` | Documentação interativa da API (Swagger UI — requer servidor rodando) |
 
 ---
 

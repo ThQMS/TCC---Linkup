@@ -19,7 +19,12 @@ module.exports = {
     dialect:  'postgres',
     logging:  false,
     dialectOptions: {
-      ssl: { require: true, rejectUnauthorized: false }
+      // DB_SSL_REJECT_UNAUTHORIZED=false apenas quando o provedor usa certificado self-signed
+      // (ex: Railway interno). Em produção com TLS próprio, manter true (padrão).
+      ssl: {
+        require:             true,
+        rejectUnauthorized:  process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
+      }
     }
   }
 };

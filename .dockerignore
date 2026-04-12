@@ -1,0 +1,30 @@
+node_modules
+.env
+.env.*
+.git
+.gitignore
+
+# Python
+python-search/venv
+python-search/__pycache__
+python-search/*.pyc
+
+# Testes e cobertura
+tests
+coverage
+.nyc_output
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Build artifacts e temporários
+*.tmp
+dist
+build
+
+# Docs e misc
+docs
+*.md
+*.bat

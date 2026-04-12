@@ -1,5 +1,7 @@
 # Referência da API — LinkUp
 
+> **Documentação interativa completa:** com o servidor rodando, acesse `http://localhost:3000/api-docs` para a referência Swagger UI com todos os 61 endpoints, schemas de request/response e agrupamento por domínio. Este arquivo cobre os endpoints principais de forma estática.
+
 O LinkUp expõe uma API HTTP server-rendered. Endpoints de dados e IA retornam JSON; envios de formulário retornam redirecionamentos com mensagens flash.
 
 **URL Base:** `http://localhost:3000` (desenvolvimento)
@@ -107,6 +109,22 @@ _csrf     string  obrigatório
 
 ---
 
+### POST /auth/resend-code
+Reenvia o código de verificação de e-mail para o usuário.
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /auth/verify  Código reenviado
+429                   Rate limit excedido
+```
+
+---
+
 ### GET /auth/logout
 Destrói a sessão.
 
@@ -160,6 +178,22 @@ _csrf         string   obrigatório
 ```
 302  →  /jobs/view/:id  Vaga criada
 302  →  /jobs/add       Erro de validação
+```
+
+---
+
+### GET /jobs/edit/:id
+Exibe o formulário de edição de uma vaga pré-preenchido. Exige ser o dono da vaga.
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da vaga
+```
+
+**Respostas**
+```
+200  HTML do formulário com dados atuais
+302  →  /  Sem autorização
 ```
 
 ---
@@ -237,6 +271,250 @@ _csrf          string   obrigatório
 **Respostas**
 ```
 302  →  /jobs/applications/:jobId  Etapa atualizada, candidato notificado
+```
+
+---
+
+### POST /jobs/delete/:id
+Exclui uma vaga. Exige ser o dono da vaga.
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da vaga
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /profile  Excluída
+302  →  /         Sem autorização
+```
+
+---
+
+### POST /jobs/cancel/:applicationId
+Cancela uma candidatura com status `pendente`. Notifica a empresa via Socket.io e e-mail.
+
+**Parâmetros**
+```
+applicationId  integer  obrigatório
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /jobs/my-applications  Cancelada
+302  →  /jobs/my-applications  Status não é pendente (flash: error_msg)
+```
+
+---
+
+### POST /jobs/favorite/:id
+Favorita ou desfavorita uma vaga (toggle). Exige conta candidato.
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da vaga
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /jobs/view/:id
+```
+
+---
+
+### GET /jobs/favorites
+Lista as vagas favoritadas pelo candidato logado.
+
+**Respostas**
+```
+200  HTML com lista de vagas favoritas
+```
+
+---
+
+### GET /jobs/my-applications
+Lista todas as candidaturas do candidato logado com status, etapa atual e dados da empresa.
+
+**Respostas**
+```
+200  HTML com lista de candidaturas
+```
+
+---
+
+### GET /jobs/my-applications/pdf
+Exporta o histórico de candidaturas em PDF.
+
+**Respostas**
+```
+200  Content-Type: application/pdf
+```
+
+---
+
+### POST /jobs/block-company/:companyId
+Bloqueia uma empresa. Vagas dessa empresa são excluídas automaticamente dos resultados de busca do candidato.
+
+**Parâmetros**
+```
+companyId  integer  obrigatório
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  página anterior
+```
+
+---
+
+### GET /jobs/applications/:id
+Lista os candidatos de uma vaga. Exige conta empresa e propriedade da vaga.
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da vaga
+```
+
+**Respostas**
+```
+200  HTML com lista de candidatos, scores, etapas e painel de candidatos sugeridos
+```
+
+---
+
+### POST /jobs/reactivate-contact/:jobId/:candidateId
+Reenvia convite a um candidato da base histórica (redescoberta de talentos).
+
+**Parâmetros**
+```
+jobId        integer  obrigatório
+candidateId  integer  obrigatório
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /jobs/talents/:jobId  E-mail reenviado
+302  →  /jobs/talents/:jobId  Erro (flash: error_msg)
+```
+
+---
+
+### POST /jobs/ai/cover-letter/:id
+Gera carta de apresentação personalizada para a vaga. Retorna JSON.
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da vaga
+```
+
+**Headers**
+```
+X-CSRF-Token  string  obrigatório
+Content-Type  application/json
+```
+
+**Resposta 200**
+```json
+{
+  "letter": "Prezados(as) recrutadores(as) da TechBridge..."
+}
+```
+
+**Respostas**
+```
+200  Carta gerada
+400  { "error": "Currículo não encontrado" }
+429  Rate limit de IA excedido
+```
+
+---
+
+### POST /jobs/ai/improve
+Melhora um campo de texto da descrição da vaga (empresa). Retorna JSON.
+
+**Body (JSON)**
+```json
+{
+  "fieldLabel": "Descrição",
+  "content": "Procuramos dev para trabalhar no produto...",
+  "title": "Desenvolvedor React"
+}
+```
+
+**Resposta 200**
+```json
+{
+  "improved": "Buscamos um Desenvolvedor React para integrar nosso time de produto..."
+}
+```
+
+---
+
+### POST /jobs/ai/stages
+Sugere etapas do pipeline para a vaga com base no título e requisitos. Retorna JSON.
+
+**Body (JSON)**
+```json
+{
+  "jobId": 7
+}
+```
+
+**Resposta 200**
+```json
+{
+  "stages": ["Triagem", "Desafio Técnico", "Entrevista com Tech Lead", "Proposta"]
+}
+```
+
+---
+
+### POST /jobs/ai/compatibility/:jobId
+Calcula score de compatibilidade entre o currículo do candidato e a vaga. Retorna JSON.
+
+**Parâmetros**
+```
+jobId  integer  obrigatório
+```
+
+**Resposta 200**
+```json
+{
+  "score": 78,
+  "analysis": "Você atende 6 de 8 requisitos técnicos. Faltam: Docker, Kubernetes."
+}
+```
+
+**Respostas**
+```
+200  Score e análise
+400  { "error": "Currículo não encontrado" }
+403  Usuário não é candidato
 ```
 
 ---
@@ -434,6 +712,28 @@ Retorna resultados de redescoberta de talentos para uma vaga (candidatos previam
 
 ## Currículo — `/resume`
 
+### GET /resume/create
+Exibe o formulário de criação ou edição do currículo, pré-preenchido se já existir.
+
+**Respostas**
+```
+200  HTML do formulário
+302  →  /auth/login  Não autenticado
+```
+
+---
+
+### GET /resume/view
+Exibe o currículo do candidato logado com opções de exportação PDF e acesso às features de IA.
+
+**Respostas**
+```
+200  HTML do currículo
+302  →  /resume/create  Currículo ainda não criado
+```
+
+---
+
 ### POST /resume/save
 Salva ou atualiza o currículo do candidato.
 
@@ -493,6 +793,27 @@ _csrf   string  obrigatório
 302  →  /resume/create  Parseado e pré-preenchido
 302  →  /resume/create  Falha no parsing (flash: error_msg)
 429                     Rate limit de upload (3 / min)
+```
+
+---
+
+### POST /resume/tailoring/apply
+Salva o currículo com o conteúdo reescrito pelo tailoring gerado para uma vaga específica.
+
+**Body (JSON)**
+```json
+{
+  "tailoredData": {
+    "summary": "Engenheiro backend com foco em...",
+    "experiences": [{ "role": "Dev Node.js", "description": "..." }]
+  }
+}
+```
+
+**Respostas**
+```
+200  { "ok": true }
+400  { "error": "Dados inválidos" }
 ```
 
 ---
@@ -575,6 +896,44 @@ Envia uma resposta à pergunta atual da entrevista.
 
 ---
 
+### POST /interview/:jobId/score
+Gera o score final e análise geral de desempenho ao final da entrevista simulada.
+
+**Body (JSON)**
+```json
+{
+  "answers": [
+    { "question": "Como você aborda...", "answer": "Eu costumo..." }
+  ]
+}
+```
+
+**Resposta 200**
+```json
+{
+  "score": 82,
+  "analysis": "Bom desempenho geral. Pontos de melhoria: objetividade nas respostas técnicas."
+}
+```
+
+---
+
+### GET /jobs/:id/chat/ping
+Verifica se o candidato tem permissão para usar o chat nesta vaga (candidatura existe e está ativa).
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da vaga
+```
+
+**Respostas**
+```
+200  { "ok": true }
+403  Sem candidatura ativa nessa vaga
+```
+
+---
+
 ### POST /jobs/:id/chat
 Envia uma mensagem para o chat IA de uma vaga específica.
 
@@ -597,6 +956,127 @@ Envia uma mensagem para o chat IA de uma vaga específica.
 
 ## Perfil e Dashboard — `/profile`
 
+### GET /profile
+Exibe a página de perfil do usuário logado com formulário de edição de dados pessoais.
+
+**Respostas**
+```
+200  HTML do perfil
+```
+
+---
+
+### POST /profile/update
+Atualiza os dados do perfil (nome, bio, cidade, website, setor, etc.).
+
+**Body (form-encoded)**
+```
+name         string  opcional
+bio          text    opcional
+city         string  opcional
+website      string  opcional
+sector       string  opcional  somente empresa
+companySize  string  opcional  somente empresa
+_csrf        string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /profile  Atualizado
+302  →  /profile  Erro de validação (flash: error_msg)
+```
+
+---
+
+### POST /profile/avatar
+Faz upload do avatar do usuário. Aceita JPG, PNG ou WEBP, máximo 3 MB.
+
+**Body (multipart/form-data)**
+```
+avatar  file    obrigatório
+_csrf   string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /profile  Avatar atualizado
+400              Formato inválido ou arquivo muito grande
+429              Rate limit: 3 uploads / min
+```
+
+---
+
+### POST /profile/availability-status
+Atualiza o status de disponibilidade do candidato.
+
+**Body (form-encoded)**
+```
+availabilityStatus  string  obrigatório
+  "Buscando Ativamente" | "Aberto a Oportunidades" |
+  "Em Processo Seletivo" | "Não Disponível"
+_csrf               string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /profile  Status atualizado
+400              Valor inválido
+```
+
+---
+
+### GET /profile/my-jobs
+Lista as vagas publicadas pela empresa logada.
+
+**Respostas**
+```
+200  HTML com lista de vagas e número de candidatos por vaga
+```
+
+---
+
+### GET /profile/candidate/dashboard
+Dashboard do candidato com métricas de candidaturas.
+
+**Respostas**
+```
+200  HTML com funil de candidaturas, taxa de resposta e horas economizadas pela IA
+```
+
+---
+
+### GET /profile/empresa/:id
+Página pública de uma empresa com vagas abertas e score de responsividade.
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da empresa
+```
+
+**Respostas**
+```
+200  HTML do perfil público
+302  →  /  Empresa não encontrada
+```
+
+---
+
+### GET /profile/c/:name
+Perfil público de um candidato.
+
+**Parâmetros**
+```
+name  string  obrigatório  Slug do nome (ex: joao-silva)
+```
+
+**Respostas**
+```
+200  HTML com currículo e status de disponibilidade
+404  Candidato não encontrado
+```
+
+---
+
 ### GET /profile/dashboard
 Retorna o dashboard de analytics do usuário autenticado (HTML).
 
@@ -610,6 +1090,125 @@ Exporta o dashboard como PDF para download.
 **Resposta**
 ```
 200  Content-Type: application/pdf
+```
+
+---
+
+## Notificações — `/notifications`
+
+### GET /notifications
+Lista todas as notificações do usuário logado e marca todas como lidas automaticamente.
+
+**Respostas**
+```
+200  HTML com lista de notificações ordenada por data
+```
+
+---
+
+### POST /notifications/delete/:id
+Exclui uma notificação específica do usuário logado.
+
+**Parâmetros**
+```
+id  integer  obrigatório  ID da notificação
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /notifications
+```
+
+---
+
+### POST /notifications/clear-all
+Exclui todas as notificações do usuário logado.
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /notifications
+```
+
+---
+
+## Buscas Salvas — `/searches`
+
+### GET /searches
+Lista as buscas salvas do candidato logado com alertas configurados.
+
+**Respostas**
+```
+200  HTML com lista de buscas e status de alerta por e-mail
+```
+
+---
+
+### POST /searches/save
+Salva uma busca com os filtros ativos para uso futuro.
+
+**Body (JSON)**
+```json
+{
+  "query": "desenvolvedor react remoto",
+  "filters": { "modality": "remoto", "isPcd": false }
+}
+```
+
+**Respostas**
+```
+200  { "ok": true }
+400  { "error": "Busca já salva" }
+```
+
+---
+
+### POST /searches/toggle-alert/:id
+Ativa ou desativa o alerta semanal por e-mail para uma busca salva.
+
+**Parâmetros**
+```
+id  integer  obrigatório
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+200  { "alertEnabled": true }
+404  Busca não encontrada
+```
+
+---
+
+### POST /searches/delete/:id
+Exclui uma busca salva.
+
+**Parâmetros**
+```
+id  integer  obrigatório
+```
+
+**Body (form-encoded)**
+```
+_csrf  string  obrigatório
+```
+
+**Respostas**
+```
+302  →  /searches
 ```
 
 ---

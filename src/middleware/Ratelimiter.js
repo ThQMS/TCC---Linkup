@@ -19,6 +19,9 @@ const registerLimiter = rateLimit({
 const aiLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 min
     max: 10,
+    // Usuários autenticados são identificados pelo ID — evita que um usuário
+    // consuma a cota de outro compartilhando o mesmo IP (ex: NAT corporativo)
+    keyGenerator: (req) => (req.user?.id ? `user_${req.user.id}` : req.ip),
     message: { error: 'Muitas requisições à IA. Aguarde um momento.' },
     standardHeaders: true,
     legacyHeaders: false

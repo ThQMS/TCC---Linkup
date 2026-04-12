@@ -37,7 +37,9 @@ const validateRegister = [
         .isEmail().withMessage('E-mail inválido.')
         .normalizeEmail({ gmail_remove_dots: false, all_lowercase: true }),
     body('password')
-        .isLength({ min: 8 }).withMessage('Senha deve ter no mínimo 8 caracteres.'),
+        .isLength({ min: 8 }).withMessage('Senha deve ter no mínimo 8 caracteres.')
+        .matches(/[A-Z]/).withMessage('Senha deve conter pelo menos uma letra maiúscula.')
+        .matches(/[0-9]/).withMessage('Senha deve conter pelo menos um número.'),
     body('userType')
         .isIn(['candidato', 'empresa']).withMessage('Tipo de usuário inválido.')
 ];

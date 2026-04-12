@@ -8,8 +8,9 @@ const globalLocals   = require('../middleware/globalLocals');
 module.exports = function setupSession(app) {
     const sessionMiddleware = session({
         store: new pgSession({
-            conString:   `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
-            tableName:   'session',
+            conString:            process.env.DATABASE_URL
+                || `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME}`,
+            tableName:            'session',
             createTableIfMissing: true
         }),
         secret:            process.env.SESSION_SECRET,
@@ -30,7 +31,7 @@ module.exports = function setupSession(app) {
     require('./passport')(passport);
 
     const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
-        getSecret:               () => process.env.SESSION_SECRET || 'linkup-csrf-secret',
+        getSecret:               () => process.env.SESSION_SECRET,
         getSessionIdentifier:    (req) => req.session.id,
         cookieName:              'x-csrf-token',
         cookieOptions:           { sameSite: 'lax', secure: process.env.NODE_ENV === 'production', httpOnly: true },

@@ -15,15 +15,28 @@ const AUDIT_ACTIONS = {
     STATUS_CHANGE:   'APPLICATION_STATUS_CHANGE'
 };
 
+/**
+ * Mascara e-mail para logs: "joao.silva@gmail.com" → "jo***@gmail.com"
+ * Preserva domínio (útil para diagnóstico) sem expor o endereço completo.
+ */
+function maskEmail(email) {
+    if (!email) return null;
+    const [local, domain] = email.split('@');
+    if (!domain) return '***';
+    const visible = local.slice(0, 2);
+    return `${visible}***@${domain}`;
+}
+
 function auditLog(action, req, extra = {}) {
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
         || req.socket?.remoteAddress
         || 'unknown';
 
+    // e-mail mascarado — nunca persiste o endereço completo em logs
     const entry = {
         action,
-        userId:    req.user?.id    || null,
-        userEmail: req.user?.email || null,
+        userId:    req.user?.id              || null,
+        userEmail: maskEmail(req.user?.email) || null,
         ip,
         userAgent: req.headers['user-agent'] || 'unknown',
         timestamp: new Date().toISOString(),

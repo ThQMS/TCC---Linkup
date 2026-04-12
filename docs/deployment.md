@@ -42,11 +42,13 @@ cp .env.example .env
 | Variável | Padrão | Descrição |
 |---|---|---|
 | `PORT` | `3000` | Porta do servidor HTTP |
-| `SEARCH_SERVICE_URL` | `http://localhost:5001` | URL do microserviço Python |
+| `BASE_URL` | `http://localhost:3000` | URL base para links em e-mails transacionais |
+| `REDIS_URL` | `redis://localhost:6379` | URL do Redis — habilita Socket.io adapter para multi-instância; **obrigatória em produção** |
+| `SEARCH_SERVICE_URL` | `http://localhost:5001` | URL do microserviço Python (sobrescrito pelo Docker) |
 | `VALIDATE_COMPANY` | `false` | Habilita verificação de CNPJ e domínio corporativo |
+| `DB_SSL_REJECT_UNAUTHORIZED` | `true` | Definir `false` apenas em provedores com certificado PostgreSQL self-signed (ex: Railway interno) |
 | `LOG_LEVEL` | `info` | Nível de log: `error` \| `warn` \| `info` \| `debug` |
 | `SEED_PASSWORD` | — | Senha padrão dos usuários criados pelo seed |
-| `BASE_URL` | `http://localhost:3000` | URL base para links em e-mails |
 
 ### Como gerar SESSION_SECRET
 
@@ -89,7 +91,7 @@ npm run migrate
 npx sequelize-cli db:migrate
 ```
 
-O projeto tem 30 migrações que evoluem o schema desde a criação das tabelas base até adições recentes como `isPcd`, `stageHistory` e `rediscoveryData`.
+O projeto tem 29 migrações que evoluem o schema desde a criação das tabelas base até adições recentes como `isPcd`, `stageHistory`, `rediscoveryData` e `passwordChangedAt`.
 
 ### 3. Popular com dados de teste (opcional)
 
@@ -208,6 +210,80 @@ http://localhost:3000
 
 ---
 
+## Deploy com Docker
+
+A forma mais simples de subir todos os serviços juntos (PostgreSQL, Redis, Python e Node.js).
+
+### Pré-requisitos
+
+- Docker Engine 24+
+- Docker Compose v2 (`docker compose`, não `docker-compose`)
+
+### 1. Configurar variáveis de ambiente
+
+```bash
+cp .env.example .env
+# Edite .env com os valores obrigatórios
+```
+
+> O `docker-compose.yml` sobrescreve automaticamente `DB_HOST`, `REDIS_URL` e `SEARCH_SERVICE_URL` para os nomes internos dos containers — não defina esses três no `.env` ao usar Docker.
+
+### 2. Subir todos os serviços
+
+```bash
+docker compose up --build -d
+```
+
+Ordem de inicialização garantida por `healthcheck`:
+1. `db` (PostgreSQL 16) — aguarda `pg_isready`
+2. `redis` (Redis 7) — aguarda `redis-cli ping`
+3. `search` (Python Flask) — aguarda `/health`
+4. `app` (Node.js 20) — executa `db:migrate` e inicia `server.js`
+
+### 3. Popular banco com dados de teste (opcional)
+
+```bash
+npm run seed:docker
+# equivale a: docker compose exec app node seed.js
+```
+
+### Comandos úteis
+
+```bash
+# Ver logs em tempo real
+docker compose logs -f app
+
+# Reiniciar apenas a aplicação
+docker compose restart app
+
+# Parar tudo
+docker compose down
+
+# Parar e remover volumes (apaga o banco)
+docker compose down -v
+```
+
+### Serviços e portas expostas
+
+| Serviço  | Imagem              | Porta host |
+|----------|---------------------|------------|
+| `app`    | build local         | 3000       |
+| `db`     | postgres:16-alpine  | 5432       |
+| `search` | build local (Python)| 5001       |
+| `redis`  | redis:7-alpine      | —          |
+
+> Redis não expõe porta ao host por segurança — é acessível apenas internamente via `redis://redis:6379`.
+
+### Variáveis injetadas automaticamente pelo Docker
+
+| Variável             | Valor injetado           |
+|----------------------|--------------------------|
+| `DB_HOST`            | `db`                     |
+| `REDIS_URL`          | `redis://redis:6379`     |
+| `SEARCH_SERVICE_URL` | `http://search:5001`     |
+
+---
+
 ## Preparação para Produção
 
 ### Variáveis críticas de produção
@@ -224,6 +300,9 @@ Com `NODE_ENV=production`:
 - Helmet habilita HSTS
 - Logs de SQL do Sequelize são desabilitados
 - Mensagens de erro genéricas são retornadas (sem stack traces)
+- `REDIS_URL` se torna obrigatória (validada na inicialização)
+
+> **Redis em produção:** com `REDIS_URL` configurada, o Socket.io adapter Redis é ativado automaticamente, permitindo que notificações push se propaguem entre múltiplas instâncias. As sessões continuam no PostgreSQL.
 
 ### Processo recomendado com PM2
 
@@ -282,7 +361,10 @@ certbot --nginx -d seudominio.com.br
 | `npm run dev` | `nodemon server.js` | Inicia com hot-reload |
 | `npm run migrate` | `sequelize-cli db:migrate` | Executa migrações pendentes |
 | `npm run migrate:undo` | `sequelize-cli db:migrate:undo:all` | Reverte todas as migrações |
-| `npm run seed` | `node seed.js` | Popula banco com dados de teste |
+| `npm run seed` | `node seed.js` | Popula banco com dados de teste (local) |
+| `npm run seed:docker` | `docker compose exec app node seed.js` | Popula banco dentro do container em execução |
+| `npm test` | `jest --config tests/jest.config.js` | Executa a suíte de testes (172 testes) |
+| `npm run test:coverage` | `jest ... --coverage` | Testes com relatório de cobertura |
 
 ---
 
@@ -314,6 +396,13 @@ pm2 logs linkup-app
 
 ## Checklist de Deploy
 
+### Docker
+- [ ] `docker compose up --build -d` sem erros
+- [ ] `docker compose logs app` mostra "Servidor rodando na porta 3000"
+- [ ] `docker compose logs search` mostra o modelo carregado
+- [ ] Seed executado se necessário (`npm run seed:docker`)
+
+### Manual (PM2 + Nginx)
 - [ ] `.env` preenchido com todos os valores obrigatórios
 - [ ] `SESSION_SECRET` é uma string aleatória longa (nunca o valor de exemplo)
 - [ ] `NODE_ENV=production`
@@ -324,4 +413,5 @@ pm2 logs linkup-app
 - [ ] `BASE_URL` configurado com o domínio de produção
 - [ ] HTTPS configurado (Nginx + Let's Encrypt)
 - [ ] PM2 configurado para reinício automático
-- [ ] `npm audit` sem vulnerabilidades críticas
+- [ ] `REDIS_URL` configurada (obrigatória em produção — habilita Socket.io multi-instância)
+- [ ] `npm audit` sem vulnerabilidades críticas (0 vulnerabilidades na versão atual)

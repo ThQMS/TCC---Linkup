@@ -10,11 +10,19 @@ const options = {
         },
         servers: [{ url: 'http://localhost:3000', description: 'Servidor local' }],
         tags: [
-            { name: 'Auth',    description: 'Autenticação e cadastro' },
-            { name: 'Jobs',    description: 'Vagas de emprego' },
-            { name: 'Resume',  description: 'Currículo do candidato' },
-            { name: 'IA',      description: 'Features de Inteligência Artificial (Groq/LLaMA)' },
-            { name: 'Metrics', description: 'Métricas de uso da IA' }
+            { name: 'Auth',          description: 'Autenticação e cadastro' },
+            { name: 'Jobs',          description: 'Vagas — CRUD, candidaturas e favoritos' },
+            { name: 'Pipeline',      description: 'Gestão do pipeline de contratação (empresa)' },
+            { name: 'Talentos',      description: 'Redescoberta e sugestão de candidatos (empresa)' },
+            { name: 'Profile',       description: 'Perfil do usuário e dashboards' },
+            { name: 'Resume',        description: 'Currículo do candidato' },
+            { name: 'IA',            description: 'Features de Inteligência Artificial (Groq / LLaMA 3.3 70B)' },
+            { name: 'Entrevista',    description: 'Simulação de entrevista por IA' },
+            { name: 'Tailoring',     description: 'Tailoring de currículo por IA' },
+            { name: 'BiasAudit',     description: 'Auditoria de viés em descrições de vaga' },
+            { name: 'Buscas',        description: 'Buscas salvas com alertas por e-mail' },
+            { name: 'Notificações',  description: 'Central de notificações do usuário' },
+            { name: 'Metrics',       description: 'Métricas de uso da IA' }
         ],
         components: {
             schemas: {
@@ -31,6 +39,7 @@ const options = {
                         salary:       { type: 'string', example: '7.000 - 10.000' },
                         modality:     { type: 'string', enum: ['remoto', 'presencial', 'híbrido'] },
                         status:       { type: 'string', enum: ['aberta', 'pausada', 'encerrada'] },
+                        isPcd:        { type: 'boolean' },
                         views:        { type: 'integer' }
                     }
                 },
@@ -64,48 +73,61 @@ const options = {
             }
         }
     },
-    apis: [] // Rotas definidas inline abaixo via paths
+    apis: []
 };
 
-// ── Paths documentados manualmente (sem JSDoc nas rotas para não poluir o código) ──
 const swaggerSpec = swaggerJsdoc(options);
 
 swaggerSpec.paths = {
-    // ── AUTH ──
+
+    // ── AUTH ─────────────────────────────────────────────────────────────────
     '/login': {
         post: {
             tags: ['Auth'], summary: 'Login do usuário',
             requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['email', 'password'], properties: { email: { type: 'string', format: 'email' }, password: { type: 'string' }, _csrf: { type: 'string' } } } } } },
-            responses: { 302: { description: 'Redireciona para / em caso de sucesso ou /login em caso de erro' } }
+            responses: {
+                302: { description: 'Sucesso → / | Erro → /login | Conta não verificada → /verify' },
+                429: { description: 'Rate limit: 10 tentativas / 15 min' }
+            }
         }
     },
     '/register': {
         post: {
             tags: ['Auth'], summary: 'Cadastro de novo usuário',
-            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['name', 'email', 'password', 'userType'], properties: { name: { type: 'string' }, email: { type: 'string', format: 'email' }, password: { type: 'string', minLength: 6 }, userType: { type: 'string', enum: ['candidato', 'empresa'] }, _csrf: { type: 'string' } } } } } },
-            responses: { 302: { description: 'Redireciona para /verify após cadastro' } }
+            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['name', 'email', 'password', 'userType'], properties: { name: { type: 'string' }, email: { type: 'string', format: 'email' }, password: { type: 'string', minLength: 6 }, userType: { type: 'string', enum: ['candidato', 'empresa'] }, cnpj: { type: 'string', description: 'Obrigatório quando userType=empresa' }, _csrf: { type: 'string' } } } } } },
+            responses: {
+                302: { description: 'Sucesso → /verify | Erro → /register' },
+                429: { description: 'Rate limit: 5 registros / hora' }
+            }
         }
     },
     '/logout': {
         get: {
-            tags: ['Auth'], summary: 'Logout',
+            tags: ['Auth'], summary: 'Encerra a sessão do usuário',
             responses: { 302: { description: 'Redireciona para /login' } }
         }
     },
 
-    // ── JOBS ──
+    // ── JOBS ─────────────────────────────────────────────────────────────────
     '/jobs/add': {
         post: {
             tags: ['Jobs'], summary: 'Criar nova vaga (empresa)',
-            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['title', 'company', 'description', 'email'], properties: { title: { type: 'string' }, company: { type: 'string' }, description: { type: 'string' }, email: { type: 'string', format: 'email' }, salary: { type: 'string' }, modality: { type: 'string', enum: ['remoto', 'presencial', 'híbrido'] }, requirements: { type: 'string' }, benefits: { type: 'string' }, differential: { type: 'string' }, _csrf: { type: 'string' } } } } } },
-            responses: { 302: { description: 'Redireciona para / após criar' }, 422: { description: 'Erro de validação' } }
+            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['title', 'company', 'description', 'email'], properties: { title: { type: 'string' }, company: { type: 'string' }, description: { type: 'string' }, email: { type: 'string', format: 'email' }, salary: { type: 'string' }, modality: { type: 'string', enum: ['remoto', 'presencial', 'híbrido'] }, contractType: { type: 'string' }, requirements: { type: 'string' }, benefits: { type: 'string' }, differential: { type: 'string' }, isPcd: { type: 'boolean' }, _csrf: { type: 'string' } } } } } },
+            responses: { 302: { description: 'Sucesso → / | Erro → /jobs/add com flash' }, 422: { description: 'Erro de validação' } }
         }
     },
     '/jobs/view/{id}': {
         get: {
-            tags: ['Jobs'], summary: 'Detalhes de uma vaga',
+            tags: ['Jobs'], summary: 'Página de detalhes de uma vaga',
             parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
-            responses: { 200: { description: 'Página da vaga' }, 302: { description: 'Vaga não encontrada' } }
+            responses: { 200: { description: 'Página da vaga com opção de candidatura e features de IA' }, 302: { description: 'Vaga não encontrada → /' } }
+        }
+    },
+    '/jobs/edit/{id}': {
+        get: {
+            tags: ['Jobs'], summary: 'Formulário de edição de vaga (empresa dona)',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 200: { description: 'Página do formulário preenchida com dados atuais' }, 302: { description: 'Sem permissão → /' } }
         }
     },
     '/jobs/update': {
@@ -125,56 +147,203 @@ swaggerSpec.paths = {
     '/jobs/apply/{id}': {
         post: {
             tags: ['Jobs'], summary: 'Candidatar-se a uma vaga (candidato)',
+            description: 'Cria a candidatura, pontua respostas de triagem via IA, notifica a empresa por e-mail e Socket.io. Envia PDF do currículo automaticamente.',
             parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
-            requestBody: { content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', properties: { coverLetter: { type: 'string', description: 'Carta de apresentação opcional' }, _csrf: { type: 'string' } } } } } },
-            responses: { 302: { description: 'Redireciona após candidatura. E-mail com currículo PDF é enviado automaticamente.' } }
+            requestBody: { content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', properties: { coverLetter: { type: 'string' }, _csrf: { type: 'string' } } } } } },
+            responses: { 302: { description: 'Redireciona após candidatura' } }
+        }
+    },
+    '/jobs/cancel/{applicationId}': {
+        post: {
+            tags: ['Jobs'], summary: 'Cancelar candidatura (candidato)',
+            description: 'Cancela candidaturas com status "pendente". Notifica a empresa via Socket.io e e-mail.',
+            parameters: [{ name: 'applicationId', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 302: { description: 'Redireciona para /jobs/my-applications' }, 403: { description: 'Candidatura não pode ser cancelada (status diferente de pendente)' } }
         }
     },
     '/jobs/my-applications': {
         get: {
             tags: ['Jobs'], summary: 'Lista candidaturas do candidato logado',
-            responses: { 200: { description: 'Lista de candidaturas com status' } }
+            responses: { 200: { description: 'Lista de candidaturas com status, etapa atual e empresa' } }
         }
     },
     '/jobs/my-applications/pdf': {
         get: {
-            tags: ['Jobs'], summary: 'Exportar candidaturas em PDF',
-            responses: { 200: { description: 'PDF com histórico de candidaturas', content: { 'application/pdf': {} } } }
+            tags: ['Jobs'], summary: 'Exportar histórico de candidaturas em PDF',
+            responses: { 200: { description: 'Arquivo PDF', content: { 'application/pdf': {} } } }
         }
     },
     '/jobs/favorites': {
         get: {
             tags: ['Jobs'], summary: 'Lista vagas favoritas do candidato',
-            responses: { 200: { description: 'Lista de vagas favoritas' } }
+            responses: { 200: { description: 'Lista de vagas favoritadas' } }
         }
     },
     '/jobs/favorite/{id}': {
         post: {
-            tags: ['Jobs'], summary: 'Favoritar ou desfavoritar uma vaga',
+            tags: ['Jobs'], summary: 'Favoritar ou desfavoritar uma vaga (toggle)',
             parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
             responses: { 302: { description: 'Redireciona de volta à vaga' } }
         }
     },
+    '/jobs/block-company/{companyId}': {
+        post: {
+            tags: ['Jobs'], summary: 'Bloquear empresa (candidato)',
+            description: 'Empresa bloqueada é excluída automaticamente dos resultados de busca do candidato.',
+            parameters: [{ name: 'companyId', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 302: { description: 'Redireciona de volta' } }
+        }
+    },
+
+    // ── PIPELINE ─────────────────────────────────────────────────────────────
     '/jobs/applications/{id}': {
         get: {
-            tags: ['Jobs'], summary: 'Lista candidatos de uma vaga (empresa)',
+            tags: ['Pipeline'], summary: 'Lista candidatos de uma vaga (empresa)',
             parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
-            responses: { 200: { description: 'Lista de candidatos com skills' } }
+            responses: { 200: { description: 'Lista de candidatos com score, etapa atual e currículo' } }
         }
     },
     '/jobs/applications/status': {
         post: {
-            tags: ['Jobs'], summary: 'Atualizar status de candidatura (empresa)',
-            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['applicationId', 'status', 'jobId'], properties: { applicationId: { type: 'integer' }, status: { type: 'string', enum: ['pendente', 'aceito', 'recusado'] }, jobId: { type: 'integer' }, _csrf: { type: 'string' } } } } } },
-            responses: { 302: { description: 'Redireciona de volta à lista de candidatos' } }
+            tags: ['Pipeline'], summary: 'Atualizar status de candidatura (empresa)',
+            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['applicationId', 'status', 'jobId'], properties: { applicationId: { type: 'integer' }, status: { type: 'string', enum: ['pendente', 'aceito', 'recusado', 'cancelado'] }, jobId: { type: 'integer' }, _csrf: { type: 'string' } } } } } },
+            responses: { 302: { description: 'Redireciona de volta ao pipeline' } }
+        }
+    },
+    '/jobs/applications/stage': {
+        post: {
+            tags: ['Pipeline'], summary: 'Avançar candidato para próxima etapa (empresa)',
+            description: 'Registra transição de etapa com timestamp em stageHistory.',
+            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['applicationId', 'stage', 'jobId'], properties: { applicationId: { type: 'integer' }, stage: { type: 'string' }, jobId: { type: 'integer' }, _csrf: { type: 'string' } } } } } },
+            responses: { 302: { description: 'Redireciona de volta ao pipeline' } }
+        }
+    },
+    '/jobs/close/{id}': {
+        post: {
+            tags: ['Pipeline'], summary: 'Encerrar vaga com feedback automático por IA (empresa)',
+            description: 'Encerra a vaga, gera feedback personalizado por IA para todos os candidatos não contratados e envia por e-mail.',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 302: { description: 'Redireciona após encerramento' } }
         }
     },
 
-    // ── RESUME ──
+    // ── TALENTOS ─────────────────────────────────────────────────────────────
+    '/jobs/talents/{id}': {
+        get: {
+            tags: ['Talentos'], summary: 'Redescoberta de talentos para uma vaga (empresa)',
+            description: 'Retorna candidatos da base histórica (6 meses) com fitScore ≥ 88% e disponibilidade ativa.',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 200: { description: 'Lista de candidatos com score de fit e dados de contato' } }
+        }
+    },
+    '/jobs/similar-candidates/{id}': {
+        get: {
+            tags: ['Talentos'], summary: 'Candidatos similares a uma candidatura (empresa)',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'ID da candidatura' }],
+            responses: { 200: { description: 'Lista de candidatos com perfil parecido' } }
+        }
+    },
+    '/jobs/suggested-candidates/{jobId}': {
+        get: {
+            tags: ['Talentos'], summary: 'Candidatos sugeridos para uma vaga (empresa)',
+            parameters: [{ name: 'jobId', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 200: { description: 'Sugestões de candidatos com base no perfil da vaga' } }
+        }
+    },
+    '/jobs/reactivate-contact/{jobId}/{candidateId}': {
+        post: {
+            tags: ['Talentos'], summary: 'Reativar contato com candidato (empresa)',
+            parameters: [
+                { name: 'jobId',      in: 'path', required: true, schema: { type: 'integer' } },
+                { name: 'candidateId', in: 'path', required: true, schema: { type: 'integer' } }
+            ],
+            responses: { 302: { description: 'E-mail enviado ao candidato' } }
+        }
+    },
+    '/jobs/contact-suggested/{jobId}/{candidateId}': {
+        post: {
+            tags: ['Talentos'], summary: 'Contactar candidato sugerido (empresa)',
+            parameters: [
+                { name: 'jobId',      in: 'path', required: true, schema: { type: 'integer' } },
+                { name: 'candidateId', in: 'path', required: true, schema: { type: 'integer' } }
+            ],
+            responses: { 302: { description: 'E-mail de convite enviado ao candidato' } }
+        }
+    },
+
+    // ── PROFILE ───────────────────────────────────────────────────────────────
+    '/profile': {
+        get: {
+            tags: ['Profile'], summary: 'Página de perfil do usuário logado',
+            responses: { 200: { description: 'Perfil com dados pessoais e formulário de edição' } }
+        }
+    },
+    '/profile/update': {
+        post: {
+            tags: ['Profile'], summary: 'Atualizar dados do perfil',
+            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', properties: { name: { type: 'string' }, bio: { type: 'string' }, city: { type: 'string' }, website: { type: 'string' }, _csrf: { type: 'string' } } } } } },
+            responses: { 302: { description: 'Redireciona para /profile' } }
+        }
+    },
+    '/profile/avatar': {
+        post: {
+            tags: ['Profile'], summary: 'Upload de avatar (JPG / PNG / WEBP, máx 3MB)',
+            requestBody: { required: true, content: { 'multipart/form-data': { schema: { type: 'object', properties: { avatar: { type: 'string', format: 'binary' } } } } } },
+            responses: { 302: { description: 'Redireciona para /profile' }, 400: { description: 'Formato inválido ou arquivo muito grande' }, 429: { description: 'Rate limit: 3 uploads / min' } }
+        }
+    },
+    '/profile/availability-status': {
+        post: {
+            tags: ['Profile'], summary: 'Atualizar status de disponibilidade (candidato)',
+            description: 'Statuses disponíveis: Buscando Ativamente | Aberto a Oportunidades | Em Processo Seletivo | Não Disponível',
+            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['availabilityStatus'], properties: { availabilityStatus: { type: 'string', enum: ['Buscando Ativamente', 'Aberto a Oportunidades', 'Em Processo Seletivo', 'Não Disponível'] }, _csrf: { type: 'string' } } } } } },
+            responses: { 302: { description: 'Redireciona para /profile' } }
+        }
+    },
+    '/profile/dashboard': {
+        get: {
+            tags: ['Profile'], summary: 'Dashboard da empresa com métricas do pipeline',
+            responses: { 200: { description: 'Conversão por etapa, tempo médio de contratação, uso do Bias Auditor' } }
+        }
+    },
+    '/profile/dashboard/pdf': {
+        get: {
+            tags: ['Profile'], summary: 'Exportar dashboard da empresa em PDF',
+            responses: { 200: { description: 'Arquivo PDF', content: { 'application/pdf': {} } } }
+        }
+    },
+    '/profile/candidate/dashboard': {
+        get: {
+            tags: ['Profile'], summary: 'Dashboard do candidato com funil de candidaturas',
+            responses: { 200: { description: 'Taxa de resposta, horas economizadas pela IA, mapa de modalidades' } }
+        }
+    },
+    '/profile/my-jobs': {
+        get: {
+            tags: ['Profile'], summary: 'Lista de vagas publicadas pela empresa',
+            responses: { 200: { description: 'Vagas com status e número de candidatos' } }
+        }
+    },
+    '/profile/empresa/{id}': {
+        get: {
+            tags: ['Profile'], summary: 'Página pública de uma empresa',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 200: { description: 'Perfil público com vagas abertas e score de responsividade' }, 302: { description: 'Empresa não encontrada → /' } }
+        }
+    },
+    '/profile/c/{name}': {
+        get: {
+            tags: ['Profile'], summary: 'Perfil público de um candidato',
+            parameters: [{ name: 'name', in: 'path', required: true, schema: { type: 'string' }, description: 'Slug do nome do candidato' }],
+            responses: { 200: { description: 'Perfil público com currículo e disponibilidade' } }
+        }
+    },
+
+    // ── RESUME ────────────────────────────────────────────────────────────────
     '/resume/create': {
         get: {
-            tags: ['Resume'], summary: 'Formulário de criação/edição do currículo',
-            responses: { 200: { description: 'Página do formulário' } }
+            tags: ['Resume'], summary: 'Formulário de criação / edição do currículo',
+            responses: { 200: { description: 'Formulário preenchido com dados atuais (se existir)' } }
         }
     },
     '/resume/save': {
@@ -187,26 +356,35 @@ swaggerSpec.paths = {
     '/resume/view': {
         get: {
             tags: ['Resume'], summary: 'Visualizar currículo do usuário logado',
-            responses: { 200: { description: 'Página do currículo com opções de exportação PDF' } }
+            responses: { 200: { description: 'Currículo com opções de exportação PDF e features de IA' } }
+        }
+    },
+    '/resume/tailoring/apply': {
+        post: {
+            tags: ['Resume'], summary: 'Aplicar tailoring de currículo gerado pela IA',
+            description: 'Salva o currículo com o conteúdo reescrito pelo tailoring da IA para a vaga.',
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['tailoredData'], properties: { tailoredData: { type: 'object', description: 'Objeto com campos reescritos pelo tailoring' } } } } } },
+            responses: { 200: { description: 'Currículo atualizado com sucesso' }, 400: { description: 'Dados inválidos' } }
         }
     },
 
-    // ── IA ──
+    // ── IA ────────────────────────────────────────────────────────────────────
     '/jobs/ai/cover-letter/{id}': {
         post: {
             tags: ['IA'], summary: 'Gerar carta de apresentação (candidato)',
-            description: 'Usa LLaMA 3.3 70B via Groq. Cruza o currículo do candidato com os dados da vaga para gerar uma carta personalizada.',
+            description: 'Cruza o currículo do candidato com os dados da vaga via LLaMA 3.3 70B.',
             parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'ID da vaga' }],
             responses: {
                 200: { description: 'Carta gerada', content: { 'application/json': { schema: { type: 'object', properties: { letter: { type: 'string' } } } } } },
-                400: { description: 'Currículo não encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+                400: { description: 'Currículo não encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+                429: { description: 'Rate limit: 10 chamadas IA / min' }
             }
         }
     },
     '/jobs/ai/compatibility/{jobId}': {
         post: {
-            tags: ['IA'], summary: 'Verificar compatibilidade candidato x vaga (candidato)',
-            description: 'Analisa o currículo do candidato frente aos requisitos da vaga. Retorna score 0-100 e análise detalhada.',
+            tags: ['IA'], summary: 'Score de compatibilidade candidato × vaga (candidato)',
+            description: 'Retorna score 0–100 e análise detalhada das lacunas de fit.',
             parameters: [{ name: 'jobId', in: 'path', required: true, schema: { type: 'integer' } }],
             responses: {
                 200: { description: 'Score e análise', content: { 'application/json': { schema: { $ref: '#/components/schemas/AiCompatibilityResponse' } } } },
@@ -218,17 +396,15 @@ swaggerSpec.paths = {
     '/jobs/ai/improve': {
         post: {
             tags: ['IA'], summary: 'Melhorar campo da descrição de vaga (empresa)',
-            description: 'Recebe um campo de texto da vaga (descrição, requisitos, benefícios, diferencial) e retorna versão melhorada.',
+            description: 'Recebe um campo (descrição, requisitos, benefícios, diferencial) e retorna versão melhorada.',
             requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['content'], properties: { fieldLabel: { type: 'string', example: 'Descrição' }, content: { type: 'string' }, title: { type: 'string' } } } } } },
-            responses: {
-                200: { description: 'Texto melhorado', content: { 'application/json': { schema: { type: 'object', properties: { improved: { type: 'string' } } } } } }
-            }
+            responses: { 200: { description: 'Texto melhorado', content: { 'application/json': { schema: { type: 'object', properties: { improved: { type: 'string' } } } } } } }
         }
     },
     '/jobs/ai/rank/{jobId}': {
         post: {
             tags: ['IA'], summary: 'Ranking de candidatos por IA (empresa)',
-            description: 'Analisa todos os candidatos da vaga e gera um ranking de compatibilidade com score e análise individual.',
+            description: 'Analisa todos os candidatos da vaga e gera ranking de compatibilidade com score e análise individual.',
             parameters: [{ name: 'jobId', in: 'path', required: true, schema: { type: 'integer' } }],
             responses: {
                 200: { description: 'Rankings ordenados', content: { 'application/json': { schema: { $ref: '#/components/schemas/AiRankingResponse' } } } },
@@ -237,36 +413,166 @@ swaggerSpec.paths = {
             }
         }
     },
+    '/jobs/ai/stages': {
+        post: {
+            tags: ['IA'], summary: 'Sugerir etapas do pipeline para uma vaga (empresa)',
+            description: 'Gera sugestão de etapas do processo seletivo com base no título e requisitos da vaga.',
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['jobId'], properties: { jobId: { type: 'integer' } } } } } },
+            responses: { 200: { description: 'Lista de etapas sugeridas', content: { 'application/json': { schema: { type: 'object', properties: { stages: { type: 'array', items: { type: 'string' } } } } } } } }
+        }
+    },
+    '/jobs/compare-candidates': {
+        post: {
+            tags: ['IA'], summary: 'Comparar 2 ou 3 candidatos lado a lado (empresa)',
+            description: 'Análise comparativa por IA com pontos fortes, fracos e recomendação.',
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['applicationIds', 'jobId'], properties: { applicationIds: { type: 'array', items: { type: 'integer' }, minItems: 2, maxItems: 3 }, jobId: { type: 'integer' } } } } } },
+            responses: { 200: { description: 'Análise comparativa', content: { 'application/json': { schema: { type: 'object', properties: { comparison: { type: 'string' } } } } } } }
+        }
+    },
     '/resume/ai/improve': {
         post: {
             tags: ['IA'], summary: 'Melhorar campo do currículo (candidato)',
-            description: 'Melhora resumo profissional ou descrição de experiência usando LLaMA. Usa prompts específicos por campo (STAR para experiências).',
-            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['field', 'content'], properties: { field: { type: 'string', enum: ['summary', 'experience'], example: 'summary' }, content: { type: 'string' }, context: { type: 'string', description: 'Cargo/empresa (obrigatório quando field=experience)' } } } } } },
-            responses: {
-                200: { description: 'Texto melhorado', content: { 'application/json': { schema: { type: 'object', properties: { improved: { type: 'string' } } } } } }
-            }
+            description: 'Melhora resumo profissional ou descrição de experiência. Usa formato STAR para experiências.',
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['field', 'content'], properties: { field: { type: 'string', enum: ['summary', 'experience'] }, content: { type: 'string' }, context: { type: 'string', description: 'Cargo/empresa (obrigatório quando field=experience)' } } } } } },
+            responses: { 200: { description: 'Texto melhorado', content: { 'application/json': { schema: { type: 'object', properties: { improved: { type: 'string' } } } } } } }
         }
     },
     '/resume/ai/import': {
         post: {
-            tags: ['IA'], summary: 'Importar currículo via PDF ou texto (candidato)',
-            description: 'Extrai dados estruturados de um PDF ou texto de currículo usando LLaMA. Retorna JSON com experiências, formação, habilidades e dados de contato.',
-            requestBody: { required: true, content: { 'multipart/form-data': { schema: { type: 'object', properties: { pdf: { type: 'string', format: 'binary', description: 'Arquivo PDF do currículo' }, text: { type: 'string', description: 'Texto do currículo (alternativa ao PDF)' } } } } } },
+            tags: ['IA'], summary: 'Importar currículo via PDF (candidato)',
+            description: 'Extrai dados estruturados de um PDF de currículo usando LLaMA. Máx 5MB.',
+            requestBody: { required: true, content: { 'multipart/form-data': { schema: { type: 'object', properties: { pdf: { type: 'string', format: 'binary' }, text: { type: 'string', description: 'Texto alternativo ao PDF' } } } } } },
             responses: {
-                200: { description: 'Dados extraídos do currículo', content: { 'application/json': { schema: { type: 'object', properties: { summary: { type: 'string' }, experiences: { type: 'array', items: { type: 'object' } }, education: { type: 'array', items: { type: 'object' } }, skills: { type: 'array', items: { type: 'string' } }, phone: { type: 'string' }, city: { type: 'string' }, linkedin: { type: 'string' }, github: { type: 'string' } } } } } },
-                400: { description: 'Conteúdo insuficiente' }
+                200: { description: 'Dados extraídos', content: { 'application/json': { schema: { type: 'object', properties: { summary: { type: 'string' }, experiences: { type: 'array', items: { type: 'object' } }, education: { type: 'array', items: { type: 'object' } }, skills: { type: 'array', items: { type: 'string' } }, phone: { type: 'string' }, city: { type: 'string' }, linkedin: { type: 'string' }, github: { type: 'string' } } } } } },
+                400: { description: 'Conteúdo insuficiente ou formato inválido' }
             }
         }
     },
 
-    // ── METRICS ──
+    // ── ENTREVISTA ────────────────────────────────────────────────────────────
+    '/interview/{jobId}/start': {
+        post: {
+            tags: ['Entrevista'], summary: 'Iniciar simulação de entrevista (candidato)',
+            description: 'Gera perguntas de entrevista personalizadas para a vaga via LLaMA.',
+            parameters: [{ name: 'jobId', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 200: { description: 'Lista de perguntas geradas', content: { 'application/json': { schema: { type: 'object', properties: { questions: { type: 'array', items: { type: 'string' } } } } } } } }
+        }
+    },
+    '/interview/{jobId}/answer': {
+        post: {
+            tags: ['Entrevista'], summary: 'Enviar resposta de entrevista (candidato)',
+            parameters: [{ name: 'jobId', in: 'path', required: true, schema: { type: 'integer' } }],
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['question', 'answer'], properties: { question: { type: 'string' }, answer: { type: 'string' } } } } } },
+            responses: { 200: { description: 'Feedback da resposta', content: { 'application/json': { schema: { type: 'object', properties: { feedback: { type: 'string' } } } } } } }
+        }
+    },
+    '/interview/{jobId}/score': {
+        post: {
+            tags: ['Entrevista'], summary: 'Gerar score final da entrevista (candidato)',
+            parameters: [{ name: 'jobId', in: 'path', required: true, schema: { type: 'integer' } }],
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['answers'], properties: { answers: { type: 'array', items: { type: 'object' } } } } } } },
+            responses: { 200: { description: 'Score e análise geral do desempenho', content: { 'application/json': { schema: { type: 'object', properties: { score: { type: 'integer' }, analysis: { type: 'string' } } } } } } }
+        }
+    },
+
+    // ── CHAT ──────────────────────────────────────────────────────────────────
+    '/jobs/{id}/chat': {
+        post: {
+            tags: ['IA'], summary: 'Chat contextual com IA sobre a vaga (candidato)',
+            description: 'IA conversacional vinculada a uma vaga específica. Contexto inclui perfil do candidato e dados da vaga.',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'ID da vaga' }],
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['message'], properties: { message: { type: 'string' }, history: { type: 'array', items: { type: 'object' } } } } } } },
+            responses: { 200: { description: 'Resposta da IA', content: { 'application/json': { schema: { type: 'object', properties: { reply: { type: 'string' } } } } } } }
+        }
+    },
+    '/jobs/{id}/chat/ping': {
+        get: {
+            tags: ['IA'], summary: 'Verifica se o chat está disponível para a vaga',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 200: { description: 'Chat disponível' }, 403: { description: 'Sem permissão ou candidatura não encontrada' } }
+        }
+    },
+
+    // ── TAILORING ─────────────────────────────────────────────────────────────
+    '/tailoring/{jobId}': {
+        post: {
+            tags: ['Tailoring'], summary: 'Gerar tailoring de currículo para uma vaga (candidato)',
+            description: 'Reescreve resumo e experiências do currículo adaptando ao perfil da vaga.',
+            parameters: [{ name: 'jobId', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: {
+                200: { description: 'Currículo reescrito', content: { 'application/json': { schema: { type: 'object', properties: { tailoredData: { type: 'object' } } } } } },
+                400: { description: 'Currículo não encontrado' }
+            }
+        }
+    },
+
+    // ── BIAS AUDIT ────────────────────────────────────────────────────────────
+    '/bias/audit': {
+        post: {
+            tags: ['BiasAudit'], summary: 'Auditar viés em descrição de vaga (empresa)',
+            description: 'Detecta linguagem excludente (gênero, raça, idade, etc.) na descrição e retorna sugestões de melhoria.',
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['text'], properties: { text: { type: 'string' }, jobId: { type: 'integer' } } } } } },
+            responses: { 200: { description: 'Resultado da auditoria', content: { 'application/json': { schema: { type: 'object', properties: { issues: { type: 'array', items: { type: 'string' } }, suggestions: { type: 'array', items: { type: 'string' } }, score: { type: 'integer' } } } } } } }
+        }
+    },
+
+    // ── BUSCAS SALVAS ─────────────────────────────────────────────────────────
+    '/searches': {
+        get: {
+            tags: ['Buscas'], summary: 'Listar buscas salvas do candidato',
+            responses: { 200: { description: 'Lista de buscas com alertas configurados' } }
+        }
+    },
+    '/searches/save': {
+        post: {
+            tags: ['Buscas'], summary: 'Salvar uma busca (candidato)',
+            requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['query'], properties: { query: { type: 'string' }, filters: { type: 'object' } } } } } },
+            responses: { 200: { description: 'Busca salva com sucesso' }, 400: { description: 'Busca já existe' } }
+        }
+    },
+    '/searches/toggle-alert/{id}': {
+        post: {
+            tags: ['Buscas'], summary: 'Ativar / desativar alerta semanal por e-mail',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 200: { description: 'Estado do alerta alterado' } }
+        }
+    },
+    '/searches/delete/{id}': {
+        post: {
+            tags: ['Buscas'], summary: 'Excluir busca salva',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 302: { description: 'Redireciona para /searches' } }
+        }
+    },
+
+    // ── NOTIFICAÇÕES ─────────────────────────────────────────────────────────
+    '/notifications': {
+        get: {
+            tags: ['Notificações'], summary: 'Central de notificações do usuário',
+            description: 'Lista todas as notificações e marca todas como lidas automaticamente.',
+            responses: { 200: { description: 'Lista de notificações ordenada por data' } }
+        }
+    },
+    '/notifications/delete/{id}': {
+        post: {
+            tags: ['Notificações'], summary: 'Excluir uma notificação',
+            parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+            responses: { 302: { description: 'Redireciona para /notifications' } }
+        }
+    },
+    '/notifications/clear-all': {
+        post: {
+            tags: ['Notificações'], summary: 'Limpar todas as notificações',
+            responses: { 302: { description: 'Redireciona para /notifications' } }
+        }
+    },
+
+    // ── METRICS ───────────────────────────────────────────────────────────────
     '/ai-metrics': {
         get: {
-            tags: ['Metrics'], summary: 'Métricas de uso das features de IA',
-            description: 'Retorna dados agregados: total de chamadas por feature, taxa de sucesso e tempo médio de resposta.',
-            responses: {
-                200: { description: 'Página de métricas' }
-            }
+            tags: ['Metrics'], summary: 'Dashboard de métricas de uso da IA',
+            description: 'Volume de chamadas, taxa de sucesso, latência média por feature, gráfico 30 dias e status da capacidade Groq.',
+            responses: { 200: { description: 'Página de métricas' } }
         }
     }
 };

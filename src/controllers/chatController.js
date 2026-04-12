@@ -62,7 +62,7 @@ exports.chat = async (req, res) => {
 
     try {
         const job = await Job.findByPk(jobId);
-        if (!job) return res.status(404).json({ error: 'Vaga não encontrada.' });
+        if (!job || job.status !== 'aberta') return res.status(404).json({ error: 'Vaga não encontrada.' });
 
         const systemPrompt = await buildSystemPrompt(job, req.user.id);
 

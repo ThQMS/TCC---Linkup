@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -51,6 +52,14 @@
       align-items: center; justify-content: center;
       text-align: center; padding: 120px 20px 80px;
       position: relative;
+    }
+    /* Painel da rede de conexão (abaixo do texto) */
+    .hero-network {
+      position: relative; width: 100%; max-width: 1100px;
+      height: 400px; margin-top: 52px; z-index: 1;
+      border: 1px solid rgba(230,57,70,0.1);
+      border-radius: 24px;
+      background: rgba(230,57,70,0.02);
     }
 
     /* Gradiente animado de fundo */
@@ -114,9 +123,9 @@
     }
     @keyframes underlineReveal { to { transform: scaleX(1); } }
 
-    .hero p { font-size: 1.1rem; color: var(--muted); max-width: 500px; line-height: 1.75; margin-bottom: 40px; animation: fadeDown 0.6s 0.5s ease both; opacity: 0; position: relative; z-index: 1; }
+    .hero p { font-size: 1.05rem; color: var(--muted); max-width: 480px; line-height: 1.75; margin-bottom: 40px; animation: fadeDown 0.6s 0.5s ease both; opacity: 0; }
 
-    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; animation: fadeDown 0.6s 0.7s ease both; opacity: 0; position: relative; z-index: 1; }
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-start; animation: fadeDown 0.6s 0.7s ease both; opacity: 0; }
 
     /* CTA com glow e ripple */
     .btn-hero {
@@ -141,6 +150,163 @@
       font-family: 'DM Sans', sans-serif; transition: all 0.2s; border: 1px solid var(--border);
     }
     .btn-hero-outline:hover { border-color: rgba(255,255,255,0.18); color: var(--text); background: rgba(255,255,255,0.03); }
+
+    /* Canvas cobre o painel inteiro */
+    #hero-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; border-radius: 24px;
+    }
+    /* Labels de canto: Candidatos / Empresas */
+    .hnet-label {
+      position: absolute; top: 16px;
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.8px;
+      color: rgba(255,255,255,0.3); z-index: 3;
+    }
+    .hnet-label i { font-size: 0.8rem; }
+    .hnet-label--left  { left: 20px; }
+    .hnet-label--right { right: 20px; flex-direction: row-reverse; }
+    /* Pill central: match em tempo real */
+    .hnet-center-tag {
+      position: absolute; top: 14px; left: 50%;
+      transform: translateX(-50%);
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 14px;
+      background: rgba(230,57,70,0.08);
+      border: 1px solid rgba(230,57,70,0.2);
+      border-radius: 100px;
+      font-size: 0.67rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: rgba(230,57,70,0.6); z-index: 3; white-space: nowrap;
+    }
+    .hnet-center-tag .dot {
+      width: 5px; height: 5px; background: var(--red);
+      border-radius: 50%; animation: pulse 2s infinite;
+    }
+    /* Wrapper do card: centralizado sobre o canvas */
+    .hero-card-wrap {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+    /* Glow pulsante atrás do card */
+    .hero-card-glow {
+      position: absolute; top: 50%; left: 50%;
+      width: 420px; height: 420px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(230,57,70,0.26) 0%, rgba(180,0,30,0.08) 45%, transparent 70%);
+      border-radius: 50%; pointer-events: none;
+      animation: cardGlow 4s ease-in-out infinite;
+    }
+    @keyframes cardGlow {
+      0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+      50%       { opacity: 1;    transform: translate(-50%, -50%) scale(1.2); }
+    }
+    /* Toast secundário flutuante */
+    .hero-toast {
+      position: absolute; bottom: -18px; right: -18px;
+      background: var(--bg3); border: 1px solid rgba(76,175,80,0.35);
+      border-radius: 14px; padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      opacity: 0; z-index: 3; min-width: 215px;
+    }
+    .hero-toast-icon {
+      width: 34px; height: 34px;
+      background: rgba(76,175,80,0.15); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #4caf50; font-size: 1rem; flex-shrink: 0;
+    }
+    .hero-toast-title { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+    .hero-toast-sub   { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    /* Flutuação suave via CSS (separada do transform 3D do JS) */
+    @keyframes heroFloat {
+      0%, 100% { translate: 0 0px; }
+      50%       { translate: 0 -10px; }
+    }
+    .hero-card--floating { animation: heroFloat 3.8s ease-in-out infinite; }
+    .hero-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 28px;
+      width: 340px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative;
+      opacity: 0; /* animado por Anime.js */
+      will-change: transform;
+      transform-style: preserve-3d;
+      cursor: default;
+    }
+    .hc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .hc-logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--red), #ff6b6b);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem;
+      color: white; flex-shrink: 0; letter-spacing: -0.5px;
+    }
+    .hc-company-info { flex: 1; min-width: 0; }
+    .hc-company { font-size: 0.88rem; font-weight: 600; }
+    .hc-location { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .hc-new {
+      background: rgba(230,57,70,0.12); border: 1px solid rgba(230,57,70,0.3);
+      color: var(--red); font-size: 0.67rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 100px;
+      text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+    }
+    .hc-title {
+      font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800;
+      letter-spacing: -0.5px; margin-bottom: 14px; line-height: 1.3;
+    }
+    .hc-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 20px; }
+    .hc-tags span {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px; padding: 4px 10px; font-size: 0.73rem; color: #999;
+    }
+    .hc-score {
+      background: rgba(230,57,70,0.05); border: 1px solid rgba(230,57,70,0.15);
+      border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
+    }
+    .hc-score-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; font-size: 0.79rem; color: #999;
+    }
+    .hc-score-header i { margin-right: 5px; color: var(--red); }
+    .hc-score-num {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      font-size: 1.1rem; font-weight: 800; color: var(--red);
+      font-variant-numeric: tabular-nums;
+    }
+    .hc-score-bar {
+      height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 3px; overflow: hidden;
+    }
+    .hc-score-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--red), #ff8080);
+      border-radius: 3px;
+    }
+    .hc-score-sub { margin-top: 8px; font-size: 0.72rem; color: var(--muted); }
+    .hc-actions { display: flex; gap: 10px; }
+    .hc-btn-primary {
+      flex: 1; padding: 10px 16px; background: var(--red); color: white;
+      border: none; border-radius: 10px; font-size: 0.84rem; font-weight: 600;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+      text-decoration: none; text-align: center; transition: all 0.2s;
+    }
+    .hc-btn-primary:hover { background: var(--red-dark); color: white; }
+    .hc-btn-secondary {
+      padding: 10px 14px; background: transparent; color: #aaa;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+      font-size: 0.84rem; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .hc-btn-secondary:hover { border-color: rgba(255,255,255,0.22); color: var(--text); }
 
     /* ── COUNTERS ── */
     .counters {
@@ -308,6 +474,9 @@
 
     @media (max-width: 900px) {
       nav { padding: 14px 20px; }
+      .hero { padding: 100px 20px 60px; }
+      .hero-network { height: 300px; margin-top: 36px; }
+      .hero-card { width: 290px; padding: 20px; }
       .features, .how, .testimonials, .cta-section, .ia-section, .responsive-section, .reconnect-section { padding: 60px 20px; }
       .features-grid, .testimonials-grid, .steps-grid { grid-template-columns: 1fr; }
       .ia-inner, .responsive-inner { grid-template-columns: 1fr; gap: 24px; }
@@ -355,7 +524,8 @@
       <span style="left:35%;--dur:15s;--delay:2.5s;--drift:-15px;"></span>
     </div>
 
-    <div class="hero-badge">
+    <!-- Texto centralizado -->
+    <div class="hero-badge" style="position:relative;z-index:1;">
       <span class="hero-badge-dot"></span>
       Plataforma de recrutamento com IA integrada
     </div>
@@ -370,13 +540,77 @@
       <em><span class="word"><span style="animation-delay:0.4s">oportunidade</span></span></em>
     </h1>
 
-    <p>Candidatos encontram vagas compatíveis com seu perfil. Empresas redescobrem talentos. IA reconecta quem pertence junto.</p>
+    <p style="max-width:520px;margin:0 auto 40px;">Candidatos encontram vagas compatíveis com seu perfil. Empresas redescobrem talentos. IA reconecta quem pertence junto.</p>
 
-    <div class="hero-cta">
-      <a href="/register" class="btn-hero"><i class="bi bi-arrow-right-circle"></i> Começar agora — grátis</a>
-      <a href="/login" class="btn-hero-outline">Já tenho conta</a>
+    <!-- Título da rede -->
+    <div style="position:relative;z-index:1;text-align:center;margin-bottom:20px;">
+      <h2 class="section-title" style="font-size:clamp(1.2rem,2.5vw,1.7rem);letter-spacing:-0.8px;margin-bottom:0;">
+        Onde candidatos e empresas se encontram
+      </h2>
     </div>
 
+    <!-- Rede de conexão: candidatos ↔ match ↔ empresas -->
+    <div class="hero-network" aria-hidden="true">
+      <canvas id="hero-canvas"></canvas>
+
+      <!-- Labels de canto -->
+      <div class="hnet-label hnet-label--left">
+        <i class="bi bi-people-fill" style="color:rgba(230,57,70,0.6)"></i>
+        Candidatos
+      </div>
+      <div class="hnet-label hnet-label--right">
+        <i class="bi bi-buildings-fill" style="color:rgba(16,185,129,0.7)"></i>
+        Empresas
+      </div>
+
+      <!-- Pill central -->
+      <div class="hnet-center-tag">
+        <span class="dot"></span>
+        Match em tempo real
+      </div>
+
+      <!-- Card do match — centralizado sobre a rede -->
+      <div class="hero-card-wrap">
+        <div class="hero-card-glow"></div>
+
+        <div class="hero-card" id="hero-card">
+          <div class="hc-header">
+            <div class="hc-logo">TC</div>
+            <div class="hc-company-info">
+              <div class="hc-company">TechCorp</div>
+              <div class="hc-location"><i class="bi bi-geo-alt"></i> São Paulo · Remoto</div>
+            </div>
+            <span class="hc-new">Nova</span>
+          </div>
+          <div class="hc-title">Dev Front-end Sênior</div>
+          <div class="hc-tags">
+            <span>React</span><span>TypeScript</span><span>Node.js</span>
+          </div>
+          <div class="hc-score">
+            <div class="hc-score-header">
+              <span><i class="bi bi-cpu"></i>Compatibilidade com IA</span>
+              <span class="hc-score-num">87%</span>
+            </div>
+            <div class="hc-score-bar"><div class="hc-score-fill" id="score-fill"></div></div>
+            <div class="hc-score-sub">Perfil muito compatível · 3 pontos de atenção</div>
+          </div>
+          <div class="hc-actions">
+            <a href="/register" class="hc-btn-primary">Candidatar-se</a>
+            <a href="/register" class="hc-btn-secondary"><i class="bi bi-chat-dots"></i> Chat IA</a>
+          </div>
+        </div>
+
+        <div class="hero-toast" id="hero-toast">
+          <div class="hero-toast-icon"><i class="bi bi-mic-fill"></i></div>
+          <div>
+            <div class="hero-toast-title">Simulação de entrevista</div>
+            <div class="hero-toast-sub">Score técnico: <strong style="color:#4caf50;">92/100</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contadores abaixo da rede -->
     <div class="counters">
       <div class="counter-item">
         <span class="counter-num" data-target="{{totalJobs}}">0</span>
@@ -394,7 +628,7 @@
   </section>
 
   <!-- FEATURES -->
-  <section class="features">
+  <section class="features" id="features">
     <div class="features-header reveal">
       <p class="section-tag">Funcionalidades</p>
       <h2 class="section-title">Tudo que você precisa,<br>em um só lugar</h2>
@@ -405,6 +639,8 @@
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-chat-dots"></i></div><h3>Chat com IA sobre a Vaga</h3><p>Converse com a IA diretamente na página da vaga. Tire dúvidas, entenda os requisitos e prepare sua candidatura.</p></div>
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-mic"></i></div><h3>Simulação de Entrevista</h3><p>Pratique entrevistas com a IA antes de enfrentar o recrutador real. Receba score por comunicação, técnica e fit cultural.</p></div>
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-scissors"></i></div><h3>Adaptar Currículo</h3><p>A IA reescreve seu currículo para cada vaga, destacando as experiências mais relevantes e aumentando seu score de compatibilidade.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-pen"></i></div><h3>Melhoria de Currículo</h3><p>Clique em "Melhorar com IA" direto no editor do currículo. A IA reescreve seu resumo profissional e cada experiência em formato STAR — sem você precisar editar palavra por palavra.</p></div>
+      <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-file-earmark-arrow-up"></i></div><h3>Importar Currículo com IA</h3><p>Tem um currículo em PDF? Faça upload e a IA extrai automaticamente todas as informações — dados de contato, experiências, formação e habilidades — preenchendo o formulário por você.</p></div>
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-envelope-check"></i></div><h3>Feedback Automático</h3><p>Ao ser recusado, você recebe automaticamente um feedback construtivo gerado por IA — sem ghosting, sem ficar no vazio.</p></div>
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-graph-up-arrow"></i></div><h3>Dashboard Inteligente</h3><p>Métricas reais: taxa de resposta, tempo médio, candidaturas expiradas. Empresas responsivas ganham um selo público de credibilidade.</p></div>
       <div class="feature-card reveal"><div class="feature-icon"><i class="bi bi-people"></i></div><h3>Redescoberta de Talentos</h3><p>Ao abrir uma vaga, o sistema busca automaticamente candidatos anteriores com fit alto que ainda estão disponíveis — sem busca manual.</p></div>
@@ -427,6 +663,8 @@
         <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;"><i class="bi bi-chat-dots"></i></div><div><div class="ia-tool-title">Chat sobre a vaga</div><div class="ia-tool-desc">Tire dúvidas e entenda os requisitos com a IA</div></div></div>
         <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(4, 80, 1, 0.795);color:#0bf574;"><i class="bi bi-mic"></i></div><div><div class="ia-tool-title">Praticar entrevista</div><div class="ia-tool-desc">Simulação completa com feedback por dimensão</div></div></div>
         <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;"><i class="bi bi-scissors"></i></div><div><div class="ia-tool-title">Adaptar currículo</div><div class="ia-tool-desc">IA reescreve seu CV para maximizar a compatibilidade</div></div></div>
+        <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(99,102,241,0.1);color:#818cf8;"><i class="bi bi-pen"></i></div><div><div class="ia-tool-title">Melhorar currículo</div><div class="ia-tool-desc">Reescreve resumo e experiências em formato profissional/STAR</div></div></div>
+        <div class="ia-tool reveal"><div class="ia-tool-icon" style="background:rgba(16,185,129,0.1);color:#34d399;"><i class="bi bi-file-earmark-arrow-up"></i></div><div><div class="ia-tool-title">Importar currículo</div><div class="ia-tool-desc">Extrai dados de um PDF automaticamente — preenche o formulário por você</div></div></div>
       </div>
     </div>
   </section>
@@ -607,6 +845,231 @@
         if (current >= target) clearInterval(timer);
       }, 28);
     });
+
+    // ── Hero visual ───────────────────────────────────────────────────────────
+
+    // 1. Canvas: candidatos ↔ empresas — pulsos de conexão
+    (function () {
+      const canvas = document.getElementById('hero-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h;
+
+      // Candidatos: círculos, esquerda
+      const CANDS = [
+        { fx: 0.07, fy: 0.22, label: 'RL', name: 'Rafael L.',  rgb: '230,57,70'  },
+        { fx: 0.04, fy: 0.52, label: 'JM', name: 'Juliana M.', rgb: '168,85,247' },
+        { fx: 0.10, fy: 0.78, label: 'CS', name: 'Carlos S.',  rgb: '6,182,212'  },
+        { fx: 0.16, fy: 0.40, label: 'BF', name: 'Beatriz F.', rgb: '245,158,11' },
+      ];
+      // Empresas: quadrados, direita
+      const CORPS = [
+        { fx: 0.93, fy: 0.22, label: 'TC', name: 'TechCorp',  rgb: '230,57,70'  },
+        { fx: 0.96, fy: 0.56, label: 'AB', name: 'Acme Co.',  rgb: '16,185,129' },
+        { fx: 0.88, fy: 0.80, label: 'XY', name: 'XYZ Ltd',   rgb: '99,102,241' },
+      ];
+
+      // Pulsos ativos
+      const pulses = [];
+
+      function addPulse() {
+        const from  = CANDS[Math.floor(Math.random() * CANDS.length)];
+        const to    = CORPS[Math.floor(Math.random() * CORPS.length)];
+        const score = Math.floor(Math.random() * 18) + 78; // 78–95%
+        pulses.push({ from, to, t: 0, speed: 0.0038 + Math.random() * 0.0025, score });
+      }
+
+      // Primeiros pulsos ao carregar, depois em intervalo
+      setTimeout(addPulse, 300);
+      setTimeout(addPulse, 900);
+      setTimeout(addPulse, 1600);
+      setInterval(addPulse, 1800);
+
+      function resize() {
+        w = canvas.width  = canvas.offsetWidth  || 420;
+        h = canvas.height = canvas.offsetHeight || 440;
+      }
+
+      const px = n => n.fx * w;
+      const py = n => n.fy * h;
+
+      function drawNode(n, t, isCompany) {
+        const x = px(n), y = py(n), R = 17;
+        const pulse = 0.8 + Math.sin(t * 1.4 + x * 0.015 + y * 0.01) * 0.2;
+
+        // Glow radial externo
+        const g = ctx.createRadialGradient(x, y, 0, x, y, 32);
+        g.addColorStop(0, `rgba(${n.rgb},0.18)`);
+        g.addColorStop(1, `rgba(${n.rgb},0)`);
+        ctx.beginPath(); ctx.arc(x, y, 32, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+
+        // Shape: círculo (candidato) ou quadrado arredondado (empresa)
+        ctx.beginPath();
+        if (isCompany) {
+          const r = 5;
+          ctx.moveTo(x - R + r, y - R);
+          ctx.arcTo(x + R, y - R, x + R, y + R, r);
+          ctx.arcTo(x + R, y + R, x - R, y + R, r);
+          ctx.arcTo(x - R, y + R, x - R, y - R, r);
+          ctx.arcTo(x - R, y - R, x + R, y - R, r);
+          ctx.closePath();
+        } else {
+          ctx.arc(x, y, R, 0, Math.PI * 2);
+        }
+        ctx.fillStyle   = `rgba(${n.rgb},0.15)`;
+        ctx.fill();
+        ctx.strokeStyle = `rgba(${n.rgb},${0.65 * pulse})`;
+        ctx.lineWidth   = 1.6;
+        ctx.stroke();
+
+        // Iniciais dentro do nó
+        ctx.font         = '700 9px system-ui,sans-serif';
+        ctx.fillStyle    = `rgba(${n.rgb},1)`;
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(n.label, x, y);
+
+        // Nome abaixo do nó
+        ctx.font         = '500 9px "DM Sans",system-ui,sans-serif';
+        ctx.fillStyle    = 'rgba(255,255,255,0.45)';
+        ctx.fillText(n.name, x, y + R + 13);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        const t = performance.now() * 0.001;
+
+        // Malha de fundo — linhas tênues entre todos os pares
+        CANDS.forEach(c => CORPS.forEach(co => {
+          ctx.beginPath();
+          ctx.moveTo(px(c), py(c));
+          ctx.lineTo(px(co), py(co));
+          ctx.strokeStyle = 'rgba(230,57,70,0.05)';
+          ctx.lineWidth   = 0.6;
+          ctx.stroke();
+        }));
+
+        // Pulsos viajantes
+        for (let i = pulses.length - 1; i >= 0; i--) {
+          const p = pulses[i];
+          p.t += p.speed;
+          if (p.t > 1.12) { pulses.splice(i, 1); continue; }
+
+          const x1 = px(p.from), y1 = py(p.from);
+          const x2 = px(p.to),   y2 = py(p.to);
+
+          // Linha ativa (ilumina conforme progresso)
+          const la = 0.22 * Math.sin(Math.min(p.t, 1) * Math.PI);
+          ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+          ctx.strokeStyle = `rgba(230,57,70,${la})`;
+          ctx.lineWidth   = 1.2;
+          ctx.stroke();
+
+          if (p.t <= 1) {
+            // Dot viajante com glow
+            const dotX = x1 + (x2 - x1) * p.t;
+            const dotY = y1 + (y2 - y1) * p.t;
+
+            const grd = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, 10);
+            grd.addColorStop(0, 'rgba(255,110,110,0.9)');
+            grd.addColorStop(1, 'rgba(230,57,70,0)');
+            ctx.beginPath(); ctx.arc(dotX, dotY, 10, 0, Math.PI * 2);
+            ctx.fillStyle = grd; ctx.fill();
+
+            ctx.beginPath(); ctx.arc(dotX, dotY, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
+
+            // Score % visível ao cruzar o meio (t entre 0.4 e 0.6)
+            if (p.t > 0.38 && p.t < 0.62) {
+              const fadeIn  = Math.min((p.t - 0.38) / 0.12, 1);
+              const fadeOut = Math.min((0.62 - p.t) / 0.12, 1);
+              const alpha   = Math.min(fadeIn, fadeOut);
+              ctx.font      = '700 11px system-ui,sans-serif';
+              ctx.fillStyle = `rgba(255,180,180,${alpha})`;
+              ctx.textAlign    = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(p.score + '%', dotX, dotY - 16);
+            }
+          }
+
+          // Burst ao chegar no destino
+          if (p.t > 0.9 && p.t <= 1.12) {
+            const burst = (p.t - 0.9) / 0.22;
+            const bGrd = ctx.createRadialGradient(x2, y2, 0, x2, y2, 32 * burst);
+            bGrd.addColorStop(0, `rgba(230,57,70,${0.65 * (1 - burst)})`);
+            bGrd.addColorStop(1, 'rgba(230,57,70,0)');
+            ctx.beginPath(); ctx.arc(x2, y2, 32 * burst, 0, Math.PI * 2);
+            ctx.fillStyle = bGrd; ctx.fill();
+          }
+        }
+
+        // Nós por cima
+        CANDS.forEach(n => drawNode(n, t, false));
+        CORPS.forEach(n => drawNode(n, t, true));
+
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      draw();
+      window.addEventListener('resize', resize);
+    })();
+
+    // 2. Card: entrada 3D + score counter + toast + tilt no mouse
+    (function () {
+      const card    = document.getElementById('hero-card');
+      const fill    = document.getElementById('score-fill');
+      const toast   = document.getElementById('hero-toast');
+      const scoreEl = card && card.querySelector('.hc-score-num');
+      if (!card || typeof anime === 'undefined') return;
+
+      // Entrada: flip 3D no eixo Y + escala + opacidade
+      anime({
+        targets: card,
+        opacity:    [0, 1],
+        rotateY:    [55, 0],
+        scale:      [0.88, 1],
+        duration:   950,
+        delay:      550,
+        easing:     'easeOutBack',
+        complete: function () {
+          // Flutuação: CSS animation no translate (não conflita com o transform JS do tilt)
+          card.classList.add('hero-card--floating');
+
+          // Barra de score preenche
+          anime({ targets: fill, width: ['0%', '87%'], duration: 1000, easing: 'easeOutCubic' });
+
+          // Número conta de 0 → 87 em sincronia
+          if (scoreEl) {
+            anime({
+              targets: { v: 0 }, v: 87, duration: 1000, easing: 'easeOutCubic',
+              update(anim) { scoreEl.textContent = Math.round(anim.animations[0].currentValue) + '%'; },
+            });
+          }
+
+          // Toast aparece 550ms depois com bounce
+          if (toast) {
+            anime({ targets: toast, opacity: [0, 1], translateY: [18, 0], scale: [0.85, 1],
+              duration: 560, delay: 550, easing: 'easeOutBack' });
+          }
+        },
+      });
+
+      // Tilt 3D que segue o mouse sobre o painel da rede
+      const network = document.querySelector('.hero-network');
+      if (network) {
+        network.addEventListener('mousemove', (e) => {
+          const r = network.getBoundingClientRect();
+          const x = ((e.clientX - r.left) / r.width  - 0.5) * 2;
+          const y = ((e.clientY - r.top)  / r.height - 0.5) * 2;
+          card.style.transform = `perspective(900px) rotateY(${x * 12}deg) rotateX(${-y * 8}deg)`;
+        });
+        network.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg)';
+        });
+      }
+    })();
   </script>
 </body>
 </html>

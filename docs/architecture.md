@@ -13,7 +13,7 @@
 7. [Jobs em Background](#7-jobs-em-background)
 8. [Diagrama de Entidades](#8-diagrama-de-entidades)
 9. [Integrações Externas](#9-integrações-externas)
-10. [Decisões Arquiteturais (ADRs)](#10-decisões-arquiteturais-adrs)
+10. [Decisões Arquiteturais (ADRs)](#10-decisões-arquiteturais-adrs) — ADR-001 a ADR-010
 11. [Limitações Conhecidas e Caminho de Escala](#11-limitações-conhecidas-e-caminho-de-escala)
 
 ---
@@ -26,7 +26,7 @@ A escolha por MPA (Multi-Page Application) server-side rendering foi deliberada:
 
 | Componente | Tecnologia | Responsabilidade |
 |---|---|---|
-| Servidor Web | Node.js 22 + Express 4 | Roteamento, middleware, SSR |
+| Servidor Web | Node.js 20 + Express 4 | Roteamento, middleware, SSR |
 | Banco de Dados | PostgreSQL 16 + Sequelize 6 | Persistência e relacionamentos |
 | IA Principal | Groq API — LLaMA 3.3 70B | Todas as features de linguagem natural |
 | Busca Semântica | Python Flask + sentence-transformers | Embeddings, BM25, Reciprocal Rank Fusion |
@@ -351,7 +351,7 @@ searchService → jobSearch.semanticSearch(query, vagas)
 
 ## 6. Comunicação em Tempo Real
 
-O Socket.io opera in-process no mesmo servidor Node.js. Eventos são emitidos da camada de service via `src/helpers/socket.js`.
+O Socket.io opera no mesmo servidor Node.js. Eventos são emitidos da camada de service via `src/helpers/socket.js`.
 
 **Tipos de evento:**
 - `notification` — nova candidatura, mudança de status, movimentação de pipeline, match de talento, convite
@@ -359,7 +359,14 @@ O Socket.io opera in-process no mesmo servidor Node.js. Eventos são emitidos da
 
 **Identificação de usuário:** conexões Socket.io são autenticadas via sessão. O `userId` é resolvido no servidor — nunca passado pelo cliente.
 
-**Limitação atual:** eventos Socket.io são in-process apenas. Implantação multi-instância requer `@socket.io/redis-adapter`.
+**Redis adapter (horizontal scaling):** `src/config/socket.js` tenta ativar o `@socket.io/redis-adapter` ao inicializar. Se o Redis estiver disponível (ping bem-sucedido), o adapter é habilitado e eventos se propagam entre todas as instâncias. Se o Redis estiver indisponível, o Socket.io opera in-process normalmente — sem crash, sem degradação visível em deployment de instância única.
+
+```
+Redis disponível  → Socket.io usa Redis pub/sub (multi-instância)
+Redis ausente     → Socket.io opera in-process (single instance, sem erro)
+```
+
+**Sessões:** armazenadas no PostgreSQL via `connect-pg-simple`. O Redis **não** é usado como session store — isso garante que a aplicação funcione sem Redis em desenvolvimento local.
 
 ---
 
@@ -498,6 +505,7 @@ Todas as chamadas à IA passam exclusivamente pelo `src/helpers/aiService.js`, q
 | Tailoring de currículo | POST /tailoring/:jobId | Sugerir adaptações do currículo |
 | Bias Auditor | POST /bias/audit | Detectar linguagem excludente |
 | Melhoria de currículo | POST /resume/ai/improve | Reescrever currículo profissionalmente |
+| Importação de currículo | POST /resume/ai/import | Extrair dados estruturados de PDF via IA |
 | Etapas sugeridas | POST /jobs/add | Sugerir pipeline baseado na área |
 | Encerramento de vaga | POST /jobs/close/:id | Feedback humanizado por candidato |
 
@@ -546,6 +554,25 @@ Inicializado em `server.js`, compartilhado com `src/config/socket.js`. `userId` 
 **Decisão:** Handlebars server-rendered + Socket.io para casos de tempo real + Alpine.js v3 para interatividade pontual (modais, chamadas AJAX, transições de estado).
 **Consequências:** navegação por full-page reload na maioria dos casos; ações isoladas (ex: cancelar candidatura) executam sem reload via Alpine.js + fetch. CSRF trivial — token exposto em `<meta>` e lido por Alpine via `document.querySelector`. Estado de componente restrito ao escopo do `x-data`, sem store global complexo.
 
+### ADR-009 — Redis apenas para Socket.io adapter; sessões no PostgreSQL
+**Contexto:** ao adicionar suporte a multi-instância, havia duas opções: mover sessões para o Redis (`connect-redis`) ou manter sessões no PostgreSQL e usar Redis apenas para o pub/sub do Socket.io.
+**Decisão:** sessões permanecem no PostgreSQL via `connect-pg-simple`. O Redis é usado exclusivamente pelo `@socket.io/redis-adapter`, ativado de forma condicional: na inicialização, `socket.js` faz um `ping()` ao Redis — se bem-sucedido, o adapter é habilitado; se falhar (Redis indisponível), o Socket.io opera in-process sem erro. O pacote `connect-redis` foi removido das dependências — não está instalado.
+**Consequências:**
+- Desenvolvimento local funciona sem Redis instalado — zero fricção de setup.
+- Em produção (com `REDIS_URL`), notificações push se propagam entre instâncias automaticamente.
+- Sessões no PostgreSQL já têm persistência nativa; mover para Redis adicionaria dependência de disponibilidade do Redis para cada request HTTP — risco desnecessário.
+- Em deploy multi-instância com sessões no PostgreSQL, sticky sessions (Nginx `ip_hash`) são necessárias para garantir afinidade de sessão.
+
+### ADR-010 — Hardening de autenticação sem dependências externas
+**Contexto:** auditoria de segurança identificou session fixation, ausência de account lockout, CSRF secret hardcoded e e-mails em texto plano nos logs.
+**Decisão:** todas as correções foram implementadas na camada de aplicação, sem adicionar pacotes externos:
+- **Session fixation:** `req.session.regenerate()` chamado antes de `req.login()` — novo ID de sessão a cada autenticação bem-sucedida.
+- **Account lockout:** Map in-memory em `authController` — 5 falhas consecutivas por e-mail bloqueiam por 15 minutos.
+- **CSRF secret:** fallback hardcoded removido — `SESSION_SECRET` (obrigatória) é a única fonte.
+- **SSL:** `rejectUnauthorized` habilitado por padrão em produção; desabilitável via `DB_SSL_REJECT_UNAUTHORIZED=false` para provedores com certificado self-signed.
+- **Audit log:** e-mails mascarados (`maskEmail()`) — nunca persistidos em texto plano.
+**Consequências:** zero dependências adicionadas; account lockout in-memory é resetado ao reiniciar o servidor (aceitável para deployment single-instance; em multi-instância, migrar para Redis). Migration `20260412000001` adiciona `passwordChangedAt` ao modelo `User`.
+
 ### ADR-008 — Alpine.js v3 para Interatividade Leve
 **Contexto:** interações específicas (confirmação de cancelamento, modais de ação) necessitam de feedback instantâneo sem recarregar a página, mas não justificam a adoção de um framework SPA completo.
 **Decisão:** Alpine.js v3 carregado via CDN com `defer`. Componentes definidos com `Alpine.data()` no evento `alpine:init`. O token CSRF é transmitido via header `x-csrf-token` nas chamadas `fetch`.
@@ -555,11 +582,11 @@ Inicializado em `server.js`, compartilhado com `src/config/socket.js`. `userId` 
 
 ## 11. Limitações Conhecidas e Caminho de Escala
 
-| Área | Limitação | Mitigação |
+| Área | Status | Observação |
 |---|---|---|
-| Sessões | PostgreSQL via `connect-pg-simple`; falha em multi-instância sem sticky sessions | Redis session store (`connect-redis`) |
-| Socket.io | Adapter in-process | `@socket.io/redis-adapter` |
-| Cron jobs | Todas as instâncias executam simultaneamente | Processo worker Bull/BullMQ |
+| Sessões | PostgreSQL (`connect-pg-simple`) | Requer sticky sessions em multi-instância; Redis session store opcional para escala maior |
+| Socket.io | Redis adapter implementado (condicional) | Ativado automaticamente se Redis disponível; funciona in-process sem Redis |
+| Cron jobs | In-process | Em multi-instância, todas as instâncias executam simultaneamente — mitigação: Bull/BullMQ |
 | Capacidade de IA | Plano gratuito Groq: 30 RPM / 1.000 req/dia | Cache layer; dashboard de capacidade; alerta em 80% |
 | Autorização | Somente camada de aplicação (sem row-level security) | Aceitável na escala atual; fortalecer antes de multi-tenant |
 | Cache de embeddings | Em memória, perdido ao reiniciar | Redis ou vector store persistente |

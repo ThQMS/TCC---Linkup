@@ -17,11 +17,11 @@ app.use(require('helmet')({
             fontSrc:       ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
             imgSrc:        ["'self'", "data:", "blob:", "https:"],
             connectSrc:    ["'self'", "https://cdn.jsdelivr.net", "https://servicodados.ibge.gov.br"],
-            frameSrc:      ["'none'"],
+            frameSrc:      ["'self'"],   // Swagger UI usa iframes internos
             objectSrc:     ["'none'"]
         }
     },
-    frameguard:     { action: 'deny' },
+    frameguard:     { action: 'sameorigin' },  // Swagger UI precisa de sameorigin
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     hsts:           process.env.NODE_ENV === 'production' ? { maxAge: 31536000, includeSubDomains: true } : false
 }));
@@ -39,6 +39,13 @@ require('./src/config/connection').connect()
 
 require('./src/routes')(app);
 require('./src/jobs');
+
+const swaggerUi   = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customSiteTitle: 'LinkUp API Docs',
+    swaggerOptions: { defaultModelsExpandDepth: -1 }
+}));
 
 app.use((req, res) => res.status(404).render('404', { layout: false }));
 

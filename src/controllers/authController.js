@@ -8,6 +8,31 @@ const transporter = require('../helpers/mailer');
 
 const CODE_EXPIRY_MINUTES = 15;
 
+// ─── Account lockout (in-memory, single-instance) ────────────────────────────
+// Chave: email em lowercase. Valor: { attempts, lockedUntil }
+const loginFailures = new Map();
+const MAX_FAILURES   = 5;
+const LOCKOUT_MS     = 15 * 60 * 1000; // 15 minutos
+
+function recordFailure(email) {
+    const key  = email.toLowerCase();
+    const rec  = loginFailures.get(key) || { attempts: 0, lockedUntil: null };
+    rec.attempts += 1;
+    if (rec.attempts >= MAX_FAILURES) rec.lockedUntil = Date.now() + LOCKOUT_MS;
+    loginFailures.set(key, rec);
+}
+
+function isLocked(email) {
+    const rec = loginFailures.get(email.toLowerCase());
+    if (!rec || !rec.lockedUntil) return false;
+    if (Date.now() > rec.lockedUntil) { loginFailures.delete(email.toLowerCase()); return false; }
+    return true;
+}
+
+function clearFailures(email) {
+    loginFailures.delete(email.toLowerCase());
+}
+
 
 exports.showLogin = async (req, res) => {
     const [totalJobs, totalCompanies] = await Promise.all([
@@ -31,23 +56,39 @@ exports.showResetPassword = (req, res) => res.render('reset-password', { showLog
 
 
 exports.login = (req, res, next) => {
+    const email = (req.body.email || '').toLowerCase();
+
+    if (isLocked(email)) {
+        req.flash('error_msg', 'Conta temporariamente bloqueada por excesso de tentativas. Tente novamente em 15 minutos.');
+        return res.redirect('/login');
+    }
+
     passport.authenticate('local', (err, user, info) => {
         if (err) return next(err);
         if (!user) {
+            recordFailure(email);
             req.flash('error_msg', info.message || 'E-mail ou senha incorretos.');
             return res.redirect('/login');
         }
-        req.login(user, (err) => {
+
+        // Regenera o session ID para evitar session fixation
+        const remember = req.body.remember;
+        req.session.regenerate((err) => {
             if (err) return next(err);
-            auditLog(AUDIT_ACTIONS.LOGIN, req, { email: user.email });
-            if (req.body.remember) {
-                req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
-            } else {
-                req.session.cookie.expires = false;
-            }
-            const redirect    = req.query.redirect || req.body.redirect || '/';
-            const safeRedirect = redirect.startsWith('/') ? redirect : '/';
-            return res.redirect(safeRedirect);
+            req.login(user, (err) => {
+                if (err) return next(err);
+                clearFailures(email);
+                req.session.loginAt = Date.now();   // usado para validar sessão após reset de senha
+                auditLog(AUDIT_ACTIONS.LOGIN, req, { userId: user.id });
+                if (remember) {
+                    req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+                } else {
+                    req.session.cookie.expires = false;
+                }
+                const redirect    = req.query.redirect || req.body.redirect || '/';
+                const safeRedirect = redirect.startsWith('/') ? redirect : '/';
+                return res.redirect(safeRedirect);
+            });
         });
     })(req, res, next);
 };
@@ -85,7 +126,7 @@ exports.register = async (req, res) => {
             html:    `<div style="font-family:sans-serif;max-width:480px;margin:auto;"><h2 style="color:#e53935;">LinkUp</h2><p>Olá, <strong>${name.trim()}</strong>!</p><p>Seu código de verificação é:</p><h1 style="letter-spacing:8px;color:#e53935;">${verificationCode}</h1><p style="color:#888;">Válido por ${CODE_EXPIRY_MINUTES} minutos.</p><p style="color:#888;">Se você não criou esta conta, ignore este e-mail.</p></div>`
         }, (error) => { if (error) logger.warn('authController', 'Erro ao enviar e-mail de verificação', { err: error.message }); });
 
-        auditLog(AUDIT_ACTIONS.REGISTER, req, { email, userType });
+        auditLog(AUDIT_ACTIONS.REGISTER, req, { userType });
 
         req.login(newUser, (err) => {
             if (err) return res.redirect('/login');
@@ -188,11 +229,12 @@ exports.resetPassword = async (req, res) => {
             return res.redirect('/forgot-password');
         }
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
-        user.verificationCode = null;
+        user.password             = await bcrypt.hash(password, salt);
+        user.verificationCode     = null;
         user.verificationCodeExpires = null;
+        user.passwordChangedAt    = new Date();   // invalida sessões abertas antes desta data
         await user.save();
-        auditLog(AUDIT_ACTIONS.RESET_PASSWORD, req, { email });
+        auditLog(AUDIT_ACTIONS.RESET_PASSWORD, req, { email: maskEmail(email) });
         req.flash('success_msg', 'Senha alterada com sucesso! Faça login.');
         res.redirect('/login');
     } catch (err) {
@@ -205,7 +247,12 @@ exports.logout = (req, res, next) => {
     auditLog(AUDIT_ACTIONS.LOGOUT, req);
     req.logout((err) => {
         if (err) return next(err);
-        res.redirect('/login');
+        // Destrói a sessão no servidor e limpa o cookie — impede reuso do token
+        req.session.destroy((err) => {
+            if (err) return next(err);
+            res.clearCookie('connect.sid');
+            res.redirect('/login');
+        });
     });
 };
 

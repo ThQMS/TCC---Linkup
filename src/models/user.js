@@ -35,7 +35,9 @@ const User = db.define('User', {
     verifyTokenExpires: { type: DataTypes.DATE, allowNull: true },
     cnpj:    { type: DataTypes.STRING,  allowNull: true },
     isPcd:   { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    pcdType: { type: DataTypes.STRING,  allowNull: true }
+    pcdType: { type: DataTypes.STRING,  allowNull: true },
+    // Preenchido ao alterar senha — usado para invalidar sessões abertas antes da mudança
+    passwordChangedAt: { type: DataTypes.DATE, allowNull: true, defaultValue: null }
 });
 
 module.exports = User;

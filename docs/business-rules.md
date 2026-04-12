@@ -6,7 +6,7 @@ Este documento especifica as regras que governam o comportamento do sistema. Cad
 
 ## Sumário
 
-1. [Autenticação e Verificação](#1-autenticação-e-verificação)
+1. [Autenticação e Verificação](#1-autenticação-e-verificação) — RN-101 a RN-110
 2. [Perfis de Usuário](#2-perfis-de-usuário)
 3. [Vagas](#3-vagas)
 4. [Pipeline de Etapas](#4-pipeline-de-etapas)
@@ -71,9 +71,37 @@ Cada regra segue o formato:
 ---
 
 **RN-106 — Rate limiting em endpoints de autenticação**
-**Descrição:** Os endpoints `/login`, `/register`, `/verify`, `/resend-code` e `/reset-password` possuem rate limiters independentes com janelas e limites configurados em `Ratelimiter.js`.
+**Descrição:** Os endpoints `/login`, `/register`, `/verify`, `/resend-code` e `/reset-password` possuem rate limiters independentes com janelas e limites configurados em `Ratelimiter.js`. Endpoints de IA são limitados por `userId` autenticado (não por IP), evitando que usuários em NAT compartilhado se prejudiquem mutuamente.
 **Justificativa:** Mitiga ataques de força bruta e credential stuffing.
 **Impacto:** Resposta HTTP 429 com mensagem amigável após exceder o limite.
+
+---
+
+**RN-107 — Bloqueio temporário de conta após tentativas de login consecutivas**
+**Descrição:** Após 5 tentativas de login falhas consecutivas com o mesmo e-mail, a conta é bloqueada por 15 minutos. Após esse período, as tentativas são resetadas automaticamente. Um login bem-sucedido limpa o contador imediatamente.
+**Justificativa:** Mitiga ataques de força bruta por dicionário que conseguem contornar rate limits baseados em IP (ex: botnets distribuídas).
+**Impacto:** Lógica em `authController` via Map in-memory (`loginFailures`). Resposta: redirect para `/login` com mensagem de bloqueio.
+
+---
+
+**RN-108 — Requisitos de complexidade de senha**
+**Descrição:** Senhas devem ter no mínimo 8 caracteres, pelo menos uma letra maiúscula e pelo menos um número.
+**Justificativa:** Senhas fracas são a principal causa de comprometimento de contas. Requisitos mínimos de complexidade reduzem significativamente o espaço de busca de ataques de força bruta.
+**Impacto:** `validateRegister` em `Validation.js` valida os três critérios com mensagens de erro específicas por violação.
+
+---
+
+**RN-109 — Logout destrói a sessão completamente**
+**Descrição:** Ao fazer logout, a sessão é destruída no servidor (`req.session.destroy()`) e o cookie `connect.sid` é removido do navegador. Não basta apenas remover o usuário da sessão.
+**Justificativa:** `req.logout()` sozinho apenas desvincula o usuário da sessão, mas o token de sessão permanece válido no servidor. Um atacante que capturou o cookie poderia reutilizá-lo. A destruição completa invalida o token imediatamente.
+**Impacto:** `authController.logout` chama `req.session.destroy()` + `res.clearCookie('connect.sid')` após `req.logout()`.
+
+---
+
+**RN-110 — Reset de senha invalida todas as sessões abertas**
+**Descrição:** Ao redefinir a senha com sucesso, o campo `passwordChangedAt` do usuário é atualizado com o timestamp atual. O middleware `ensureAuthenticated` compara esse valor com o `loginAt` armazenado na sessão — se a senha foi alterada após o login, a sessão é destruída e o usuário é redirecionado para login.
+**Justificativa:** Após um reset de senha (iniciado pelo próprio usuário ou via fluxo de recuperação), sessões abertas em outros dispositivos devem ser invalidadas. Caso contrário, um atacante que obteve acesso a uma sessão ativa mantém o acesso mesmo após a senha ser trocada.
+**Impacto:** `passwordChangedAt` (DATE, nullable) adicionado ao modelo `User` via migration `20260412000001`. `authController.resetPassword` e `changePassword` atualizam o campo. `auth.js` (`ensureAuthenticated`) verifica a condição em toda requisição autenticada.
 
 ---
 
@@ -398,7 +426,21 @@ Transições de status e ações automáticas:
 
 ---
 
-**RN-606 — Bias Auditor analisa exclusivamente a descrição da vaga**
+**RN-606 — Melhoria de currículo por IA age campo a campo**
+**Descrição:** A feature de melhoria de currículo recebe um campo específico (`summary` ou `experience`) e reescreve exclusivamente aquele trecho. Para o sumário, o prompt exige reescrita profissional e impactante em até 4 linhas. Para experiências, aplica o formato STAR (Situação, Tarefa, Ação, Resultado) com verbos de ação no passado. A IA retorna apenas o texto melhorado — sem markdown, sem asteriscos.
+**Justificativa:** Reescritas granulares reduzem o risco de perda de contexto e permitem que o candidato aceite ou rejeite cada melhoria individualmente.
+**Impacto:** `resumeController.postAiImprove` (POST `/resume/ai/improve`) chama `aiService.chatComplete()` com prompt por campo. Resultado exibido inline no formulário de edição para revisão antes de salvar. Log registrado em `AiLogs` com feature `improve-resume`.
+
+---
+
+**RN-606b — Importação de currículo com IA extrai estrutura de PDF**
+**Descrição:** O candidato pode enviar um arquivo PDF do seu currículo (máximo 5 MB). A plataforma valida os magic bytes (`%PDF`) antes de processar. O texto é extraído via `pdfjs-dist` e enviado à IA (até 3.000 caracteres), que retorna JSON estruturado com campos: `phone`, `city`, `birthDate`, `address`, `linkedin`, `github`, `summary`, `experiences`, `education` e `skills`. O formulário de currículo é pré-populado com os dados extraídos para revisão e edição antes de salvar.
+**Justificativa:** Reduz o atrito de onboarding para candidatos que já possuem currículo em PDF — evitam digitar todas as informações manualmente.
+**Impacto:** `resumeController.postAiImport` (POST `/resume/ai/import`) com upload via multer (memória, PDF apenas). Validação dupla de MIME type e extensão. Log registrado em `AiLogs` com feature `import-resume`.
+
+---
+
+**RN-606c — Bias Auditor analisa exclusivamente a descrição da vaga**
 **Descrição:** O Bias Auditor recebe o texto da descrição da vaga e retorna análise de linguagem excludente, tendenciosa ou que possa desencorajar grupos sub-representados.
 **Justificativa:** Linguagem não-inclusiva em descrições de vagas reduz a diversidade do pool de candidatos, frequentemente sem intenção consciente da empresa.
 **Impacto:** `biasAuditController.audit` chama `aiService.chatComplete()` com prompt especializado. Resultado exibido inline para revisão antes de publicar a vaga.
@@ -621,9 +663,9 @@ Retorna até 3 perfis com `combinedScore ≥ 20`, ordenados de forma decrescente
 ---
 
 **RN-1103 — Audit log de ações sensíveis**
-**Descrição:** Ações sensíveis (login bem-sucedido, falha de login, alteração de senha, exclusão de vaga) são registradas em log estruturado via `auditLog.js` com contexto completo (userId, IP, timestamp, ação).
-**Justificativa:** Permite rastreabilidade de incidentes de segurança e auditoria de conformidade.
-**Impacto:** `auditLog` middleware aplicado seletivamente nas rotas relevantes.
+**Descrição:** Ações sensíveis (login, registro, verificação de e-mail, alteração de senha, criação/exclusão de vaga, candidatura, mudança de status) são registradas em log estruturado via `auditLog.js` com contexto completo: `userId`, IP, user-agent, timestamp e ação. E-mails são mascarados nos logs (`jo***@gmail.com`) — nunca persistidos em texto plano.
+**Justificativa:** Permite rastreabilidade de incidentes de segurança sem expor dados pessoais sensíveis nos logs.
+**Impacto:** `auditLog` middleware aplicado seletivamente nas rotas relevantes. Função `maskEmail()` aplicada em todos os campos de e-mail antes do registro.
 
 ---
 
