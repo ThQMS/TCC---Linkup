@@ -239,25 +239,6 @@ Veja [`docs/architecture.md`](docs/architecture.md) e [`docs/engineering-princip
 | Microserviço de busca | Processo Flask único | Workers Python com load balancer |
 | Embeddings | Microserviço Python | pgvector (eliminar hop de rede) |
 
----
-
-## Modelo de Negócio
-
-**Mercado-alvo:** empresas de tech brasileiras (50–500 funcionários) gastando R$3.000–15.000/mês em recrutamento com baixas taxas de conversão.
-
-**Estrutura:**
-- **Candidatos** — gratuito permanente. Menor custo de aquisição; base maior de candidatos aumenta o valor da plataforma para empresas
-- **Empresas** — freemium com camada de IA baseada em uso:
-
-| Plano | Preço | Inclui |
-|---|---|---|
-| Gratuito | R$0 | 3 vagas ativas, pipeline básico |
-| Growth | R$299/mês | Vagas ilimitadas, suite de IA completa, redescoberta de talentos |
-| Scale | R$799/mês | Multi-recrutador, acesso à API, integrações ATS, SLA |
-
-As features de IA são a alavanca principal de monetização — cada chamada de IA no plano gratuito demonstra valor que converte para pago. O modelo `AiLog` captura esse sinal com precisão.
-
-**Expansão:** gestão de pipeline white-label para agências de recrutamento; dados anônimos do mercado de contratações como produto B2B.
 
 ---
 
