@@ -46,4 +46,4 @@ function auditLog(action, req, extra = {}) {
     logger.info('audit', JSON.stringify(entry));
 }
 
-module.exports = { auditLog, AUDIT_ACTIONS };
+module.exports = { auditLog, AUDIT_ACTIONS, maskEmail };

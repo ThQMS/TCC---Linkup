@@ -36,6 +36,9 @@ module.exports = function(passport) {
     passport.deserializeUser(async (id, done) => {
         try {
             const user = await User.findByPk(id);
+            // Usuário pode ter sido excluído com a sessão ainda ativa: encerra a sessão
+            // limpa (done(null, false)) em vez de deixar req.user nulo e autenticado.
+            if (!user) return done(null, false);
             done(null, user);
         } catch (err) {
             done(err, null);

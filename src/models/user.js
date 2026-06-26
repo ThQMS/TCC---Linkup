@@ -1,5 +1,9 @@
 const { DataTypes } = require('sequelize');
+const bcrypt = require('bcryptjs');
 const db = require('../config/connection');
+
+// Custo do bcrypt centralizado — 12 rounds é o recomendado atual (OWASP).
+const BCRYPT_ROUNDS = 12;
 
 const User = db.define('User', {
     name:               { type: DataTypes.STRING, allowNull: false },
@@ -39,5 +43,16 @@ const User = db.define('User', {
     // Preenchido ao alterar senha — usado para invalidar sessões abertas antes da mudança
     passwordChangedAt: { type: DataTypes.DATE, allowNull: true, defaultValue: null }
 });
+
+// Hashing centralizado: qualquer save com senha em texto puro é hasheado aqui.
+// O guard `$2[aby]$` evita re-hashear valores que já são bcrypt (ex.: o seed,
+// que insere senhas pré-hasheadas) — impede double-hash.
+async function hashPasswordHook(user) {
+    if (user.changed('password') && user.password && !/^\$2[aby]\$/.test(user.password)) {
+        user.password = await bcrypt.hash(user.password, BCRYPT_ROUNDS);
+    }
+}
+User.beforeCreate(hashPasswordHook);
+User.beforeUpdate(hashPasswordHook);
 
 module.exports = User;

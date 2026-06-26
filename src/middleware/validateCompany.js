@@ -99,9 +99,15 @@ const validateCompany = async (req, res, next) => {
             return res.redirect('/register');
         }
 
-        // Se a API estiver fora do ar, deixa passar com aviso (não bloqueia o cadastro)
+        // API indisponível. Em produção, fail-closed: não permite cadastro de empresa
+        // sem validar o CNPJ (evita contas falsas durante instabilidade da API).
+        // Em dev/teste, deixa passar para não travar o fluxo local.
         logger.error('validateCompany', 'Erro ao consultar BrasilAPI', { err: err.message });
-        logger.warn('validateCompany', 'API indisponível — cadastro permitido sem validação de CNPJ');
+        if (process.env.NODE_ENV === 'production') {
+            req.flash('error_msg', 'Não foi possível validar o CNPJ no momento (serviço indisponível). Tente novamente em alguns minutos.');
+            return res.redirect('/register');
+        }
+        logger.warn('validateCompany', 'API indisponível — cadastro permitido sem validação (apenas dev)');
         next();
     }
 };

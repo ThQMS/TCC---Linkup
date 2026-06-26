@@ -15,8 +15,8 @@ router.get('/logout',                      auth.logout);
 
 router.post('/login',    loginLimiter,    validateLogin,    (req, res, next) => handleValidationErrors(req, res, next, '/login'),    auth.login);
 router.post('/register', ensureGuest, registerLimiter, validateRegister, validateCompany, (req, res, next) => handleValidationErrors(req, res, next, '/register'), auth.register);
-router.post('/verify',        verifyLimiter, auth.verify);
-router.post('/resend-code',   verifyLimiter, auth.resendCode);
+router.post('/verify',        ensureAuthenticated, verifyLimiter, auth.verify);
+router.post('/resend-code',   ensureAuthenticated, verifyLimiter, auth.resendCode);
 router.post('/forgot-password', resetLimiter, auth.forgotPassword);
 router.post('/reset-password',  resetLimiter, auth.resetPassword);
 router.post('/onboarding/complete',          ensureAuthenticated, auth.onboardingComplete);

@@ -4,6 +4,12 @@ const logger  = require('./src/helpers/logger');
 
 const app = express();
 
+// Atrás de um reverse proxy (Caddy/Nginx/Railway/Render), confia no primeiro hop
+// para que cookies `secure`, req.protocol e o IP do rate-limit funcionem corretamente.
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
 require('./src/config/handlebars')(app);
 
 app.use(require('morgan')(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
@@ -30,6 +36,10 @@ app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(express.json({ limit: '2mb' }));
 app.use(require('cookie-parser')());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Healthcheck leve — antes de sessão/CSRF, sem auth. Para load balancer / Docker.
+app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
+
 app.use(require('./src/middleware/Validation').sanitizeInputs);
 
 const sessionMiddleware = require('./src/config/session')(app);
@@ -54,7 +64,7 @@ app.use((err, req, res, next) => {
         const isAjax = req.xhr || (req.headers.accept || '').includes('application/json') || (req.headers['content-type'] || '').includes('application/json');
         if (isAjax) return res.status(403).json({ error: 'Token de segurança expirado. Recarregue a página.' });
         req.flash('error_msg', 'Token de segurança expirado. Tente novamente.');
-        return res.redirect('back');
+        return res.redirect(req.get('Referrer') || '/');
     }
     logger.error('app', 'Erro não tratado', { err: err.message, stack: err.stack });
     res.status(500).render('500', { layout: false });

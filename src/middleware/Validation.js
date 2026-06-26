@@ -5,11 +5,14 @@ function sanitizeInputs(req, res, next) {
     next();
 }
 
+// Camada leve de defesa-em-profundidade. A proteção real contra XSS é o escape
+// de saída do Handlebars ({{ }}) — aqui apenas neutralizamos tags HTML reais e
+// vetores óbvios, sem destruir um "<" legítimo isolado (ex.: bio com "a < b").
 function sanitizeObject(obj) {
     for (const key of Object.keys(obj)) {
         if (typeof obj[key] === 'string') {
             obj[key] = obj[key]
-                .replace(/<[^>]*>/g, '')
+                .replace(/<\/?[a-z][\s\S]*?>/gi, '')   // só remove tags HTML de verdade
                 .replace(/javascript:/gi, '')
                 .replace(/on\w+\s*=/gi, '')
                 .trim();

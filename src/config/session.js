@@ -31,7 +31,8 @@ module.exports = function setupSession(app) {
     require('./passport')(passport);
 
     const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
-        getSecret:               () => process.env.SESSION_SECRET,
+        // Segredo dedicado ao CSRF (cai no SESSION_SECRET se não definido, p/ compat).
+        getSecret:               () => process.env.CSRF_SECRET || process.env.SESSION_SECRET,
         getSessionIdentifier:    (req) => req.session.id,
         cookieName:              'x-csrf-token',
         cookieOptions:           { sameSite: 'lax', secure: process.env.NODE_ENV === 'production', httpOnly: true },
