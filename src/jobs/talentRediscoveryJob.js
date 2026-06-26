@@ -2,7 +2,7 @@ const cron   = require('node-cron');
 const { Op } = require('sequelize');
 const { Job, User, Resume, Application } = require('../models');
 const { notifyRevisitedOpportunities }   = require('../services/talentRediscoveryService');
-const { checkAndUpdateAvailability }     = require('../services/availabilityService');
+const { checkAndUpdateAvailability, STATUS } = require('../services/availabilityService');
 const logger = require('../helpers/logger');
 
 
@@ -46,12 +46,25 @@ async function _processRevisitedOpportunities() {
 async function _updateCandidateAvailability() {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
+    // 1) Candidatos com candidatura recente — alimentam a Regra 1 (aprovado → sugerir).
     const activeApplications = await Application.findAll({
         where:      { createdAt: { [Op.gte]: thirtyDaysAgo } },
         attributes: ['userId'],
         group:      ['userId']
     });
-    const activeIds = [...new Set(activeApplications.map(a => a.userId))];
+
+    // 2) Candidatos em "busca ativa" — únicos elegíveis ao downgrade por inatividade
+    //    (Regra 2). Sem incluí-los, a regra nunca dispararia, pois o conjunto acima
+    //    por definição tem atividade recente.
+    const activelySearching = await User.findAll({
+        where:      { userType: 'candidato', availabilityStatus: STATUS.ACTIVELY_SEARCHING },
+        attributes: ['id']
+    });
+
+    const activeIds = [...new Set([
+        ...activeApplications.map(a => a.userId),
+        ...activelySearching.map(u => u.id)
+    ])];
 
     logger.info('talentRediscoveryJob', `Verificando disponibilidade de ${activeIds.length} candidatos...`);
 

@@ -11,7 +11,10 @@ const Favorite = db.define('Favorite', {
         allowNull: false
     }
 }, {
-    tableName: 'favorites'
+    tableName: 'favorites',
+    indexes: [
+        { unique: true, fields: ['userId', 'jobId'] }
+    ]
 });
 
 module.exports = Favorite;

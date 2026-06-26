@@ -373,16 +373,28 @@ exports.getPublicCandidate = async (req, res) => {
     try {
         // Converte slug de URL para nome (ex: "ana-paula" → "ana paula")
         // Usa iLike para busca case-insensitive sem curingas — sem risco de LIKE injection
-        const nameParam = req.params.name
-            .replace(/-/g, ' ')
-            .replace(/[^a-zA-ZÀ-úÀ-ÿ0-9\s]/g, '')
-            .trim()
-            .slice(0, 100);
-        if (!nameParam) return res.status(404).render('404', { layout: false });
-        const candidate = await User.findOne({
-            where: { userType: 'candidato', name: { [Op.iLike]: nameParam } },
-            attributes: CANDIDATO_PUBLIC_FIELDS
-        });
+        // Preferir busca por ID (inequívoca). O nome no path serve para SEO/leitura.
+        // A busca só por nome (compat) é ambígua quando há homônimos — por isso o
+        // ID via query é o caminho usado pelos links internos.
+        const candidateId = parseInt(req.query.id, 10);
+        let candidate;
+        if (!isNaN(candidateId)) {
+            candidate = await User.findOne({
+                where: { id: candidateId, userType: 'candidato' },
+                attributes: CANDIDATO_PUBLIC_FIELDS
+            });
+        } else {
+            const nameParam = req.params.name
+                .replace(/-/g, ' ')
+                .replace(/[^a-zA-ZÀ-úÀ-ÿ0-9\s]/g, '')
+                .trim()
+                .slice(0, 100);
+            if (!nameParam) return res.status(404).render('404', { layout: false });
+            candidate = await User.findOne({
+                where: { userType: 'candidato', name: { [Op.iLike]: nameParam } },
+                attributes: CANDIDATO_PUBLIC_FIELDS
+            });
+        }
         if (!candidate) return res.status(404).render('404', { layout: false });
         const resume = await Resume.findOne({ where: { userId: candidate.id } });
         if (!resume) return res.status(404).render('404', { layout: false });

@@ -3,11 +3,11 @@
 
     <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
       <div>
-        <h2 style="color:#f03e3e;font-weight:700;margin:0;">Candidatos</h2>
+        <h2 style="color:#e63946;font-weight:700;margin:0;">Candidatos</h2>
         <p style="color:#aaa;margin:4px 0 0;font-size:0.9rem;">Vaga: <strong>{{job.title}}</strong>
           <span style="margin-left:8px;padding:2px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;
             {{#if (eq job.status 'aberta')}}background:rgba(76,175,80,0.1);border:1px solid #4caf50;color:#4caf50;
-            {{else if (eq job.status 'encerrada')}}background:rgba(240,62,62,0.1);border:1px solid #f03e3e;color:#f03e3e;
+            {{else if (eq job.status 'encerrada')}}background:rgba(230,57,70,0.1);border:1px solid #e63946;color:#e63946;
             {{else}}background:#2a2a2a;border:1px solid #555;color:#888;{{/if}}">
             {{job.status}}
           </span>
@@ -17,7 +17,7 @@
         {{#unless (eq job.status 'encerrada')}}
         <form action="/jobs/close/{{job.id}}" method="POST" onsubmit="return confirm('Encerrar a vaga e enviar feedback para todos os candidatos não selecionados? Esta ação não pode ser desfeita.')">
           <input type="hidden" name="_csrf" value="{{csrfToken}}">
-          <button type="submit" style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='rgba(240,62,62,0.1)'" onmouseout="this.style.background='transparent'">
+          <button type="submit" style="background:transparent;border:1px solid #e63946;color:#e63946;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='rgba(230,57,70,0.1)'" onmouseout="this.style.background='transparent'">
             <i class="bi bi-x-circle me-1"></i>Encerrar vaga
           </button>
         </form>
@@ -79,7 +79,7 @@
     {{/if}}
 
     <!-- ALERTA REDESCOBERTA DE TALENTOS (carregado via JS) -->
-    <div id="rediscovery-alert" style="display:none;background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(240,62,62,0.06));border:1px solid #a855f7;border-radius:12px;padding:20px 24px;margin-bottom:20px;">
+    <div id="rediscovery-alert" style="display:none;background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(230,57,70,0.06));border:1px solid #a855f7;border-radius:12px;padding:20px 24px;margin-bottom:20px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
         <i class="bi bi-stars" style="color:#a855f7;font-size:1.4rem;"></i>
         <div>
@@ -123,7 +123,7 @@
                   <input type="checkbox" class="candidate-check" data-id="{{this.id}}" onchange="updateCompareBtn()" style="position:absolute;opacity:0;width:0;height:0;">
                   <span class="custom-check" style="position:absolute;inset:0;border-radius:5px;border:2px solid #3a3a3a;background:#1a1a1a;transition:all 0.15s;display:flex;align-items:center;justify-content:center;"></span>
                 </label>
-                <div style="width:50px;height:50px;border-radius:50%;border:2px solid #f03e3e;background:#2a2a2a;display:flex;align-items:center;justify-content:center;color:#f03e3e;font-size:1.3rem;flex-shrink:0;">
+                <div style="width:50px;height:50px;border-radius:50%;border:2px solid #e63946;background:#2a2a2a;display:flex;align-items:center;justify-content:center;color:#e63946;font-size:1.3rem;flex-shrink:0;">
                   <i class="bi bi-person-fill"></i>
                 </div>
                 <div>
@@ -141,7 +141,7 @@
                 {{else if (eq this.status 'aprovado')}}
                   <span style="background:#1a3a1a;border:1px solid #4caf50;color:#4caf50;border-radius:20px;padding:4px 12px;font-size:0.8rem;"><i class="bi bi-check-circle-fill me-1"></i>Aprovado</span>
                 {{else if (eq this.status 'rejeitado')}}
-                  <span style="background:#3a1a1a;border:1px solid #f03e3e;color:#f03e3e;border-radius:20px;padding:4px 12px;font-size:0.8rem;"><i class="bi bi-x-circle-fill me-1"></i>Recusado</span>
+                  <span style="background:#3a1a1a;border:1px solid #e63946;color:#e63946;border-radius:20px;padding:4px 12px;font-size:0.8rem;"><i class="bi bi-x-circle-fill me-1"></i>Recusado</span>
                 {{else if (eq this.status 'expirado')}}
                   <span style="background:#2a2a2a;border:1px solid #444;color:#666;border-radius:20px;padding:4px 12px;font-size:0.8rem;"><i class="bi bi-dash-circle me-1"></i>Encerrado</span>
                 {{else}}
@@ -164,7 +164,7 @@
             {{#if this.skills.length}}
               <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;">
                 {{#each this.skills}}
-                  <span style="background:#2a2a2a;border:1px solid #f03e3e;color:#f03e3e;border-radius:20px;padding:3px 10px;font-size:0.78rem;">{{this}}</span>
+                  <span style="background:#2a2a2a;border:1px solid #e63946;color:#e63946;border-radius:20px;padding:3px 10px;font-size:0.78rem;">{{this}}</span>
                 {{/each}}
               </div>
             {{/if}}
@@ -246,12 +246,12 @@
                 {{#if (eq this.status 'aprovado')}}
                 <button type="submit"
                   onclick="return confirm('Desclassificar {{this.candidate.name}}? O candidato será removido do processo seletivo.')"
-                  style="background:rgba(240,62,62,0.1);border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='#f03e3e';this.style.color='white'" onmouseout="this.style.background='rgba(240,62,62,0.1)';this.style.color='#f03e3e'">
+                  style="background:rgba(230,57,70,0.1);border:1px solid #e63946;color:#e63946;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='#e63946';this.style.color='white'" onmouseout="this.style.background='rgba(230,57,70,0.1)';this.style.color='#e63946'">
                   <i class="bi bi-person-x me-1"></i>Desclassificar
                 </button>
                 {{else}}
                 <button type="submit"
-                  style="background:rgba(240,62,62,0.1);border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='#f03e3e';this.style.color='white'" onmouseout="this.style.background='rgba(240,62,62,0.1)';this.style.color='#f03e3e'">
+                  style="background:rgba(230,57,70,0.1);border:1px solid #e63946;color:#e63946;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='#e63946';this.style.color='white'" onmouseout="this.style.background='rgba(230,57,70,0.1)';this.style.color='#e63946'">
                   <i class="bi bi-x-lg me-1"></i>Recusar
                 </button>
                 {{/if}}
@@ -352,7 +352,7 @@ async function toggleSimilares(applicationId, btn) {
                   </div>
                   <div style="padding:8px 0;">
                   ${data.similar.map((s, i) => {
-                    const color = s.fitScore >= 70 ? '#4caf50' : s.fitScore >= 40 ? '#ffc107' : '#f03e3e';
+                    const color = s.fitScore >= 70 ? '#4caf50' : s.fitScore >= 40 ? '#ffc107' : '#e63946';
                     const initial = s.candidate.name ? s.candidate.name.charAt(0).toUpperCase() : '?';
                     return `
                     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;${i < data.similar.length - 1 ? 'border-bottom:1px solid #1e1e1e;' : ''}flex-wrap:wrap;gap:10px;transition:background 0.15s;" onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
@@ -375,7 +375,7 @@ async function toggleSimilares(applicationId, btn) {
                           <div style="font-size:1.4rem;font-weight:800;color:${s.similarity >= 60 ? '#4caf50' : s.similarity >= 30 ? '#ffc107' : '#888'};line-height:1;">${s.similarity}%</div>
                           <div style="color:#555;font-size:0.65rem;text-transform:uppercase;letter-spacing:.5px;">similaridade</div>
                         </div>
-                        <a href="/profile/c/${s.candidate.name ? s.candidate.name.replace(/\s+/g,'-') : ''}?fromJob=${APPLICATIONS_JOB_ID}" target="_blank"
+                        <a href="/profile/c/${s.candidate.name ? s.candidate.name.replace(/\s+/g,'-') : ''}?id=${s.candidate.id}&fromJob=${APPLICATIONS_JOB_ID}" target="_blank"
                           style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);color:#a855f7;border-radius:8px;padding:7px 14px;font-size:0.8rem;font-weight:600;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;"
                           onmouseover="this.style.background='rgba(168,85,247,0.22)';this.style.borderColor='#a855f7'" onmouseout="this.style.background='rgba(168,85,247,0.1)';this.style.borderColor='rgba(168,85,247,0.3)'">
                           <i class="bi bi-person-lines-fill"></i>Ver Perfil
@@ -422,7 +422,7 @@ async function rankCandidates() {
         data.rankings.forEach(r => {
             const card = document.querySelector('.applicant-card[data-id="' + r.applicationId + '"]');
             if (!card) return;
-            const color = r.score >= 70 ? '#4caf50' : r.score >= 40 ? '#ffc107' : '#f03e3e';
+            const color = r.score >= 70 ? '#4caf50' : r.score >= 40 ? '#ffc107' : '#e63946';
             const scoreEl = card.querySelector('.score-value');
             scoreEl.textContent = r.score + '%';
             scoreEl.style.color = color;
@@ -475,16 +475,16 @@ async function compararSelecionados() {
         document.getElementById('compare-content').style.display = 'block';
         document.getElementById('compare-content').innerHTML = renderComparacao(data);
     } catch(e) {
-        document.getElementById('compare-loading').innerHTML = '<p style="color:#f03e3e;">Erro ao comparar. Tente novamente.</p>';
+        document.getElementById('compare-loading').innerHTML = '<p style="color:#e63946;">Erro ao comparar. Tente novamente.</p>';
     }
 }
 
 function renderComparacao(data) {
-    if (data.error) return `<p style="color:#f03e3e;padding:12px;">${data.error}</p>`;
+    if (data.error) return `<p style="color:#e63946;padding:12px;">${data.error}</p>`;
     const candidates = data.candidates || [];
 
     const cols = candidates.map(c => {
-        const scoreColor = c.score >= 70 ? '#4caf50' : c.score >= 40 ? '#f59e0b' : '#f03e3e';
+        const scoreColor = c.score >= 70 ? '#4caf50' : c.score >= 40 ? '#f59e0b' : '#e63946';
         const borderColor = c.recomendado ? '#4caf50' : '#2a2a2a';
         const initial = c.nome ? c.nome.charAt(0).toUpperCase() : '?';
         const barWidth = Math.max(4, Math.min(100, c.score || 0));
@@ -531,9 +531,9 @@ function renderComparacao(data) {
           <!-- Lacunas -->
           ${(c.lacunas||[]).length ? `
           <div style="padding:12px 18px;">
-            <div style="font-size:0.68rem;font-weight:700;color:#f03e3e;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;"><i class="bi bi-exclamation-circle me-1"></i>Lacunas</div>
+            <div style="font-size:0.68rem;font-weight:700;color:#e63946;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;"><i class="bi bi-exclamation-circle me-1"></i>Lacunas</div>
             <div style="display:flex;flex-direction:column;gap:4px;">
-              ${(c.lacunas).map(l => `<span style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#ccc;"><span style="color:#f03e3e;font-size:0.75rem;">✗</span>${l}</span>`).join('')}
+              ${(c.lacunas).map(l => `<span style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#ccc;"><span style="color:#e63946;font-size:0.75rem;">✗</span>${l}</span>`).join('')}
             </div>
           </div>` : ''}
 
@@ -593,7 +593,7 @@ function fecharComparacao() {
                         <div style="font-size:1.1rem;font-weight:700;color:${s.combinedScore>=70?'#4caf50':s.combinedScore>=40?'#ffc107':'#06b6d4'};">${s.combinedScore}%</div>
                         <div style="color:#888;font-size:0.68rem;">fit combinado</div>
                     </div>
-                    <a href="/profile/c/${s.candidate.name.replace(/\s+/g,'-')}?fromJob=${jobId}" target="_blank"
+                    <a href="/profile/c/${s.candidate.name.replace(/\s+/g,'-')}?id=${s.candidate.id}&fromJob=${jobId}" target="_blank"
                         style="background:transparent;border:1px solid #2a2a2a;color:#aaa;border-radius:8px;padding:7px 12px;font-size:0.82rem;font-weight:600;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
                         <i class="bi bi-person-lines-fill"></i>Ver Perfil
                     </a>
@@ -625,13 +625,13 @@ async function convidarSugerido(candidateId, jobId, btn) {
             btn.style.opacity    = '1';
         } else {
             btn.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>' + (data.error || 'Erro');
-            btn.style.background = '#f03e3e';
+            btn.style.background = '#e63946';
             btn.style.opacity    = '1';
             btn.disabled         = false;
         }
     } catch (e) {
         btn.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Erro';
-        btn.style.background = '#f03e3e';
+        btn.style.background = '#e63946';
         btn.style.opacity    = '1';
         btn.disabled         = false;
     }

@@ -15,6 +15,7 @@ const parseResume = require('../helpers/parseResume');
 const { formatDate, applicationStatusBadge } = require('../helpers/pdfUtils');
 const { applyToJob, cancelApplication, updateApplicationStatus, updateApplicationStage, sendBulkClosingFeedback } = require('../services/applicationService');
 const { findTalentsForJob, notifyRevisitedOpportunities, reactivateContact: _reactivateContact, findSimilarCandidates } = require('../services/talentRediscoveryService');
+const { invalidateJobCache } = require('../helpers/jobSearch');
 const { findSuggestedCandidates, findCandidatesSimilarTo, contactSuggestedCandidate } = require('../services/similarCandidatesService');
 
 exports.showAdd = (req, res) => res.render('add', { csrfToken: res.locals.csrfToken });
@@ -25,11 +26,14 @@ exports.view = async (req, res) => {
         if (!job) { req.flash('error_msg', 'Vaga não encontrada.'); return res.redirect('/'); }
 
         try {
-            if (req.user) {
+            // Não conta a própria visualização do dono da vaga (infla métricas).
+            const isJobOwner = req.user && req.user.id === job.UserId;
+            if (req.user && !isJobOwner) {
                 const [, created] = await JobView.findOrCreate({ where: { jobId: job.id, userId: req.user.id } });
                 if (created) await job.increment('views');
-            } else {
-                const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+            } else if (!req.user) {
+                // req.ip respeita 'trust proxy' — não confiar em x-forwarded-for cru (forjável).
+                const ip = req.ip;
                 const alreadyViewed = await JobView.findOne({ where: { jobId: job.id, ip } });
                 if (!alreadyViewed) { await JobView.create({ jobId: job.id, userId: null, ip }); await job.increment('views'); }
             }
@@ -143,6 +147,9 @@ exports.update = async (req, res) => {
         req.flash('success_msg', 'Vaga atualizada com sucesso!');
         res.redirect('/jobs/view/' + id);
 
+        // Conteúdo mudou → invalida o embedding em cache (ranking semântico atualizado)
+        invalidateJobCache(id).catch(() => {});
+
         if (status === 'aberta') {
             const reactivated = await Job.findByPk(id);
             if (reactivated) {
@@ -162,7 +169,16 @@ exports.destroy = async (req, res) => {
         const job = await Job.findByPk(id);
         if (!job) { req.flash('error_msg', 'Vaga não encontrada.'); return res.redirect('/'); }
         if (job.UserId !== req.user.id) { req.flash('error_msg', 'Sem permissão.'); return res.redirect('/jobs/view/' + id); }
-        await job.destroy();
+        // Remove registros dependentes explicitamente (não dependemos de FK no banco,
+        // que pode não existir em tabelas legadas) numa transação atômica.
+        const sequelize = require('../config/connection');
+        await sequelize.transaction(async (t) => {
+            await Application.destroy({ where: { jobId: id }, transaction: t });
+            await Favorite.destroy({ where: { jobId: id }, transaction: t });
+            await JobView.destroy({ where: { jobId: id }, transaction: t });
+            await job.destroy({ transaction: t });
+        });
+        invalidateJobCache(id).catch(() => {});
         req.flash('success_msg', 'Vaga excluída com sucesso!');
         res.redirect('/');
     } catch (err) {
@@ -185,7 +201,14 @@ exports.apply = async (req, res) => {
             Application.findOne({ where: { jobId: job.id, userId: req.user.id } }),
             Resume.findOne({ where: { userId: req.user.id } })
         ]);
-        if (existing) { req.flash('error_msg', 'Você já se candidatou a esta vaga!'); return res.redirect('/jobs/view/' + job.id); }
+        if (existing && existing.status !== 'cancelado') {
+            req.flash('error_msg', 'Você já se candidatou a esta vaga!');
+            return res.redirect('/jobs/view/' + job.id);
+        }
+        // Candidatura anterior foi cancelada: remove o registro para permitir recandidatar.
+        if (existing && existing.status === 'cancelado') {
+            await existing.destroy();
+        }
         if (!resume) {
             req.flash('error_msg', 'Você precisa criar seu currículo antes de se candidatar.');
             return res.redirect('/jobs/view/' + job.id);
@@ -284,9 +307,11 @@ exports.myApplicationsPdf = async (req, res) => {
         });
         const data       = applications.map(app => ({ ...app.toJSON() }));
         const total      = data.length;
-        const aprovados  = data.filter(a => a.status === 'aprovado').length;
+        // Buckets alinhados aos status reais. "Contratado" entra em aprovados;
+        // "em análise"/"pendente"/sem status entram em pendentes; cancelado/expirado à parte.
+        const aprovados  = data.filter(a => ['aprovado', 'contratado'].includes(a.status)).length;
         const rejeitados = data.filter(a => a.status === 'rejeitado').length;
-        const pendentes  = data.filter(a => a.status === 'pendente' || !a.status).length;
+        const pendentes  = data.filter(a => ['pendente', 'em análise'].includes(a.status) || !a.status).length;
 
         const rows = data.filter(a => a.job).map(a =>
             '<tr>' +
@@ -312,7 +337,7 @@ exports.myApplicationsPdf = async (req, res) => {
             '.footer{margin-top:32px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:.75rem;color:#aaa}' +
             '</style></head><body>' +
             '<div class="header"><div class="header-logo">Link<span>Up</span></div>' +
-            '<div class="header-info"><strong>' + req.user.name + '</strong>Relatório gerado em ' + formatDate(new Date()) + '</div></div>' +
+            '<div class="header-info"><strong>' + escapeHtml(req.user.name) + '</strong>Relatório gerado em ' + formatDate(new Date()) + '</div></div>' +
             '<div class="summary">' +
             '<div class="summary-card total"><div class="num">' + total + '</div><div class="label">Total</div></div>' +
             '<div class="summary-card aprovado"><div class="num">' + aprovados + '</div><div class="label">Aprovadas</div></div>' +
@@ -322,7 +347,7 @@ exports.myApplicationsPdf = async (req, res) => {
             '<p class="section-title">Histórico de candidaturas</p>' +
             '<table><thead><tr><th>Vaga / Empresa</th><th>Modalidade</th><th>Salário</th><th>Status</th><th>Data</th></tr></thead>' +
             '<tbody>' + (rows || '<tr><td colspan="5" style="padding:24px;text-align:center;color:#aaa">Nenhuma candidatura encontrada.</td></tr>') + '</tbody></table>' +
-            '<div class="footer"><span>LinkUp</span><span>' + req.user.email + '</span></div>' +
+            '<div class="footer"><span>LinkUp</span><span>' + escapeHtml(req.user.email) + '</span></div>' +
             '</body></html>';
 
         const pdfBuffer = await generatePdf(html);
@@ -372,7 +397,11 @@ exports.toggleFavorite = async (req, res) => {
         const id = parseInt(req.params.id, 10);
         const existing = await Favorite.findOne({ where: { userId: req.user.id, jobId: id } });
         if (existing) { await existing.destroy(); req.flash('success_msg', 'Vaga removida dos favoritos.'); }
-        else { await Favorite.create({ userId: req.user.id, jobId: id }); req.flash('success_msg', 'Vaga salva nos favoritos!'); }
+        else {
+            // findOrCreate + índice único evitam duplicados em cliques concorrentes.
+            await Favorite.findOrCreate({ where: { userId: req.user.id, jobId: id } });
+            req.flash('success_msg', 'Vaga salva nos favoritos!');
+        }
         res.redirect('/jobs/view/' + id);
     } catch (err) {
         req.flash('error_msg', 'Erro ao favoritar vaga.');
@@ -404,6 +433,9 @@ exports.blockCompany = async (req, res) => {
         if (req.user.userType !== 'candidato') return res.status(403).json({ error: 'Apenas candidatos podem bloquear empresas.' });
         const companyId = parseInt(req.params.companyId, 10);
         if (isNaN(companyId)) return res.status(400).json({ error: 'ID inválido.' });
+        // Garante que o alvo é mesmo uma empresa existente (evita poluir a tabela).
+        const company = await User.findOne({ where: { id: companyId, userType: 'empresa' }, attributes: ['id'] });
+        if (!company) return res.status(404).json({ error: 'Empresa não encontrada.' });
         const existing  = await UserBlock.findOne({ where: { userId: req.user.id, companyId } });
         if (existing) { await existing.destroy(); req.flash('success_msg', 'Empresa desbloqueada.'); }
         else { await UserBlock.create({ userId: req.user.id, companyId }); req.flash('success_msg', 'Empresa bloqueada. Suas vagas não aparecerão mais para você.'); }
@@ -570,10 +602,14 @@ exports.compareCandidates = async (req, res) => {
         const job = await Job.findByPk(jobId);
         if (!job || job.UserId !== req.user.id) return res.status(403).json({ error: 'Sem permissão.' });
 
+        // Filtra por jobId além do id: impede comparar candidatos de OUTRA vaga/empresa (IDOR).
         const applications = await Application.findAll({
-            where:   { id: applicationIds },
+            where:   { id: applicationIds, jobId: job.id },
             include: [{ model: User, as: 'candidate', attributes: ['id', 'name'] }]
         });
+        if (applications.length < 2) {
+            return res.status(400).json({ error: 'Candidatos inválidos para esta vaga.' });
+        }
 
         const cmpUserIds   = applications.map(a => a.userId);
         const cmpResumes   = await Resume.findAll({ where: { userId: { [Op.in]: cmpUserIds } } });
@@ -693,7 +729,8 @@ exports.getSimilarCandidates = async (req, res) => {
         if (!target) return res.json({ similar: [] });
 
         const job = await Job.findByPk(target.jobId);
-        if (!job || job.UserId !== req.user.id) return res.status(403).json({ error: 'Sem permissão.' });
+        // Resposta uniforme (não distingue 403 de vazio) p/ não permitir enumerar IDs.
+        if (!job || job.UserId !== req.user.id) return res.json({ similar: [] });
 
         const similar = await findCandidatesSimilarTo(target.userId, job.id, req.user.id);
         res.json({ similar });

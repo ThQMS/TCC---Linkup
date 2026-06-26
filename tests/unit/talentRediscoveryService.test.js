@@ -240,54 +240,54 @@ describe('applyPcdBoost — Boost de inclusão PCD', () => {
   });
 
   test('Candidato PCD com score borderline aparece em vaga PCD via findTalentsForJob', async () => {
-    // Score base 70% (7 de 10 skills) → 70 + 20 = 90 >= 88 → incluído
+    // Score base 50% (6 de 12 skills, denom cap 12) → 50 + 20 = 70 >= 60 → incluído
     const company   = await createCompany();
     const candidate = await createCandidate({ availabilityStatus: 'actively_searching', isPcd: true });
 
     await createResume(candidate.id, {
-      skills:      JSON.stringify(['node', 'javascript', 'python', 'django', 'flask', 'sqlalchemy', 'celery', 'redis', 'docker', 'aws']),
+      skills:      JSON.stringify(['node', 'javascript', 'python', 'django', 'flask', 'sqlalchemy', 'redis', 'docker', 'aws', 'kubernetes', 'terraform', 'graphql']),
       experiences: '[]'
     });
 
     const oldJob = await createJob(company.id, {
       title:        'backend developer',
-      requirements: 'node javascript python django flask sqlalchemy celery',
+      requirements: 'node javascript python django flask sqlalchemy',
       isPcd:        true
     });
     await createApplication(oldJob.id, candidate.id);
 
     const newJob = await createJob(company.id, {
       title:        'backend developer',
-      requirements: 'node javascript python django flask sqlalchemy celery',
+      requirements: 'node javascript python django flask sqlalchemy',
       isPcd:        true
     });
 
     const result = await findTalentsForJob(newJob, company.id);
     expect(result.length).toBeGreaterThanOrEqual(1);
     expect(result[0].candidate.id).toBe(candidate.id);
-    expect(result[0].fitScore).toBeGreaterThanOrEqual(88);
+    expect(result[0].fitScore).toBeGreaterThanOrEqual(60);
   });
 
   test('Candidato PCD com score borderline NÃO aparece em vaga não-PCD', async () => {
-    // Mesmo score 70% mas sem boost → 70 < 88 → excluído
+    // Mesmo score base 50% mas sem boost (vaga não-PCD) → 50 < 60 → excluído
     const company   = await createCompany();
     const candidate = await createCandidate({ availabilityStatus: 'actively_searching', isPcd: true });
 
     await createResume(candidate.id, {
-      skills:      JSON.stringify(['node', 'javascript', 'python', 'django', 'flask', 'sqlalchemy', 'celery', 'redis', 'docker', 'aws']),
+      skills:      JSON.stringify(['node', 'javascript', 'python', 'django', 'flask', 'sqlalchemy', 'redis', 'docker', 'aws', 'kubernetes', 'terraform', 'graphql']),
       experiences: '[]'
     });
 
     const oldJob = await createJob(company.id, {
       title:        'backend developer',
-      requirements: 'node javascript python django flask sqlalchemy celery',
+      requirements: 'node javascript python django flask sqlalchemy',
       isPcd:        false
     });
     await createApplication(oldJob.id, candidate.id);
 
     const newJob = await createJob(company.id, {
       title:        'backend developer',
-      requirements: 'node javascript python django flask sqlalchemy celery',
+      requirements: 'node javascript python django flask sqlalchemy',
       isPcd:        false
     });
 

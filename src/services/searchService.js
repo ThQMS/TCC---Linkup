@@ -7,8 +7,34 @@ const { getResponsiveCompanies } = require('./responsividadeService');
 const LIMIT = 8;
 
 /**
- * Returns blockedCompanyIds for a candidate user, or [] for empresa/unauthenticated.
+ * Extrai o valor numérico mínimo de uma string de salário.
+ * Ex: "R$ 3.000 - R$ 5.000" → 3000 | "A combinar" → null
  */
+function parseSalaryMin(s) {
+    if (!s) return null;
+    if (s.toLowerCase().includes('combinar')) return null;
+    const n = s.replace(/\./g, '').match(/\d+/g);
+    return n ? parseInt(n[0], 10) : null;
+}
+
+/**
+ Filtra uma lista de vagas pelo parâmetro salary da URL.
+ Valores esperados: '1000' | '2000' | '3000' | '5000' | 'combinar' | 'todos' */
+function filterBySalary(jobs, salary) {
+    if (!salary || salary === 'todos') return jobs;
+    if (salary === 'combinar') {
+        return jobs.filter(j => j.salary && j.salary.toLowerCase().includes('combinar'));
+    }
+    const max = parseInt(salary, 10);
+    if (isNaN(max)) return jobs;
+    return jobs.filter(j => {
+        const min = parseSalaryMin(j.salary);
+        return min !== null && min <= max;
+    });
+}
+
+/**
+Returns blockedCompanyIds for a candidate user, or [] for empresa/unauthenticated.*/
 async function getBlockedCompanyIds(user) {
     if (!user || user.userType !== 'candidato') return [];
     try {
@@ -42,7 +68,11 @@ async function searchJobs({ search, modality, city, salary, skill, isPcd, page, 
             order: [['createdAt', 'DESC']]
         });
 
-        const semantic = await semanticSearch(search, allOpenJobs.map(j => j.toJSON()));
+        // Aplica filtro de salário antes de enviar ao Python para que o ranking
+        // semântico e o totalCount já reflitam apenas as vagas relevantes.
+        const jobsForSearch = filterBySalary(allOpenJobs.map(j => j.toJSON()), salary);
+
+        const semantic = await semanticSearch(search, jobsForSearch);
 
         if (semantic && semantic.ids && semantic.ids.length > 0) {
             semanticUsed = true;
@@ -67,30 +97,25 @@ async function searchJobs({ search, modality, city, salary, skill, isPcd, page, 
         if (city     && city     !== 'todos') conditions.push({ city: { [Op.like]: `%${city}%` } });
         if (isPcd)                            conditions.push({ isPcd: true });
         if (blockedCompanyIds.length > 0)     conditions.push({ UserId: { [Op.notIn]: blockedCompanyIds } });
+        // Filtro de skill aplicado já no SQL (antes do cap), para o conjunto ser correto.
+        if (skill && skill !== 'todos') {
+            const like = `%${skill}%`;
+            conditions.push({ [Op.or]: [
+                { title:        { [Op.like]: like } },
+                { description:  { [Op.like]: like } },
+                { requirements: { [Op.like]: like } }
+            ] });
+        }
 
         const whereClause = conditions.length > 0 ? { [Op.and]: conditions } : {};
-        const { count, rows } = await Job.findAndCountAll({ where: whereClause, order: [['createdAt', 'DESC']], limit: LIMIT, offset });
+        // Busca o conjunto candidato (cap 200, igual ao ramo semântico). O filtro de
+        // salário é por texto livre — feito em memória — então paginamos APÓS filtrar
+        // para que totalCount e o tamanho da página fiquem corretos.
+        const allMatching = await Job.findAll({ where: whereClause, order: [['createdAt', 'DESC']], limit: 200 });
+        const filteredAll = filterBySalary(allMatching, salary);
 
-        totalCount   = count;
-        filteredRows = rows;
-
-        // Salary range filter
-        if (salary && salary !== 'todos') {
-            const ranges = { 'ate-5000': [0, 5000], '5000-8000': [5000, 8000], '8000-12000': [8000, 12000], 'acima-12000': [12000, 999999] };
-            const range  = ranges[salary];
-            if (range) {
-                function parseSalaryMin(s) { if (!s) return 0; const n = s.replace(/\./g, '').match(/\d+/g); return n ? parseInt(n[0], 10) : 0; }
-                filteredRows = filteredRows.filter(j => { const min = parseSalaryMin(j.salary); return min >= range[0] && min <= range[1]; });
-            }
-        }
-
-        // Skill keyword filter
-        if (skill && skill !== 'todos') {
-            filteredRows = filteredRows.filter(j => {
-                const text = [j.title, j.description, j.requirements].join(' ').toLowerCase();
-                return text.includes(skill.toLowerCase());
-            });
-        }
+        totalCount   = filteredAll.length;
+        filteredRows = filteredAll.slice(offset, offset + LIMIT);
     }
 
     return { rows: filteredRows, totalCount, semanticUsed };

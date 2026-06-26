@@ -189,7 +189,7 @@ swaggerSpec.paths = {
     '/jobs/applications/status': {
         post: {
             tags: ['Pipeline'], summary: 'Atualizar status de candidatura (empresa)',
-            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['applicationId', 'status', 'jobId'], properties: { applicationId: { type: 'integer' }, status: { type: 'string', enum: ['pendente', 'aceito', 'recusado', 'cancelado'] }, jobId: { type: 'integer' }, _csrf: { type: 'string' } } } } } },
+            requestBody: { required: true, content: { 'application/x-www-form-urlencoded': { schema: { type: 'object', required: ['applicationId', 'status', 'jobId'], properties: { applicationId: { type: 'integer' }, status: { type: 'string', enum: ['pendente', 'em análise', 'aprovado', 'rejeitado', 'expirado', 'contratado'] }, jobId: { type: 'integer' }, _csrf: { type: 'string' } } } } } },
             responses: { 302: { description: 'Redireciona de volta ao pipeline' } }
         }
     },

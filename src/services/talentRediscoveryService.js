@@ -25,7 +25,11 @@ const { isAvailable }    = require('./availabilityService');
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 
-const FIT_THRESHOLD         = 88;   // % mínimo para acionar as features
+// Threshold configurável por env. O default de 88% sobre match exato quase nunca
+// disparava na prática (penalizava candidatos com muitas skills); 60% é alcançável
+// com a métrica de cobertura ajustada abaixo. Recalibre com dados reais via env.
+const FIT_THRESHOLD         = parseInt(process.env.FIT_THRESHOLD, 10) || 60;
+const FIT_DENOM_CAP         = 12;   // teto do denominador — não exige casar TODAS as skills
 const LOOKBACK_MONTHS       = 6;    // janela de busca de candidaturas antigas
 const MAX_CANDIDATES_NOTIFY = 50;   // limite de candidatos processados por chamada
 const PCD_BOOST             = 20;   // boost quando candidato PCD candidata a vaga PCD
@@ -66,7 +70,11 @@ function calcFitScore(resume, job) {
     );
 
     const matched = [...candidateKeywords].filter(kw => jobWords.has(kw)).length;
-    return Math.round((matched / candidateKeywords.size) * 100);
+    // Cobertura relativa a um teto (FIT_DENOM_CAP) em vez de todas as skills do
+    // candidato: assim um perfil amplo não é penalizado — casar ~12 keywords-chave
+    // já indica fit forte.
+    const denom = Math.min(candidateKeywords.size, FIT_DENOM_CAP);
+    return Math.min(100, Math.round((matched / denom) * 100));
 }
 
 /**
