@@ -5,7 +5,7 @@
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
       <div>
         <h2 style="font-weight:700;margin-bottom:4px;">
-          <i class="bi bi-speedometer2 me-2" style="color:#f03e3e;"></i>Meu Dashboard
+          <i class="bi bi-speedometer2 me-2" style="color:#e63946;"></i>Meu Dashboard
         </h2>
         <p style="color:#888;margin:0;">Acompanhe sua jornada de candidaturas.</p>
       </div>
@@ -20,7 +20,7 @@
     <div class="row g-3 mb-4">
       <div class="col-6 col-md-3">
         <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center;">
-          <div style="font-size:2rem;font-weight:700;color:#f03e3e;">{{totalCandidaturas}}</div>
+          <div style="font-size:2rem;font-weight:700;color:#e63946;">{{totalCandidaturas}}</div>
           <div style="font-size:0.85rem;color:#888;">Total</div>
         </div>
       </div>
@@ -46,7 +46,7 @@
 
     <!-- CARD OPORTUNIDADES REVISITADAS -->
     {{#if oportunidadesRevisitadas}}
-    <div style="background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(240,62,62,0.06));border:1px solid #a855f7;border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+    <div style="background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(230,57,70,0.06));border:1px solid #a855f7;border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
       <div style="display:flex;align-items:center;gap:16px;">
         <div style="width:48px;height:48px;border-radius:12px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <i class="bi bi-arrow-repeat" style="color:#a855f7;font-size:1.4rem;"></i>
@@ -73,7 +73,7 @@
       {{#if applications.length}}
       <div class="col-md-5">
         <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;height:100%;">
-          <h5 style="color:#f03e3e;font-weight:700;margin-bottom:20px;">
+          <h5 style="color:#e63946;font-weight:700;margin-bottom:20px;">
             <i class="bi bi-pie-chart me-2"></i>Distribuição
           </h5>
           <canvas id="statusChart"></canvas>
@@ -84,7 +84,7 @@
       <div class="col-md-7">
         <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;height:100%;display:flex;flex-direction:column;justify-content:space-between;">
           <div>
-            <h5 style="color:#f03e3e;font-weight:700;margin-bottom:24px;">
+            <h5 style="color:#e63946;font-weight:700;margin-bottom:24px;">
               <i class="bi bi-bar-chart-line me-2"></i>Resultado das Candidaturas
             </h5>
             <div style="display:flex;flex-direction:column;gap:20px;">
@@ -145,7 +145,7 @@
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.8rem;color:#666;margin-bottom:2px;">Total enviadas</div>
-              <div style="font-size:1.6rem;font-weight:700;color:#f03e3e;">{{totalCandidaturas}}</div>
+              <div style="font-size:1.6rem;font-weight:700;color:#e63946;">{{totalCandidaturas}}</div>
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@
 
     <!-- TIMELINE DE CANDIDATURAS -->
     <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:24px;">
-      <h5 style="color:#f03e3e;font-weight:700;margin-bottom:24px;">
+      <h5 style="color:#e63946;font-weight:700;margin-bottom:24px;">
         <i class="bi bi-clock-history me-2"></i>Timeline de Candidaturas
       </h5>
 
@@ -173,12 +173,12 @@
             <div style="position:absolute;left:0;top:4px;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;
               {{#if (eq this.status 'aprovado')}}background:#1a3a1a;border:2px solid #4caf50;
               {{else if (eq this.status 'contratado')}}background:#1a3a1a;border:2px solid #4caf50;
-              {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;border:2px solid #f03e3e;
+              {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;border:2px solid #e63946;
               {{else if (eq this.status 'expirado')}}background:#2a2a2a;border:2px solid #555;
               {{else}}background:#2a2a1a;border:2px solid #ffc107;{{/if}}">
               <i class="bi {{#if (eq this.status 'aprovado')}}bi-check-lg" style="color:#4caf50;
                 {{else if (eq this.status 'contratado')}}bi-award-fill" style="color:#4caf50;
-                {{else if (eq this.status 'rejeitado')}}bi-x-lg" style="color:#f03e3e;
+                {{else if (eq this.status 'rejeitado')}}bi-x-lg" style="color:#e63946;
                 {{else if (eq this.status 'expirado')}}bi-dash-circle" style="color:#555;
                 {{else}}bi-hourglass-split" style="color:#ffc107;{{/if}}
                 font-size:1rem;"></i>
@@ -188,19 +188,19 @@
             <div style="background:#141414;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;
               {{#if (eq this.status 'aprovado')}}border-left:3px solid #4caf50;
               {{else if (eq this.status 'contratado')}}border-left:3px solid #4caf50;
-              {{else if (eq this.status 'rejeitado')}}border-left:3px solid #f03e3e;
+              {{else if (eq this.status 'rejeitado')}}border-left:3px solid #e63946;
               {{else if (eq this.status 'expirado')}}border-left:3px solid #555;
               {{else}}border-left:3px solid #ffc107;{{/if}}">
 
               <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
                 <div>
                   <p style="font-weight:700;font-size:0.95rem;margin:0 0 2px;">{{this.job.title}}</p>
-                  <p style="color:#f03e3e;font-size:0.82rem;margin:0;">{{this.job.company}}</p>
+                  <p style="color:#e63946;font-size:0.82rem;margin:0;">{{this.job.company}}</p>
                 </div>
                 <span style="padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;white-space:nowrap;
                   {{#if (eq this.status 'aprovado')}}background:#1a3a1a;color:#4caf50;border:1px solid #4caf50;
                   {{else if (eq this.status 'contratado')}}background:#1a3a1a;color:#4caf50;border:1px solid #4caf50;
-                  {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;color:#f03e3e;border:1px solid #f03e3e;
+                  {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;color:#e63946;border:1px solid #e63946;
                   {{else if (eq this.status 'expirado')}}background:#2a2a2a;color:#666;border:1px solid #444;
                   {{else if (eq this.status 'em análise')}}background:rgba(6,182,212,0.08);color:#06b6d4;border:1px solid rgba(6,182,212,0.3);
                   {{else}}background:#2a2a1a;color:#ffc107;border:1px solid #ffc107;{{/if}}">
@@ -241,7 +241,7 @@
                 <div style="flex:1;height:2px;background:#2a2a2a;min-width:20px;
                   {{#if (eq this.status 'aprovado')}}background:#4caf50;
                   {{else if (eq this.status 'contratado')}}background:#4caf50;
-                  {{else if (eq this.status 'rejeitado')}}background:#f03e3e;
+                  {{else if (eq this.status 'rejeitado')}}background:#e63946;
                   {{else if (eq this.status 'expirado')}}background:#555;
                   {{else}}background:#2a2a2a;{{/if}}"></div>
 
@@ -250,21 +250,21 @@
                   <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
                     {{#if (eq this.status 'aprovado')}}background:#1a3a1a;border:2px solid #4caf50;
                     {{else if (eq this.status 'contratado')}}background:#1a3a1a;border:2px solid #4caf50;
-                    {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;border:2px solid #f03e3e;
+                    {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;border:2px solid #e63946;
                     {{else if (eq this.status 'expirado')}}background:#2a2a2a;border:2px solid #555;
                     {{else}}background:#2a2a1a;border:2px solid #ffc107;{{/if}}">
                     <i class="bi {{#if (eq this.status 'aprovado')}}bi-check{{else if (eq this.status 'contratado')}}bi-check{{else if (eq this.status 'rejeitado')}}bi-check{{else if (eq this.status 'expirado')}}bi-check{{else}}bi-hourglass-split{{/if}}"
                       style="font-size:0.75rem;
                       {{#if (eq this.status 'aprovado')}}color:#4caf50;
                       {{else if (eq this.status 'contratado')}}color:#4caf50;
-                      {{else if (eq this.status 'rejeitado')}}color:#f03e3e;
+                      {{else if (eq this.status 'rejeitado')}}color:#e63946;
                       {{else if (eq this.status 'expirado')}}color:#555;
                       {{else}}color:#ffc107;{{/if}}"></i>
                   </div>
                   <p style="font-size:0.65rem;margin:4px 0 0;text-align:center;line-height:1.2;
                     {{#if (eq this.status 'aprovado')}}color:#4caf50;
                     {{else if (eq this.status 'contratado')}}color:#4caf50;
-                    {{else if (eq this.status 'rejeitado')}}color:#f03e3e;
+                    {{else if (eq this.status 'rejeitado')}}color:#e63946;
                     {{else if (eq this.status 'expirado')}}color:#555;
                     {{else}}color:#ffc107;{{/if}}">Em análise</p>
                 </div>
@@ -272,7 +272,7 @@
                 <div style="flex:1;height:2px;min-width:20px;
                   {{#if (eq this.status 'aprovado')}}background:#4caf50;
                   {{else if (eq this.status 'contratado')}}background:#4caf50;
-                  {{else if (eq this.status 'rejeitado')}}background:#f03e3e;
+                  {{else if (eq this.status 'rejeitado')}}background:#e63946;
                   {{else if (eq this.status 'expirado')}}background:#555;
                   {{else}}background:#2a2a2a;{{/if}}"></div>
 
@@ -281,21 +281,21 @@
                   <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
                     {{#if (eq this.status 'aprovado')}}background:#1a3a1a;border:2px solid #4caf50;
                     {{else if (eq this.status 'contratado')}}background:#1a3a1a;border:2px solid #4caf50;
-                    {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;border:2px solid #f03e3e;
+                    {{else if (eq this.status 'rejeitado')}}background:#3a1a1a;border:2px solid #e63946;
                     {{else if (eq this.status 'expirado')}}background:#2a2a2a;border:2px solid #555;
                     {{else}}background:#141414;border:2px solid #444;{{/if}}">
                     <i class="bi {{#if (eq this.status 'aprovado')}}bi-check-circle{{else if (eq this.status 'contratado')}}bi-award-fill{{else if (eq this.status 'rejeitado')}}bi-x-lg{{else if (eq this.status 'expirado')}}bi-dash-circle{{else}}bi-circle{{/if}}"
                       style="font-size:0.75rem;
                       {{#if (eq this.status 'aprovado')}}color:#4caf50;
                       {{else if (eq this.status 'contratado')}}color:#4caf50;
-                      {{else if (eq this.status 'rejeitado')}}color:#f03e3e;
+                      {{else if (eq this.status 'rejeitado')}}color:#e63946;
                       {{else if (eq this.status 'expirado')}}color:#555;
                       {{else}}color:#444;{{/if}}"></i>
                   </div>
                   <p style="font-size:0.65rem;margin:4px 0 0;text-align:center;line-height:1.2;
                     {{#if (eq this.status 'aprovado')}}color:#4caf50;
                     {{else if (eq this.status 'contratado')}}color:#4caf50;
-                    {{else if (eq this.status 'rejeitado')}}color:#f03e3e;
+                    {{else if (eq this.status 'rejeitado')}}color:#e63946;
                     {{else if (eq this.status 'expirado')}}color:#555;
                     {{else}}color:#444;{{/if}}">
                     {{#if (eq this.status 'aprovado')}}Aprovado!
@@ -314,7 +314,7 @@
                 </span>
                 <a href="/jobs/view/{{this.job.id}}"
                   style="background:transparent;border:1px solid #333;color:#aaa;border-radius:6px;padding:4px 12px;text-decoration:none;font-size:0.78rem;transition:border-color 0.2s;"
-                  onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+                  onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'"
                   onmouseout="this.style.borderColor='#333';this.style.color='#aaa'">
                   Ver Vaga <i class="bi bi-arrow-right ms-1"></i>
                 </a>
@@ -327,10 +327,10 @@
 
       {{else}}
         <div style="text-align:center;padding:50px 0;">
-          <i class="bi bi-clock-history" style="font-size:3rem;color:#f03e3e;"></i>
+          <i class="bi bi-clock-history" style="font-size:3rem;color:#e63946;"></i>
           <h5 class="mt-3">Nenhuma candidatura ainda</h5>
           <p class="text-muted">Candidate-se a vagas para acompanhar sua jornada aqui.</p>
-          <a href="/" style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 20px;text-decoration:none;">
+          <a href="/" style="background:#e63946;border:none;color:white;border-radius:8px;padding:8px 20px;text-decoration:none;">
             <i class="bi bi-search me-1"></i> Buscar Vagas
           </a>
         </div>
@@ -342,8 +342,8 @@
 
 <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px;margin-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
   <div style="display:flex;align-items:center;gap:14px;">
-    <div style="width:42px;height:42px;border-radius:10px;background:rgba(240,62,62,0.1);border:1px solid rgba(240,62,62,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-      <i class="bi bi-cpu" style="color:#f03e3e;font-size:1.1rem;"></i>
+    <div style="width:42px;height:42px;border-radius:10px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <i class="bi bi-cpu" style="color:#e63946;font-size:1.1rem;"></i>
     </div>
     <div>
       <div style="font-weight:700;font-size:0.9rem;">Métricas de IA</div>
@@ -351,9 +351,9 @@
     </div>
   </div>
   <a href="/ai-metrics"
-    style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:7px 16px;text-decoration:none;font-size:0.85rem;font-weight:600;white-space:nowrap;transition:all 0.2s;"
-    onmouseover="this.style.background='#f03e3e';this.style.color='white'"
-    onmouseout="this.style.background='transparent';this.style.color='#f03e3e'">
+    style="background:transparent;border:1px solid #e63946;color:#e63946;border-radius:8px;padding:7px 16px;text-decoration:none;font-size:0.85rem;font-weight:600;white-space:nowrap;transition:all 0.2s;"
+    onmouseover="this.style.background='#e63946';this.style.color='white'"
+    onmouseout="this.style.background='transparent';this.style.color='#e63946'">
     <i class="bi bi-graph-up-arrow me-1"></i> Ver Métricas
   </a>
 </div>
@@ -375,7 +375,7 @@
         labels: ['Pendentes', 'Aceitos', 'Recusados'],
         datasets: [{
           data: [pieData.pendentes, pieData.aceitos, pieData.recusados],
-          backgroundColor: ['#ffc107', '#4caf50', '#f03e3e'],
+          backgroundColor: ['#ffc107', '#4caf50', '#e63946'],
           borderColor: '#1e1e1e',
           borderWidth: 3
         }]

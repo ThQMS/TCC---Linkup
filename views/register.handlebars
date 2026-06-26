@@ -62,7 +62,7 @@
             </div>
         </div>
 
-        <div class="auth-left-footer">© 2025 LinkUp — Projeto TCC</div>
+        <div class="auth-left-footer">© 2026 LinkUp — Projeto TCC</div>
     </div>
 
     <div class="auth-right">
@@ -193,9 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ── VALIDAÇÃO INLINE ── */
 function setFieldErr(input, msg) {
-    input.style.borderColor = '#f03e3e';
+    input.style.borderColor = '#e63946';
     let err = input.closest('.mb-3, .mb-4').querySelector('.lk-field-err');
-    if (!err) { err = document.createElement('p'); err.className = 'lk-field-err'; err.style.cssText = 'color:#f03e3e;font-size:0.75rem;margin:4px 0 0;'; input.closest('.mb-3, .mb-4').appendChild(err); }
+    if (!err) { err = document.createElement('p'); err.className = 'lk-field-err'; err.style.cssText = 'color:#e63946;font-size:0.75rem;margin:4px 0 0;'; input.closest('.mb-3, .mb-4').appendChild(err); }
     err.textContent = msg;
 }
 function clearFieldErr(input) {

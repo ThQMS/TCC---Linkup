@@ -2,7 +2,7 @@
 <div style="padding-top: 80px; padding-bottom: 60px;">
   <div class="container" style="max-width: 1060px;">
 
-    <a href="javascript:history.back()" style="color:#f03e3e;text-decoration:none;font-size:0.9rem;display:inline-flex;align-items:center;gap:6px;margin-bottom:24px;">
+    <a href="javascript:history.back()" style="color:#e63946;text-decoration:none;font-size:0.9rem;display:inline-flex;align-items:center;gap:6px;margin-bottom:24px;">
       <i class="bi bi-arrow-left"></i> Voltar para vagas
     </a>
 
@@ -11,17 +11,17 @@
       <!-- HEADER -->
       <div style="background:linear-gradient(135deg,#1a1a1a,#2c2c2c);padding:32px 36px;border-bottom:1px solid #2a2a2a;">
         <div class="d-flex align-items-center gap-4 flex-wrap">
-          <div style="width:72px;height:72px;border-radius:14px;border:2px solid #f03e3e;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#f03e3e;flex-shrink:0;">
+          <div style="width:72px;height:72px;border-radius:14px;border:2px solid #e63946;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#e63946;flex-shrink:0;">
             <i class="bi bi-building"></i>
           </div>
           <div class="flex-grow-1">
             <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
               <h1 style="font-size:1.6rem;font-weight:700;margin:0;line-height:1.45;">{{job.title}}</h1>
-              {{#if (isNew job.createdAt)}}<span style="background:#f03e3e;color:white;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">NOVA</span>{{/if}}
+              {{#if (isNew job.createdAt)}}<span style="background:#e63946;color:white;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">NOVA</span>{{/if}}
               {{#if (eq job.status 'pausada')}}<span style="background:#3a2e00;color:#ffc107;border:1px solid #ffc107;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">⏸️ PAUSADA</span>{{/if}}
-              {{#if (eq job.status 'encerrada')}}<span style="background:#3a1a1a;color:#f03e3e;border:1px solid #f03e3e;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">🔒 ENCERRADA</span>{{/if}}
+              {{#if (eq job.status 'encerrada')}}<span style="background:#3a1a1a;color:#e63946;border:1px solid #e63946;font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;">🔒 ENCERRADA</span>{{/if}}
             </div>
-            <p style="color:#f03e3e;font-weight:600;font-size:0.95rem;margin-bottom:8px;">{{job.company}}</p>
+            <p style="color:#e63946;font-weight:600;font-size:0.95rem;margin-bottom:8px;">{{job.company}}</p>
             <div class="d-flex gap-2 flex-wrap">
               {{#if job.modality}}<span style="background:#2a2a2a;border:1px solid #3a3a3a;color:#aaa;border-radius:20px;padding:3px 12px;font-size:0.78rem;">{{formatModality job.modality}}</span>{{/if}}
               {{#if job.contractType}}<span style="background:#2a2a2a;border:1px solid #3a3a3a;color:#aaa;border-radius:20px;padding:3px 12px;font-size:0.78rem;">{{formatContractType job.contractType}}</span>{{/if}}
@@ -40,24 +40,24 @@
           <!-- COLUNA PRINCIPAL -->
           <div class="col-md-7">
             <div style="margin-bottom:24px;">
-              <h5 style="color:#f03e3e;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-file-text"></i> Descrição</h5>
+              <h5 style="color:#e63946;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-file-text"></i> Descrição</h5>
               <p style="color:#ccc;line-height:1.8;white-space:pre-line;font-size:0.92rem;">{{job.description}}</p>
             </div>
             {{#if job.requirements}}
             <div style="margin-bottom:24px;">
-              <h5 style="color:#f03e3e;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-check2-square"></i> Requisitos</h5>
+              <h5 style="color:#e63946;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-check2-square"></i> Requisitos</h5>
               <p style="color:#ccc;line-height:1.8;white-space:pre-line;font-size:0.92rem;">{{job.requirements}}</p>
             </div>
             {{/if}}
             {{#if job.benefits}}
             <div style="margin-bottom:24px;">
-              <h5 style="color:#f03e3e;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-gift"></i> Benefícios</h5>
+              <h5 style="color:#e63946;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-gift"></i> Benefícios</h5>
               <p style="color:#ccc;line-height:1.8;white-space:pre-line;font-size:0.92rem;">{{job.benefits}}</p>
             </div>
             {{/if}}
             {{#if job.differential}}
             <div style="margin-bottom:24px;">
-              <h5 style="color:#f03e3e;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-star"></i> Diferencial</h5>
+              <h5 style="color:#e63946;font-weight:700;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;"><i class="bi bi-star"></i> Diferencial</h5>
               <p style="color:#ccc;line-height:1.8;white-space:pre-line;font-size:0.92rem;">{{job.differential}}</p>
             </div>
             {{/if}}
@@ -83,7 +83,7 @@
                   {{else if alreadyApplied}}
                     <button disabled style="width:100%;background:#1a3a1a;border:1px solid #4caf50;color:#4caf50;border-radius:10px;padding:11px;font-weight:600;font-size:0.88rem;"><i class="bi bi-check-circle me-2"></i>Candidatura Enviada</button>
                   {{else if hasResume}}
-                    <button onclick="abrirModalCarta()" style="width:100%;background:#f03e3e;border:none;color:white;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-size:0.92rem;transition:background 0.2s;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#f03e3e'">
+                    <button onclick="abrirModalCarta()" style="width:100%;background:#e63946;border:none;color:white;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-size:0.92rem;transition:background 0.2s;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e63946'">
                       <i class="bi bi-send me-2"></i>Me Candidatar
                     </button>
                     <p style="color:#666;font-size:0.75rem;text-align:center;margin:6px 0 0;">Carta de apresentação gerada por IA</p>
@@ -108,7 +108,7 @@
                   <div style="margin-top:10px;">
                     <form action="/jobs/favorite/{{job.id}}" method="POST">
                       <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                      <button type="submit" style="width:100%;background:transparent;border:1px solid {{#if isFavorited}}#f03e3e{{else}}#2a2a2a{{/if}};color:{{#if isFavorited}}#f03e3e{{else}}#666{{/if}};border-radius:10px;padding:8px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;">
+                      <button type="submit" style="width:100%;background:transparent;border:1px solid {{#if isFavorited}}#e63946{{else}}#2a2a2a{{/if}};color:{{#if isFavorited}}#e63946{{else}}#666{{/if}};border-radius:10px;padding:8px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;">
                         <i class="bi bi-{{#if isFavorited}}heart-fill{{else}}heart{{/if}} me-1"></i>{{#if isFavorited}}Salvo{{else}}Salvar Vaga{{/if}}
                       </button>
                     </form>
@@ -120,7 +120,7 @@
                     <p style="color:#666;font-size:0.82rem;text-align:center;margin:0;">Gerencie esta vaga pelos botões abaixo.</p>
                   {{/if}}
                 {{else}}
-                  <p style="color:#888;font-size:0.85rem;text-align:center;margin:0;"><a href="/login" style="color:#f03e3e;">Faça login</a> para se candidatar.</p>
+                  <p style="color:#888;font-size:0.85rem;text-align:center;margin:0;"><a href="/login" style="color:#e63946;">Faça login</a> para se candidatar.</p>
                 {{/if}}
               </div>
             </div>
@@ -177,7 +177,7 @@
               </div>
               <div style="padding:16px 18px;">
                 <p style="font-weight:700;margin:0 0 2px;font-size:0.95rem;">{{job.company}}</p>
-                <a href="/profile/empresa/{{job.UserId}}" style="color:#f03e3e;font-size:0.8rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;">
+                <a href="/profile/empresa/{{job.UserId}}" style="color:#e63946;font-size:0.8rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:10px;">
                   <i class="bi bi-box-arrow-up-right"></i> Ver página da empresa
                 </a>
                 {{#if job.modality}}
@@ -203,13 +203,13 @@
 
             <!-- AÇÕES SECUNDÁRIAS -->
             <div style="display:flex;gap:8px;">
-              <button onclick="compartilharVaga()" id="share-btn" style="flex:1;background:transparent;border:1px solid #2a2a2a;color:#666;border-radius:10px;padding:8px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'" onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#666'">
+              <button onclick="compartilharVaga()" id="share-btn" style="flex:1;background:transparent;border:1px solid #2a2a2a;color:#666;border-radius:10px;padding:8px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'" onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#666'">
                 <i class="bi bi-share me-1"></i> Compartilhar
               </button>
               {{#if isCandidate}}
               <form action="/jobs/block-company/{{job.UserId}}" method="POST" style="flex:1;">
                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                <button type="submit" style="width:100%;background:transparent;border:1px solid #2a2a2a;color:#666;border-radius:10px;padding:8px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'" onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#666'" onclick="return confirm('Bloquear vagas desta empresa?')">
+                <button type="submit" style="width:100%;background:transparent;border:1px solid #2a2a2a;color:#666;border-radius:10px;padding:8px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;" onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'" onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#666'" onclick="return confirm('Bloquear vagas desta empresa?')">
                   <i class="bi bi-slash-circle me-1"></i> Bloquear
                 </button>
               </form>
@@ -219,7 +219,7 @@
             <!-- BOTÕES DO DONO -->
             {{#if (isOwner user.id job.UserId)}}
             <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
-              <a href="/jobs/edit/{{job.id}}" style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:10px;padding:9px 16px;text-decoration:none;text-align:center;font-weight:600;font-size:0.88rem;"><i class="bi bi-pencil me-1"></i> Editar Vaga</a>
+              <a href="/jobs/edit/{{job.id}}" style="background:transparent;border:1px solid #e63946;color:#e63946;border-radius:10px;padding:9px 16px;text-decoration:none;text-align:center;font-weight:600;font-size:0.88rem;"><i class="bi bi-pencil me-1"></i> Editar Vaga</a>
               <a href="/jobs/applications/{{job.id}}" style="background:transparent;border:1px solid #2a2a2a;color:#aaa;border-radius:10px;padding:9px 16px;text-decoration:none;text-align:center;font-weight:600;font-size:0.88rem;"><i class="bi bi-people me-1"></i> Ver Candidatos</a>
               <form action="/jobs/delete/{{job.id}}" method="POST" onsubmit="return confirm('Excluir esta vaga?');">
                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
@@ -238,20 +238,20 @@
 <!-- VAGAS SIMILARES -->
 {{#if similarJobs.length}}
 <div class="container" style="max-width:1060px;margin:0 auto;padding-bottom:60px;">
-  <h5 style="color:#f0f0f0;font-weight:700;margin-bottom:16px;font-size:0.95rem;"><i class="bi bi-grid me-2" style="color:#f03e3e;"></i>Vagas Similares</h5>
+  <h5 style="color:#f0f0f0;font-weight:700;margin-bottom:16px;font-size:0.95rem;"><i class="bi bi-grid me-2" style="color:#e63946;"></i>Vagas Similares</h5>
   <div class="row g-3">
     {{#each similarJobs}}
     <div class="col-md-4">
-      <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:18px;transition:border-color 0.2s;height:100%;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.borderColor='#f03e3e'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:18px;transition:border-color 0.2s;height:100%;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.borderColor='#e63946'" onmouseout="this.style.borderColor='#2a2a2a'">
         <div>
           <p style="font-weight:700;margin:0 0 4px;font-size:0.9rem;">{{title}}</p>
-          <p style="color:#f03e3e;font-size:0.8rem;margin:0 0 10px;">{{company}}</p>
+          <p style="color:#e63946;font-size:0.8rem;margin:0 0 10px;">{{company}}</p>
           <div style="display:flex;flex-wrap:wrap;gap:6px;">
             {{#if modality}}<span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.72rem;">{{modality}}</span>{{/if}}
             {{#if salary}}<span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:2px 10px;font-size:0.72rem;">R$ {{salary}}</span>{{/if}}
           </div>
         </div>
-        <a href="/jobs/view/{{id}}" style="display:block;background:#f03e3e;color:white;border-radius:8px;padding:7px 16px;text-decoration:none;font-weight:600;font-size:0.82rem;text-align:center;margin-top:14px;">Ver Vaga</a>
+        <a href="/jobs/view/{{id}}" style="display:block;background:#e63946;color:white;border-radius:8px;padding:7px 16px;text-decoration:none;font-weight:600;font-size:0.82rem;text-align:center;margin-top:14px;">Ver Vaga</a>
       </div>
     </div>
     {{/each}}
@@ -263,30 +263,30 @@
 <div id="carta-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:9998;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#1e1e1e;border:1px solid #3a3a3a;border-radius:16px;padding:32px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px;">
-      <div><h5 style="color:#f03e3e;font-weight:700;margin:0 0 4px;">✉️ Carta de Apresentação</h5><p style="color:#888;font-size:0.82rem;margin:0;">Gerada pela IA. Edite à vontade antes de enviar.</p></div>
+      <div><h5 style="color:#e63946;font-weight:700;margin:0 0 4px;">✉️ Carta de Apresentação</h5><p style="color:#888;font-size:0.82rem;margin:0;">Gerada pela IA. Edite à vontade antes de enviar.</p></div>
       <button onclick="fecharModalCarta()" style="background:transparent;border:none;color:#666;font-size:1.5rem;cursor:pointer;line-height:1;flex-shrink:0;">×</button>
     </div>
     <div id="carta-loading" style="text-align:center;padding:48px 0;"><div style="font-size:2rem;margin-bottom:12px;">🤖</div><p style="color:#888;margin:0;">Gerando sua carta...</p></div>
     <div id="carta-content" style="display:none;">
-      <textarea id="carta-texto" style="width:100%;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:8px;color:#e0e0e0;padding:16px;font-size:0.88rem;line-height:1.75;resize:vertical;min-height:300px;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#f03e3e'" onblur="this.style.borderColor='#3a3a3a'"></textarea>
+      <textarea id="carta-texto" style="width:100%;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:8px;color:#e0e0e0;padding:16px;font-size:0.88rem;line-height:1.75;resize:vertical;min-height:300px;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#e63946'" onblur="this.style.borderColor='#3a3a3a'"></textarea>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px;">
         <button onclick="regenerarCarta()" style="background:transparent;border:1px solid #a855f7;color:#a855f7;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:0.82rem;" onmouseover="this.style.background='#a855f7';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='#a855f7'">🔄 Regenerar</button>
         <div style="display:flex;gap:8px;">
           <button onclick="fecharModalCarta()" style="background:transparent;border:1px solid #444;color:#888;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:0.88rem;">Cancelar</button>
           <form id="apply-form" action="/jobs/apply/{{job.id}}" method="POST" style="display:inline;">
             <input type="hidden" name="_csrf" value="{{csrfToken}}"><input type="hidden" name="coverLetter" id="cover-letter-input">
-            <button type="button" onclick="confirmarCandidatura()" style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:6px 20px;cursor:pointer;font-weight:700;font-size:0.88rem;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#f03e3e'"><i class="bi bi-send me-1"></i> Enviar</button>
+            <button type="button" onclick="confirmarCandidatura()" style="background:#e63946;border:none;color:white;border-radius:8px;padding:6px 20px;cursor:pointer;font-weight:700;font-size:0.88rem;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e63946'"><i class="bi bi-send me-1"></i> Enviar</button>
           </form>
         </div>
       </div>
     </div>
     <div id="carta-erro" style="display:none;">
-      <div style="background:#2a1a1a;border:1px solid #3a1a1a;border-radius:8px;padding:12px 16px;margin-bottom:16px;"><p style="color:#f03e3e;font-size:0.85rem;margin:0;">⚠️ Não foi possível gerar a carta automaticamente.</p></div>
+      <div style="background:#2a1a1a;border:1px solid #3a1a1a;border-radius:8px;padding:12px 16px;margin-bottom:16px;"><p style="color:#e63946;font-size:0.85rem;margin:0;">⚠️ Não foi possível gerar a carta automaticamente.</p></div>
       <textarea id="carta-manual" style="width:100%;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:8px;color:#e0e0e0;padding:16px;font-size:0.88rem;line-height:1.75;resize:vertical;min-height:200px;outline:none;font-family:inherit;" placeholder="Escreva sua carta (opcional)..."></textarea>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap;">
         <button onclick="fecharModalCarta()" style="background:transparent;border:1px solid #444;color:#888;border-radius:8px;padding:6px 16px;cursor:pointer;">Cancelar</button>
         <form action="/jobs/apply/{{job.id}}" method="POST" style="display:inline;"><input type="hidden" name="_csrf" value="{{csrfToken}}"><input type="hidden" name="coverLetter" value=""><button type="submit" style="background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;padding:6px 16px;cursor:pointer;">Enviar sem carta</button></form>
-        <form id="apply-form-manual" action="/jobs/apply/{{job.id}}" method="POST" style="display:inline;"><input type="hidden" name="_csrf" value="{{csrfToken}}"><input type="hidden" name="coverLetter" id="cover-letter-manual"><button type="button" onclick="confirmarCandidaturaManual()" style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:6px 20px;cursor:pointer;font-weight:700;"><i class="bi bi-send me-1"></i> Enviar</button></form>
+        <form id="apply-form-manual" action="/jobs/apply/{{job.id}}" method="POST" style="display:inline;"><input type="hidden" name="_csrf" value="{{csrfToken}}"><input type="hidden" name="coverLetter" id="cover-letter-manual"><button type="button" onclick="confirmarCandidaturaManual()" style="background:#e63946;border:none;color:white;border-radius:8px;padding:6px 20px;cursor:pointer;font-weight:700;"><i class="bi bi-send me-1"></i> Enviar</button></form>
       </div>
     </div>
   </div>
@@ -331,7 +331,7 @@
     <div id="tailoring-loading" style="padding:60px;text-align:center;"><p style="color:#888;">⏳ Adaptando seu currículo...</p></div>
     <div id="tailoring-content" style="display:none;padding:24px;">
       <div style="display:flex;gap:16px;margin-bottom:24px;background:#1e1e1e;border-radius:12px;padding:16px;">
-        <div style="flex:1;text-align:center;"><div style="color:#888;font-size:0.75rem;margin-bottom:4px;">Antes</div><div id="score-antes" style="font-size:1.8rem;font-weight:800;color:#f03e3e;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;">—</div><div style="color:#666;font-size:0.7rem;">compatibilidade</div></div>
+        <div style="flex:1;text-align:center;"><div style="color:#888;font-size:0.75rem;margin-bottom:4px;">Antes</div><div id="score-antes" style="font-size:1.8rem;font-weight:800;color:#e63946;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;">—</div><div style="color:#666;font-size:0.7rem;">compatibilidade</div></div>
         <div style="display:flex;align-items:center;color:#555;font-size:1.2rem;">→</div>
         <div style="flex:1;text-align:center;"><div style="color:#888;font-size:0.75rem;margin-bottom:4px;">Depois</div><div id="score-depois" style="font-size:1.8rem;font-weight:800;color:#4caf50;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;">—</div><div style="color:#666;font-size:0.7rem;">compatibilidade</div></div>
       </div>
@@ -388,9 +388,9 @@ async function checkCompatibility(){
   const modal=document.getElementById('compat-modal'),result=document.getElementById('compat-result');
   modal.style.display='flex';result.innerHTML='<span style="color:#888;">⏳ Analisando...</span>';
   try{const r=await fetch('/jobs/ai/compatibility/{{job.id}}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.getElementById('job-data').dataset.csrf}});const d=await r.json();
-  if(d.error){result.innerHTML='<span style="color:#f03e3e;">'+d.error+'</span>';return;}
-  result.innerHTML='<div style="text-align:center;margin-bottom:20px;"><div style="font-size:3rem;font-weight:700;color:'+(d.score>=70?'#4caf50':d.score>=40?'#ffc107':'#f03e3e')+';">'+d.score+'%</div><div style="color:#aaa;font-size:0.9rem;">de compatibilidade</div></div><div style="background:#2a2a2a;border-radius:8px;padding:16px;white-space:pre-wrap;font-size:0.9rem;">'+d.analysis+'</div>';}
-  catch(e){result.innerHTML='<span style="color:#f03e3e;">Erro ao conectar com a IA.</span>';}}
+  if(d.error){result.innerHTML='<span style="color:#e63946;">'+d.error+'</span>';return;}
+  result.innerHTML='<div style="text-align:center;margin-bottom:20px;"><div style="font-size:3rem;font-weight:700;color:'+(d.score>=70?'#4caf50':d.score>=40?'#ffc107':'#e63946')+';">'+d.score+'%</div><div style="color:#aaa;font-size:0.9rem;">de compatibilidade</div></div><div style="background:#2a2a2a;border-radius:8px;padding:16px;white-space:pre-wrap;font-size:0.9rem;">'+d.analysis+'</div>';}
+  catch(e){result.innerHTML='<span style="color:#e63946;">Erro ao conectar com a IA.</span>';}}
 
 // ── COMPARTILHAR ─────────────────────────
 function compartilharVaga(){const btn=document.getElementById('share-btn');navigator.clipboard.writeText(window.location.href).then(()=>{btn.innerHTML='<i class="bi bi-check-lg me-1"></i> Copiado!';btn.style.borderColor='#4caf50';btn.style.color='#4caf50';setTimeout(()=>{btn.innerHTML='<i class="bi bi-share me-1"></i> Compartilhar';btn.style.borderColor='#2a2a2a';btn.style.color='#666';},2000);});}
@@ -403,14 +403,14 @@ function fecharEntrevista(){document.getElementById('interview-modal').style.dis
 function addInterviewMsg(role,text){const c=document.getElementById('interview-messages'),d=document.createElement('div');d.style.cssText=role==='user'?'background:#f59e0b;color:white;border-radius:12px 12px 4px 12px;padding:10px 14px;max-width:85%;align-self:flex-end;font-size:0.875rem;line-height:1.6;margin-left:auto;':'background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px 12px 12px 4px;padding:12px 14px;max-width:90%;font-size:0.875rem;line-height:1.6;color:#e0e0e0;';d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight;}
 async function startInterview(){document.getElementById('interview-messages').innerHTML='';const l=document.createElement('div');l.style.cssText='text-align:center;padding:20px;color:#888;';l.textContent='Preparando entrevista...';document.getElementById('interview-messages').appendChild(l);try{const r=await fetch('/interview/'+INTERVIEW_JOB_ID+'/start',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':INTERVIEW_CSRF}});const d=await r.json();l.remove();currentQuestion=1;interviewHistory.push({role:'assistant',content:d.question});addInterviewMsg('assistant',d.question);document.getElementById('interview-input').style.display='block';document.getElementById('question-counter').textContent='Pergunta '+currentQuestion+'/5';document.getElementById('interview-answer').focus();}catch(e){l.textContent='Erro ao iniciar.';}}
 async function enviarResposta(){const input=document.getElementById('interview-answer'),answer=input.value.trim();if(!answer||interviewEnded)return;input.value='';addInterviewMsg('user',answer);interviewHistory.push({role:'user',content:answer});const l=document.createElement('div');l.style.cssText='color:#888;font-size:0.82rem;padding:8px;';l.textContent='...';document.getElementById('interview-messages').appendChild(l);try{const r=await fetch('/interview/'+INTERVIEW_JOB_ID+'/answer',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':INTERVIEW_CSRF},body:JSON.stringify({history:interviewHistory,answer,questionNumber:currentQuestion})});const d=await r.json();l.remove();interviewHistory.push({role:'assistant',content:d.response});addInterviewMsg('assistant',d.response);currentQuestion++;document.getElementById('question-counter').textContent='Pergunta '+Math.min(currentQuestion,5)+'/5';if(d.isEnd){interviewEnded=true;document.getElementById('interview-input').style.display='none';await gerarScore();}}catch(e){l.textContent='Erro. Tente novamente.';}}
-async function gerarScore(){const s=document.getElementById('interview-score');s.style.display='block';s.innerHTML='<p style="color:#888;">Gerando avaliação...</p>';try{const r=await fetch('/interview/'+INTERVIEW_JOB_ID+'/score',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':INTERVIEW_CSRF},body:JSON.stringify({history:interviewHistory})});const d=await r.json();const rc={aprovado:'#4caf50',em_analise:'#f59e0b',reprovado:'#f03e3e'}[d.recomendacao]||'#888',rl={aprovado:'Aprovado',em_analise:'Em Análise',reprovado:'Reprovado'}[d.recomendacao]||'';s.innerHTML='<div style="display:flex;gap:16px;margin-bottom:14px;align-items:center;"><div style="text-align:center;"><div style="font-size:2rem;font-weight:800;color:'+rc+';">'+d.score+'</div><div style="color:#888;font-size:0.72rem;">Score Final</div></div><span style="background:'+rc+'22;border:1px solid '+rc+';color:'+rc+';border-radius:20px;padding:4px 14px;font-weight:700;font-size:0.82rem;">'+rl+'</span></div><div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;"><div style="background:#1e1e1e;border-radius:8px;padding:8px 12px;text-align:center;min-width:80px;"><div style="font-weight:700;color:#06b6d4;">'+d.comunicacao+'/10</div><div style="color:#888;font-size:0.7rem;">Comunicação</div></div><div style="background:#1e1e1e;border-radius:8px;padding:8px 12px;text-align:center;min-width:80px;"><div style="font-weight:700;color:#a855f7;">'+d.conhecimento_tecnico+'/10</div><div style="color:#888;font-size:0.7rem;">Técnico</div></div><div style="background:#1e1e1e;border-radius:8px;padding:8px 12px;text-align:center;min-width:80px;"><div style="font-weight:700;color:#f59e0b;">'+d.fit_cultural+'/10</div><div style="color:#888;font-size:0.7rem;">Fit Cultural</div></div></div><p style="color:#aaa;font-size:0.82rem;line-height:1.6;">'+(d.feedback_geral||'')+'</p><button onclick="fecharEntrevista()" style="background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:0.82rem;margin-top:8px;">Fechar</button>';}catch(e){s.innerHTML='<p style="color:#f03e3e;">Erro ao gerar avaliação.</p>';}}
+async function gerarScore(){const s=document.getElementById('interview-score');s.style.display='block';s.innerHTML='<p style="color:#888;">Gerando avaliação...</p>';try{const r=await fetch('/interview/'+INTERVIEW_JOB_ID+'/score',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':INTERVIEW_CSRF},body:JSON.stringify({history:interviewHistory})});const d=await r.json();const rc={aprovado:'#4caf50',em_analise:'#f59e0b',reprovado:'#e63946'}[d.recomendacao]||'#888',rl={aprovado:'Aprovado',em_analise:'Em Análise',reprovado:'Reprovado'}[d.recomendacao]||'';s.innerHTML='<div style="display:flex;gap:16px;margin-bottom:14px;align-items:center;"><div style="text-align:center;"><div style="font-size:2rem;font-weight:800;color:'+rc+';">'+d.score+'</div><div style="color:#888;font-size:0.72rem;">Score Final</div></div><span style="background:'+rc+'22;border:1px solid '+rc+';color:'+rc+';border-radius:20px;padding:4px 14px;font-weight:700;font-size:0.82rem;">'+rl+'</span></div><div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;"><div style="background:#1e1e1e;border-radius:8px;padding:8px 12px;text-align:center;min-width:80px;"><div style="font-weight:700;color:#06b6d4;">'+d.comunicacao+'/10</div><div style="color:#888;font-size:0.7rem;">Comunicação</div></div><div style="background:#1e1e1e;border-radius:8px;padding:8px 12px;text-align:center;min-width:80px;"><div style="font-weight:700;color:#a855f7;">'+d.conhecimento_tecnico+'/10</div><div style="color:#888;font-size:0.7rem;">Técnico</div></div><div style="background:#1e1e1e;border-radius:8px;padding:8px 12px;text-align:center;min-width:80px;"><div style="font-weight:700;color:#f59e0b;">'+d.fit_cultural+'/10</div><div style="color:#888;font-size:0.7rem;">Fit Cultural</div></div></div><p style="color:#aaa;font-size:0.82rem;line-height:1.6;">'+(d.feedback_geral||'')+'</p><button onclick="fecharEntrevista()" style="background:transparent;border:1px solid #555;color:#aaa;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:0.82rem;margin-top:8px;">Fechar</button>';}catch(e){s.innerHTML='<p style="color:#e63946;">Erro ao gerar avaliação.</p>';}}
 
 // ── TAILORING ────────────────────────────
 const TAILORING_JOB_ID=document.getElementById('job-data').dataset.jobId,TAILORING_CSRF=document.getElementById('job-data').dataset.csrf;
 let tailoringData=null;
 function abrirTailoring(){document.getElementById('tailoring-modal').style.display='flex';document.getElementById('tailoring-loading').style.display='block';document.getElementById('tailoring-content').style.display='none';fetchTailoring();}
 function fecharTailoring(){document.getElementById('tailoring-modal').style.display='none';}
-async function fetchTailoring(){try{const r=await fetch('/tailoring/'+TAILORING_JOB_ID,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':TAILORING_CSRF}});const d=await r.json();if(d.error){alert(d.error);fecharTailoring();return;}tailoringData=d;document.getElementById('score-antes').textContent=(d.score_antes||0)+'%';document.getElementById('score-depois').textContent=(d.score_depois||0)+'%';document.getElementById('tailoring-summary').textContent=d.summary||'';document.getElementById('tailoring-skills').innerHTML=(d.skills_destacadas||[]).map(s=>'<span style="background:#2a2a2a;border:1px solid #f59e0b;color:#f59e0b;border-radius:20px;padding:4px 14px;font-size:0.8rem;">'+s+'</span>').join('');document.getElementById('tailoring-experiences').innerHTML=(d.experiences_reescritas||[]).map(e=>'<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;padding:14px;margin-bottom:10px;"><p style="font-weight:700;margin:0 0 2px;">'+e.role+'</p><p style="color:#f03e3e;font-size:0.82rem;margin:0 0 8px;">'+e.company+' · '+(e.period||'')+'</p><p style="color:#aaa;font-size:0.85rem;line-height:1.6;margin:0;">'+e.description+'</p></div>').join('');document.getElementById('tailoring-dicas').innerHTML=(d.dicas||[]).map(d=>'<div style="display:flex;gap:8px;margin-bottom:8px;color:#aaa;font-size:0.85rem;"><span style="color:#f59e0b;flex-shrink:0;">→</span>'+d+'</div>').join('');document.getElementById('tailoring-loading').style.display='none';document.getElementById('tailoring-content').style.display='block';}catch(e){alert('Erro ao adaptar currículo.');fecharTailoring();}}
+async function fetchTailoring(){try{const r=await fetch('/tailoring/'+TAILORING_JOB_ID,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':TAILORING_CSRF}});const d=await r.json();if(d.error){alert(d.error);fecharTailoring();return;}tailoringData=d;document.getElementById('score-antes').textContent=(d.score_antes||0)+'%';document.getElementById('score-depois').textContent=(d.score_depois||0)+'%';document.getElementById('tailoring-summary').textContent=d.summary||'';document.getElementById('tailoring-skills').innerHTML=(d.skills_destacadas||[]).map(s=>'<span style="background:#2a2a2a;border:1px solid #f59e0b;color:#f59e0b;border-radius:20px;padding:4px 14px;font-size:0.8rem;">'+s+'</span>').join('');document.getElementById('tailoring-experiences').innerHTML=(d.experiences_reescritas||[]).map(e=>'<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;padding:14px;margin-bottom:10px;"><p style="font-weight:700;margin:0 0 2px;">'+e.role+'</p><p style="color:#e63946;font-size:0.82rem;margin:0 0 8px;">'+e.company+' · '+(e.period||'')+'</p><p style="color:#aaa;font-size:0.85rem;line-height:1.6;margin:0;">'+e.description+'</p></div>').join('');document.getElementById('tailoring-dicas').innerHTML=(d.dicas||[]).map(d=>'<div style="display:flex;gap:8px;margin-bottom:8px;color:#aaa;font-size:0.85rem;"><span style="color:#f59e0b;flex-shrink:0;">→</span>'+d+'</div>').join('');document.getElementById('tailoring-loading').style.display='none';document.getElementById('tailoring-content').style.display='block';}catch(e){alert('Erro ao adaptar currículo.');fecharTailoring();}}
 async function aplicarTailoring(){if(!tailoringData)return;try{const r=await fetch('/resume/tailoring/apply',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':TAILORING_CSRF},body:JSON.stringify(tailoringData)});const d=await r.json();if(d.ok){alert('Currículo atualizado!');fecharTailoring();}}catch(e){alert('Erro ao aplicar.');}}
 
 // ── CHAT ─────────────────────────────────

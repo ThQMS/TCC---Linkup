@@ -3,11 +3,16 @@
     --dark-bg:      #1a1a1a;
     --card-bg:      #1e1e1e;
     --input-bg:     #2a2a2a;
-    --primary:      #f03e3e;
-    --primary-dark: #d63030;
+    --primary:      #e63946;
+    --primary-dark: #c92d3a;
     --border:       #2d2d2d;
     --text:         #f1f1f1;
     --muted:        #a0a0a0;
+    --muted-2:      #8a8a8a;   /* piso de contraste p/ texto secundário (>= AA) */
+    --label:        #b0b0b0;   /* labels de formulário */
+    --shadow:       0 1px 3px rgba(0,0,0,.45);
+    --shadow-lg:    0 6px 24px rgba(0,0,0,.35);
+    --radius:       12px;
 }
 
 /* ── TIPOGRAFIA GLOBAL ── */
@@ -171,7 +176,7 @@ body {
     border-color: var(--primary);
     outline: none;
     background-color: #3a3a3a;
-    box-shadow: 0 0 0 0.25rem rgba(240,62,62,0.25);
+    box-shadow: 0 0 0 0.25rem rgba(230,57,70,0.25);
 }
 
 .search-button-custom {
@@ -270,7 +275,7 @@ body {
     border-color: var(--primary);
     outline: none;
     background-color: #2a2a2a;
-    box-shadow: 0 0 0 0.25rem rgba(240,62,62,0.25);
+    box-shadow: 0 0 0 0.25rem rgba(230,57,70,0.25);
 }
 #add-form-container form input.form-control::placeholder,
 #add-form-container form textarea.form-control::placeholder { color: #fff; opacity: 0.7; }
@@ -359,7 +364,7 @@ body {
 #auth-container .form-control::placeholder { color: #777 !important; opacity: 1; }
 #auth-container .form-control:focus {
     border-color: var(--primary) !important;
-    box-shadow: 0 0 0 0.25rem rgba(240,62,62,0.25) !important;
+    box-shadow: 0 0 0 0.25rem rgba(230,57,70,0.25) !important;
     color: #fff !important;
 }
 
@@ -421,7 +426,7 @@ body {
 .form-check-input:checked {
     background-color: var(--primary);
     border-color: var(--primary);
-    box-shadow: 0 0 0 0.25rem rgba(240,62,62,0.25);
+    box-shadow: 0 0 0 0.25rem rgba(230,57,70,0.25);
 }
 .form-check-label { color: var(--text); font-size: 1rem; }
 
@@ -490,7 +495,7 @@ select option { background-color: #1e1e1e !important; color: #e0e0e0 !important;
     margin-bottom: 12px;
     transition: border-color 0.2s;
 }
-.resume-item-block:hover { border-color: rgba(240,62,62,0.27); }
+.resume-item-block:hover { border-color: rgba(230,57,70,0.27); }
 
 .resume-input {
     background: var(--card-bg) !important;
@@ -504,7 +509,7 @@ select option { background-color: #1e1e1e !important; color: #e0e0e0 !important;
 .resume-input:focus {
     border-color: var(--primary) !important;
     outline: none !important;
-    box-shadow: 0 0 0 0.2rem rgba(240,62,62,0.15) !important;
+    box-shadow: 0 0 0 0.2rem rgba(230,57,70,0.15) !important;
 }
 
 .skill-tag {
@@ -571,7 +576,7 @@ select option { background-color: #1e1e1e !important; color: #e0e0e0 !important;
 .auth-input:focus {
     background-color: #333 !important;
     border-color: var(--primary) !important;
-    box-shadow: 0 0 0 0.2rem rgba(240,62,62,0.2) !important;
+    box-shadow: 0 0 0 0.2rem rgba(230,57,70,0.2) !important;
     color: #fff !important;
 }
 
@@ -646,3 +651,72 @@ p, h5, h6 { color: var(--text); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
+
+/* ════════════════════════════════════════════════════════════════════
+   CLASSES UTILITÁRIAS (LinkUp Design System)
+   Padroniza os blocos antes repetidos inline em dezenas de views.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Cartões */
+.lk-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+.lk-card-hover { transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.lk-card-hover:hover,
+.lk-card-hover:focus-within {
+    transform: translateY(-2px);
+    border-color: #3a3a3a;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Pills / badges */
+.lk-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: .75rem; font-weight: 600;
+    background: var(--input-bg); border: 1px solid var(--border); color: var(--muted);
+}
+.lk-pill-primary { background: rgba(230,57,70,.1); border-color: var(--primary); color: var(--primary); }
+
+/* Botões */
+.lk-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 20px; border-radius: 10px; border: 1px solid transparent;
+    font-weight: 700; font-size: .9rem; cursor: pointer; text-decoration: none;
+    transition: filter .15s ease, transform .05s ease;
+}
+.lk-btn:active { transform: translateY(1px); }
+.lk-btn-primary { background: var(--primary); color: #fff; }
+.lk-btn-primary:hover { filter: brightness(1.08); color: #fff; }
+.lk-btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+.lk-btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Texto secundário com contraste mínimo AA */
+.lk-muted   { color: var(--muted-2); }
+.lk-label   { color: var(--label); font-weight: 600; }
+
+/* Empty state padronizado (replica o bom padrão da home) */
+.lk-empty { text-align: center; padding: 48px 24px; color: var(--muted-2); }
+.lk-empty .lk-empty-icon { font-size: 2.6rem; color: #3a3a3a; margin-bottom: 12px; }
+.lk-empty h3 { color: var(--text); font-size: 1.1rem; margin: 0 0 6px; }
+.lk-empty p  { margin: 0 0 18px; font-size: .92rem; }
+
+/* Foco visível por teclado (acessibilidade) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Respeita preferência de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}

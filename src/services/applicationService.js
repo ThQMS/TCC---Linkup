@@ -204,7 +204,7 @@ async function _sendCancellationEmail({ user, job, jobOwnerEmail }) {
         html:
             `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
                <div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;">
-                 <h2 style="color:#f03e3e;margin:0;">Link<span style="color:white;">Up</span></h2>
+                 <h2 style="color:#e63946;margin:0;">Link<span style="color:white;">Up</span></h2>
                </div>
                <div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;">
                  <h3 style="margin:0 0 16px;color:#1a1a1a;">Candidatura cancelada pelo candidato</h3>
@@ -216,7 +216,7 @@ async function _sendCancellationEmail({ user, job, jobOwnerEmail }) {
                    A candidatura foi removida do processo seletivo e não constará mais nas estatísticas de candidatos ativos.
                  </p>
                  <a href="${BASE}/jobs/applications/${job.id}"
-                    style="display:inline-block;background:#f03e3e;color:white;padding:11px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">
+                    style="display:inline-block;background:#e63946;color:white;padding:11px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">
                    Ver Candidatos da Vaga
                  </a>
                </div>
@@ -293,7 +293,7 @@ async function _sendRejectionFeedback(job, candidateId, wasDisqualified = false)
             from:    `"LinkUp" <${process.env.GMAIL_USER}>`,
             to:      candidate.email,
             subject,
-            html:    `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;"><div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;"><h2 style="color:#f03e3e;margin:0;">Link<span style="color:white;">Up</span></h2></div><div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;"><p style="white-space:pre-wrap;">${feedback}</p><p style="color:#888;font-size:0.85rem;margin-top:16px;">Continue explorando novas oportunidades no LinkUp.</p><a href="${process.env.BASE_URL || 'http://localhost:3000'}" style="display:inline-block;background:#f03e3e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">Ver Vagas</a></div></div>`
+            html:    `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;"><div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;"><h2 style="color:#e63946;margin:0;">Link<span style="color:white;">Up</span></h2></div><div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;"><p style="white-space:pre-wrap;">${feedback}</p><p style="color:#888;font-size:0.85rem;margin-top:16px;">Continue explorando novas oportunidades no LinkUp.</p><a href="${process.env.BASE_URL || 'http://localhost:3000'}" style="display:inline-block;background:#e63946;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">Ver Vagas</a></div></div>`
         });
         logger.info('applicationService', 'E-mail de feedback enviado', { candidateId: candidate.id, wasDisqualified });
     } catch (e) {
@@ -329,13 +329,13 @@ function _buildResumeHtml({ user: u, resume, phone, city, linkedin, github, birt
 
 function _buildApplicationEmail({ user: u, job, coverLetter }) {
     return '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">'
-        + '<div style="background:#f03e3e;padding:24px 32px;border-radius:8px 8px 0 0">'
+        + '<div style="background:#e63946;padding:24px 32px;border-radius:8px 8px 0 0">'
         + '<h2 style="color:white;margin:0">Nova Candidatura</h2>'
         + '<p style="color:rgba(255,255,255,.85);margin:6px 0 0;font-size:.9rem">Vaga: <strong>' + escHtml(job.title) + '</strong></p>'
         + '</div>'
         + '<div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none">'
         + '<p><strong>' + escHtml(u.name) + '</strong> se candidatou à vaga de <strong>' + escHtml(job.title) + '</strong>.</p>'
-        + (coverLetter ? '<div style="background:white;border-left:4px solid #f03e3e;padding:16px 20px;margin-bottom:20px"><p style="font-size:.8rem;color:#888;margin:0 0 8px">Carta de Apresentação</p><p style="white-space:pre-wrap">' + escHtml(coverLetter) + '</p></div>' : '')
+        + (coverLetter ? '<div style="background:white;border-left:4px solid #e63946;padding:16px 20px;margin-bottom:20px"><p style="font-size:.8rem;color:#888;margin:0 0 8px">Carta de Apresentação</p><p style="white-space:pre-wrap">' + escHtml(coverLetter) + '</p></div>' : '')
         + '<p style="color:#666;font-size:.9rem">Currículo em anexo.</p>'
         + '</div></div>';
 }
@@ -351,7 +351,7 @@ async function _sendCongratsEmail(job, candidateId) {
             subject: `Parabéns pela contratação — ${job.title}`,
             html:    `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
                         <div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;">
-                          <h2 style="color:#f03e3e;margin:0;">Link<span style="color:white;">Up</span></h2>
+                          <h2 style="color:#e63946;margin:0;">Link<span style="color:white;">Up</span></h2>
                         </div>
                         <div style="background:#f9f9f9;padding:32px;border:1px solid #eee;border-top:none;">
                           <h2 style="color:#1a1a1a;margin:0 0 16px;">🎉 Parabéns, ${escHtml(candidate.name)}!</h2>

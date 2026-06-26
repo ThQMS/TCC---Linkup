@@ -3,19 +3,19 @@
     background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:20px;
     transition:border-color 0.2s,transform 0.2s;position:relative;overflow:hidden;
 }
-.metric-card:hover { border-color:#f03e3e; transform:translateY(-2px); }
+.metric-card:hover { border-color:#e63946; transform:translateY(-2px); }
 .metric-card .accent { position:absolute;top:0;left:0;right:0;height:3px; }
 .kpi-value { font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums; }
 .kpi-label { font-size:0.78rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-top:4px; }
 .kpi-sub { font-size:0.78rem;color:#555;margin-top:6px; }
 .feature-row { display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1e1e1e; }
 .feature-row:last-child { border-bottom:none; }
-.feature-icon { width:36px;height:36px;border-radius:8px;background:rgba(240,62,62,0.1);border:1px solid rgba(240,62,62,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#f03e3e;font-size:0.9rem; }
+.feature-icon { width:36px;height:36px;border-radius:8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#e63946;font-size:0.9rem; }
 .progress-bar-custom { height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;margin-top:4px; }
 .progress-fill { height:100%;border-radius:2px;transition:width 1s ease; }
 .growth-badge { display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:600;padding:2px 8px;border-radius:20px; }
 .growth-pos { background:rgba(76,175,80,0.1);color:#4caf50;border:1px solid rgba(76,175,80,0.2); }
-.growth-neg { background:rgba(240,62,62,0.1);color:#f03e3e;border:1px solid rgba(240,62,62,0.2); }
+.growth-neg { background:rgba(230,57,70,0.1);color:#e63946;border:1px solid rgba(230,57,70,0.2); }
 .section-title { font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#444;margin-bottom:16px; }
 </style>
 
@@ -25,7 +25,7 @@
     <!-- HEADER -->
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
         <div class="d-flex align-items-center gap-3">
-            <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f03e3e,#c0392b);display:flex;align-items:center;justify-content:center;">
+            <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#e63946,#c0392b);display:flex;align-items:center;justify-content:center;">
                 <i class="bi bi-graph-up-arrow text-white fs-5"></i>
             </div>
             <div>
@@ -45,8 +45,8 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="metric-card">
-                <div class="accent" style="background:#f03e3e;"></div>
-                <div class="kpi-value" style="color:#f03e3e;">{{totalCalls}}</div>
+                <div class="accent" style="background:#e63946;"></div>
+                <div class="kpi-value" style="color:#e63946;">{{totalCalls}}</div>
                 <div class="kpi-label">📊 Total chamadas</div>
                 <div class="kpi-sub">{{callsThisMonth}} nos últimos 30d</div>
             </div>
@@ -166,8 +166,8 @@
         <!-- Cabeçalho -->
         <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
             <div class="d-flex align-items-center gap-2">
-                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,rgba(240,62,62,0.15),rgba(240,62,62,0.05));border:1px solid rgba(240,62,62,0.2);display:flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-speedometer2" style="color:#f03e3e;font-size:0.9rem;"></i>
+                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,rgba(230,57,70,0.15),rgba(230,57,70,0.05));border:1px solid rgba(230,57,70,0.2);display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-speedometer2" style="color:#e63946;font-size:0.9rem;"></i>
                 </div>
                 <div>
                     <div style="font-weight:700;font-size:0.95rem;">Capacidade da IA</div>
@@ -184,13 +184,13 @@
         <div class="row g-2 mb-4">
             <div class="col-6 col-md-2">
                 <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
-                    <div style="font-size:1.3rem;font-weight:800;color:#f03e3e;font-variant-numeric:tabular-nums;">{{capacityData.rpmLimit}}</div>
+                    <div style="font-size:1.3rem;font-weight:800;color:#e63946;font-variant-numeric:tabular-nums;">{{capacityData.rpmLimit}}</div>
                     <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Limite RPM</div>
                 </div>
             </div>
             <div class="col-6 col-md-2">
                 <div style="background:#111;border:1px solid #222;border-radius:10px;padding:12px 14px;">
-                    <div style="font-size:1.3rem;font-weight:800;color:#f03e3e;font-variant-numeric:tabular-nums;">{{capacityData.dailyLimit}}</div>
+                    <div style="font-size:1.3rem;font-weight:800;color:#e63946;font-variant-numeric:tabular-nums;">{{capacityData.dailyLimit}}</div>
                     <div style="font-size:0.68rem;color:#555;text-transform:uppercase;letter-spacing:.8px;margin-top:2px;">Limite Diário</div>
                 </div>
             </div>
@@ -250,7 +250,7 @@
             {{#if topFeature}}
             <div style="text-align:right;">
                 <div style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:1px;">Top feature</div>
-                <div style="font-size:0.85rem;font-weight:700;color:#f03e3e;">{{topFeature.label}}</div>
+                <div style="font-size:0.85rem;font-weight:700;color:#e63946;">{{topFeature.label}}</div>
                 <div style="font-size:0.72rem;color:#555;">{{topFeature.total}} chamadas</div>
             </div>
             {{/if}}
@@ -268,16 +268,16 @@
             <div style="flex:1;min-width:0;">
                 <div style="font-weight:600;font-size:0.88rem;">{{this.label}}</div>
                 <div class="progress-bar-custom">
-                    <div class="progress-fill" style="width:{{this.successPct}}%;background:{{#if (gte this.successPct 80)}}#4caf50{{else if (gte this.successPct 50)}}#f59e0b{{else}}#f03e3e{{/if}};"></div>
+                    <div class="progress-fill" style="width:{{this.successPct}}%;background:{{#if (gte this.successPct 80)}}#4caf50{{else if (gte this.successPct 50)}}#f59e0b{{else}}#e63946{{/if}};"></div>
                 </div>
             </div>
             <div style="text-align:right;flex-shrink:0;">
                 <div style="font-weight:700;font-size:0.9rem;">{{this.total}} <span style="color:#555;font-weight:400;font-size:0.75rem;">calls</span></div>
-                <div style="font-size:0.75rem;color:{{#if (gte this.successPct 80)}}#4caf50{{else if (gte this.successPct 50)}}#f59e0b{{else}}#f03e3e{{/if}};">{{this.successPct}}% sucesso</div>
+                <div style="font-size:0.75rem;color:{{#if (gte this.successPct 80)}}#4caf50{{else if (gte this.successPct 50)}}#f59e0b{{else}}#e63946{{/if}};">{{this.successPct}}% sucesso</div>
             </div>
             <div style="text-align:right;flex-shrink:0;min-width:50px;">
                 {{#if this.errors}}
-                <span style="background:rgba(240,62,62,0.1);color:#f03e3e;border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:600;">⚠️ {{this.errors}}</span>
+                <span style="background:rgba(230,57,70,0.1);color:#e63946;border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:600;">⚠️ {{this.errors}}</span>
                 {{else}}
                 <span style="color:#4caf50;font-size:0.72rem;">✓</span>
                 {{/if}}
@@ -315,11 +315,11 @@ if (ctx) {
             datasets: [{
                 label: 'Chamadas',
                 data: lineData,
-                borderColor: '#f03e3e',
-                backgroundColor: 'rgba(240,62,62,0.08)',
+                borderColor: '#e63946',
+                backgroundColor: 'rgba(230,57,70,0.08)',
                 borderWidth: 2,
                 pointRadius: 3,
-                pointBackgroundColor: '#f03e3e',
+                pointBackgroundColor: '#e63946',
                 fill: true,
                 tension: 0.4
             }]
@@ -349,15 +349,15 @@ if (weeklyCtx && weeklyLabels && weeklyData) {
                 data: weeklyData,
                 backgroundColor: weeklyData.map(v => {
                     const pct = (v / 1000) * 100;
-                    if (pct >= 90)  return 'rgba(240,62,62,0.7)';
+                    if (pct >= 90)  return 'rgba(230,57,70,0.7)';
                     if (pct >= 70)  return 'rgba(245,158,11,0.7)';
-                    return 'rgba(240,62,62,0.35)';
+                    return 'rgba(230,57,70,0.35)';
                 }),
                 borderColor: weeklyData.map(v => {
                     const pct = (v / 1000) * 100;
-                    if (pct >= 90)  return '#f03e3e';
+                    if (pct >= 90)  return '#e63946';
                     if (pct >= 70)  return '#f59e0b';
-                    return '#f03e3e';
+                    return '#e63946';
                 }),
                 borderWidth: 1,
                 borderRadius: 4

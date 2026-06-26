@@ -3,12 +3,12 @@
 
     <!-- CABEÇALHO DA PÁGINA -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-      <h2 style="color:#f03e3e;font-weight:700;margin:0;">
+      <h2 style="color:#e63946;font-weight:700;margin:0;">
         <i class="bi bi-file-earmark-text me-2"></i>Meu Currículo
       </h2>
       <div class="d-flex gap-2 align-items-center flex-wrap">
         <a href="/resume/create"
-          style="background:transparent;border:1px solid #f03e3e;color:#f03e3e;border-radius:8px;padding:8px 16px;text-decoration:none;font-size:0.9rem;">
+          style="background:transparent;border:1px solid #e63946;color:#e63946;border-radius:8px;padding:8px 16px;text-decoration:none;font-size:0.9rem;">
           <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <button onclick="document.getElementById('templateModal').style.display='flex'"
@@ -16,7 +16,7 @@
           <i class="bi bi-palette me-1"></i> Template: <span id="selectedTemplateName">Refinado</span>
         </button>
         <button onclick="exportPDF()"
-          style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:0.9rem;font-weight:600;">
+          style="background:#e63946;border:none;color:white;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:0.9rem;font-weight:600;">
           <i class="bi bi-file-pdf me-1"></i> Exportar PDF
         </button>
         <a href="/profile"
@@ -30,7 +30,7 @@
     <div id="resumeContent">
       <div class="resume-card">
         <div class="d-flex align-items-center gap-4">
-          <div style="width:80px;height:80px;border-radius:50%;border:3px solid #f03e3e;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#f03e3e;flex-shrink:0;">
+          <div style="width:80px;height:80px;border-radius:50%;border:3px solid #e63946;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#e63946;flex-shrink:0;">
             <i class="bi bi-person-fill"></i>
           </div>
           <div style="flex:1;">
@@ -43,8 +43,8 @@
             <p style="color:#aaa;font-size:0.85rem;margin:0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
               <span><i class="bi bi-envelope me-1"></i>{{user.email}}</span>
               {{#if user.phone}}<span>•</span><span>{{user.phone}}</span>{{/if}}
-              {{#if user.linkedin}}<span>•</span><a href="{{user.linkedin}}" style="color:#f03e3e;" target="_blank">LinkedIn</a>{{/if}}
-              {{#if user.github}}<span>•</span><a href="{{user.github}}" style="color:#f03e3e;" target="_blank">GitHub</a>{{/if}}
+              {{#if user.linkedin}}<span>•</span><a href="{{user.linkedin}}" style="color:#e63946;" target="_blank">LinkedIn</a>{{/if}}
+              {{#if user.github}}<span>•</span><a href="{{user.github}}" style="color:#e63946;" target="_blank">GitHub</a>{{/if}}
             </p>
           </div>
         </div>
@@ -59,11 +59,11 @@
       <div class="resume-card">
         <h5><i class="bi bi-briefcase me-2"></i>Experiências</h5>
         {{#each resume.experiences}}
-          <div style="border-left:3px solid #f03e3e;padding-left:16px;margin-bottom:20px;">
+          <div style="border-left:3px solid #e63946;padding-left:16px;margin-bottom:20px;">
             <div class="d-flex justify-content-between align-items-start flex-wrap">
               <div>
                 <p style="font-weight:700;font-size:1rem;margin-bottom:2px;">{{this.role}}</p>
-                <p style="color:#f03e3e;font-size:0.9rem;margin-bottom:4px;">{{this.company}}</p>
+                <p style="color:#e63946;font-size:0.9rem;margin-bottom:4px;">{{this.company}}</p>
               </div>
               {{#if this.period}}<span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:3px 10px;font-size:0.8rem;">{{this.period}}</span>{{/if}}
             </div>
@@ -76,11 +76,11 @@
       <div class="resume-card">
         <h5><i class="bi bi-mortarboard me-2"></i>Formação Acadêmica</h5>
         {{#each resume.education}}
-          <div style="border-left:3px solid #f03e3e;padding-left:16px;margin-bottom:20px;">
+          <div style="border-left:3px solid #e63946;padding-left:16px;margin-bottom:20px;">
             <div class="d-flex justify-content-between align-items-start flex-wrap">
               <div>
                 <p style="font-weight:700;font-size:1rem;margin-bottom:2px;">{{this.course}}</p>
-                <p style="color:#f03e3e;font-size:0.9rem;margin-bottom:0;">{{this.institution}}</p>
+                <p style="color:#e63946;font-size:0.9rem;margin-bottom:0;">{{this.institution}}</p>
               </div>
               {{#if this.period}}<span style="background:#2a2a2a;border:1px solid #333;color:#aaa;border-radius:20px;padding:3px 10px;font-size:0.8rem;">{{this.period}}</span>{{/if}}
             </div>
@@ -93,7 +93,7 @@
         <h5><i class="bi bi-lightning me-2"></i>Habilidades</h5>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           {{#each resume.skills}}
-            <span style="background:#2a2a2a;border:1px solid #f03e3e;color:#f03e3e;border-radius:20px;padding:5px 14px;font-size:0.85rem;">{{this}}</span>
+            <span style="background:#2a2a2a;border:1px solid #e63946;color:#e63946;border-radius:20px;padding:5px 14px;font-size:0.85rem;">{{this}}</span>
           {{/each}}
         </div>
       </div>
@@ -106,7 +106,7 @@
 <div id="templateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#1e1e1e;border:1px solid #333;border-radius:16px;padding:32px;max-width:760px;width:95%;max-height:90vh;overflow-y:auto;">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h5 style="color:#f03e3e;font-weight:700;margin:0;"><i class="bi bi-palette me-2"></i>Escolha o Template</h5>
+      <h5 style="color:#e63946;font-weight:700;margin:0;"><i class="bi bi-palette me-2"></i>Escolha o Template</h5>
       <button onclick="document.getElementById('templateModal').style.display='none'"
         style="background:transparent;border:none;color:#aaa;font-size:1.5rem;cursor:pointer;">&times;</button>
     </div>
@@ -114,7 +114,7 @@
 
       <!-- REFINADO -->
       <div class="template-card" onclick="selectTemplate('refined','Refinado')" id="tcard-refined"
-        style="border:2px solid #f03e3e;border-radius:12px;overflow:hidden;cursor:pointer;">
+        style="border:2px solid #e63946;border-radius:12px;overflow:hidden;cursor:pointer;">
         <div style="background:#2c3e50;padding:10px 12px;">
           <div style="display:flex;gap:8px;">
             <div style="width:36px;height:36px;border-radius:50%;border:2px solid #e74c3c;background:#34495e;"></div>
@@ -147,7 +147,7 @@
           </div>
         </div>
         <div style="padding:8px 12px;background:#1e1e1e;text-align:center;">
-          <span style="color:#f03e3e;font-weight:700;font-size:0.85rem;">✨ Refinado</span>
+          <span style="color:#e63946;font-weight:700;font-size:0.85rem;">✨ Refinado</span>
           <p style="color:#888;font-size:0.75rem;margin:2px 0 0;">Barra lateral escura + conteúdo principal</p>
         </div>
       </div>
@@ -261,7 +261,7 @@
     </div>
     <div class="d-flex justify-content-end mt-4">
       <button onclick="document.getElementById('templateModal').style.display='none'"
-        style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:10px 24px;cursor:pointer;font-weight:600;">
+        style="background:#e63946;border:none;color:white;border-radius:8px;padding:10px 24px;cursor:pointer;font-weight:600;">
         Confirmar
       </button>
     </div>
@@ -296,7 +296,7 @@ function selectTemplate(key, name) {
   selectedTemplate = key;
   document.getElementById('selectedTemplateName').textContent = name;
   document.querySelectorAll('.template-card').forEach(c => c.style.border = '2px solid #333');
-  document.getElementById('tcard-' + key).style.border = '2px solid #f03e3e';
+  document.getElementById('tcard-' + key).style.border = '2px solid #e63946';
   document.getElementById('templateModal').style.display = 'none';
 }
 </script>

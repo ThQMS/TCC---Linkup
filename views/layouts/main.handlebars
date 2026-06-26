@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LinkUp</title>
+    <title>LinkUp — Vagas de tecnologia com busca inteligente</title>
+    <meta name="description" content="LinkUp conecta candidatos e empresas de tecnologia com busca semântica, currículo assistido por IA e um pipeline de seleção completo.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="mask-icon" href="/favicon.svg" color="#e63946">
+    <meta name="theme-color" content="#1a1a1a">
+    <!-- Open Graph / compartilhamento -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LinkUp">
+    <meta property="og:title" content="LinkUp — Vagas de tecnologia com busca inteligente">
+    <meta property="og:description" content="Busca semântica, currículo com IA e pipeline de seleção. Encontre a vaga (ou o talento) certo.">
+    <meta name="twitter:card" content="summary">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -127,7 +137,7 @@
                     <li class="nav-item mt-1 mt-lg-0">
                         <a href="/notifications"
                             style="position:relative;color:#888;text-decoration:none;padding:7px 9px;display:inline-flex;align-items:center;gap:8px;border-radius:8px;border:1px solid #2a2a2a;transition:all 0.2s;"
-                            onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+                            onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'"
                             onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#888'">
                             <i class="bi bi-bell" style="font-size:1rem;"></i>
                             <span class="d-lg-none">Notificações</span>
@@ -148,7 +158,7 @@
                     <li class="nav-item mt-1 mt-lg-0">
                         <a href="/profile"
                             style="display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border:1px solid #2a2a2a;border-radius:20px;text-decoration:none;color:#e0e0e0;font-size:0.85rem;transition:all 0.2s;"
-                            onmouseover="this.style.borderColor='#f03e3e'"
+                            onmouseover="this.style.borderColor='#e63946'"
                             onmouseout="this.style.borderColor='#2a2a2a'">
                             {{#if user.avatar}}
                                 <img src="{{user.avatar}}" alt="avatar"
@@ -166,7 +176,7 @@
                     <li class="nav-item">
                         <a href="/logout"
                             style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #2a2a2a;border-radius:8px;text-decoration:none;color:#666;font-size:0.85rem;transition:all 0.2s;"
-                            onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+                            onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'"
                             onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#666'">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sair</span>
@@ -419,7 +429,7 @@
         const socket=io();
         socket.on('notification',function(data){
             const toast=document.createElement('div');
-            toast.style.cssText='position:fixed;bottom:24px;right:24px;background:#1e1e1e;border:1px solid #f03e3e;border-radius:12px;padding:14px 18px;z-index:99999;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.5);animation:slideIn 0.3s ease;';
+            toast.style.cssText='position:fixed;bottom:24px;right:24px;background:#1e1e1e;border:1px solid #e63946;border-radius:12px;padding:14px 18px;z-index:99999;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.5);animation:slideIn 0.3s ease;';
             toast.innerHTML='<p style="font-weight:700;margin:0 0 4px;font-size:0.88rem;color:#f0f0f0;">🔔 '+(data.title||'Nova notificação')+'</p><p style="color:#aaa;font-size:0.8rem;margin:0;">'+(data.message||'')+'</p>';
             document.body.appendChild(toast);
             setTimeout(()=>{toast.style.opacity='0';toast.style.transition='opacity 0.4s';setTimeout(()=>toast.remove(),400);},4000);

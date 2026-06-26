@@ -26,7 +26,7 @@ async function enviarEmailCandidatoExpiracao(candidate, job, feedbackText) {
         html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
                 <div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;">
-                    <h2 style="color:#f03e3e;margin:0;">Link<span style="color:white;">Up</span></h2>
+                    <h2 style="color:#e63946;margin:0;">Link<span style="color:white;">Up</span></h2>
                 </div>
                 <div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;">
                     <p style="white-space:pre-wrap;line-height:1.7;">${feedbackText}</p>
@@ -34,7 +34,7 @@ async function enviarEmailCandidatoExpiracao(candidate, job, feedbackText) {
                         <p style="color:#92400e;font-size:0.85rem;margin:0;">💡 Use "Ver minha compatibilidade" antes de se candidatar para maximizar suas chances nas próximas vagas.</p>
                     </div>
                     <a href="${process.env.BASE_URL || 'http://localhost:3000'}"
-                        style="display:inline-block;background:#f03e3e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:16px;">
+                        style="display:inline-block;background:#e63946;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:16px;">
                         Ver Novas Vagas
                     </a>
                 </div>
@@ -82,7 +82,7 @@ cron.schedule('0 3 * * *', async () => {
                     subject: `⏰ ${candidate?.name} aguarda retorno há 7 dias — ${job.title}`,
                     html: `
                         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-                            <div style="background:#f03e3e;padding:24px 32px;border-radius:8px 8px 0 0;">
+                            <div style="background:#e63946;padding:24px 32px;border-radius:8px 8px 0 0;">
                                 <h2 style="color:white;margin:0;">Candidato aguardando retorno</h2>
                             </div>
                             <div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;">
@@ -90,7 +90,7 @@ cron.schedule('0 3 * * *', async () => {
                                 <p><strong>${candidate?.name || 'Um candidato'}</strong> está aguardando retorno sobre a vaga <strong>${job.title}</strong> há 7 dias.</p>
                                 <p>Dar um retorno faz uma enorme diferença — mesmo que seja uma recusa, o candidato merece saber.</p>
                                 <a href="${process.env.BASE_URL || 'http://localhost:3000'}/jobs/applications/${job.id}"
-                                    style="display:inline-block;background:#f03e3e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">
+                                    style="display:inline-block;background:#e63946;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">
                                     Ver Candidatos
                                 </a>
                             </div>
@@ -173,11 +173,11 @@ cron.schedule('0 3 * * *', async () => {
                                 <p>Para manter a vaga ativa, basta acessar o sistema e dar retorno aos candidatos ou atualizar a vaga.</p>
                                 <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
                                     <a href="${process.env.BASE_URL || 'http://localhost:3000'}/jobs/applications/${job.id}"
-                                        style="display:inline-block;background:#f03e3e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">
+                                        style="display:inline-block;background:#e63946;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">
                                         Ver Candidatos
                                     </a>
                                     <a href="${process.env.BASE_URL || 'http://localhost:3000'}/jobs/edit/${job.id}"
-                                        style="display:inline-block;background:transparent;border:2px solid #f03e3e;color:#f03e3e;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">
+                                        style="display:inline-block;background:transparent;border:2px solid #e63946;color:#e63946;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">
                                         Editar Vaga
                                     </a>
                                 </div>
@@ -257,7 +257,7 @@ cron.schedule('0 3 * * *', async () => {
                         html: `
                             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
                                 <div style="background:#1a1a1a;padding:24px 32px;border-radius:8px 8px 0 0;">
-                                    <h2 style="color:#f03e3e;margin:0;">Vaga inativada automaticamente</h2>
+                                    <h2 style="color:#e63946;margin:0;">Vaga inativada automaticamente</h2>
                                 </div>
                                 <div style="background:#f9f9f9;padding:24px 32px;border:1px solid #eee;border-top:none;">
                                     <p>Olá, <strong>${recruiter.name}</strong>!</p>
@@ -265,7 +265,7 @@ cron.schedule('0 3 * * *', async () => {
                                     <p>Todos os candidatos pendentes foram notificados automaticamente.</p>
                                     <p style="color:#666;">Para reabrir a vaga, acesse o sistema, atualize a descrição e mude o status para "Aberta".</p>
                                     <a href="${process.env.BASE_URL || 'http://localhost:3000'}/jobs/edit/${job.id}"
-                                        style="display:inline-block;background:#f03e3e;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">
+                                        style="display:inline-block;background:#e63946;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">
                                         Reabrir Vaga
                                     </a>
                                 </div>

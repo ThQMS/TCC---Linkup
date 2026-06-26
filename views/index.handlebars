@@ -186,7 +186,7 @@
       <div>
         {{#if search}}
           <h2 style="font-size:1.1rem;margin:0;">
-            Resultados para: <strong style="color:#f03e3e;">{{search}}</strong>
+            Resultados para: <strong style="color:#e63946;">{{search}}</strong>
             <span style="color:#888;font-size:0.9rem;font-weight:400;"> — {{totalJobs}} vaga(s)</span>
           </h2>
         {{else}}
@@ -200,7 +200,7 @@
       {{#if search}}
       <button onclick="salvarBusca()" id="save-search-btn"
         style="background:transparent;border:1px solid #3a3a3a;color:#888;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:0.78rem;transition:all 0.2s;"
-        onmouseover="this.style.borderColor='#f03e3e';this.style.color='#f03e3e'"
+        onmouseover="this.style.borderColor='#e63946';this.style.color='#e63946'"
         onmouseout="this.style.borderColor='#3a3a3a';this.style.color='#888'">
         <i class="bi bi-bookmark me-1"></i> Salvar busca
       </button>
@@ -212,7 +212,7 @@
     <div id="job-list">
       {{#each jobs}}
         <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:20px 24px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;transition:border-color 0.2s;"
-          onmouseover="this.style.borderColor='#f03e3e'" onmouseout="this.style.borderColor='#2a2a2a'">
+          onmouseover="this.style.borderColor='#e63946'" onmouseout="this.style.borderColor='#2a2a2a'">
           <div class="d-flex align-items-center gap-3 flex-wrap">
             <div style="width:48px;height:48px;border-radius:10px;border:1px solid #333;background:#1a1a1a;display:flex;align-items:center;justify-content:center;color:#888;flex-shrink:0;font-size:1.3rem;">
               <i class="bi bi-building"></i>
@@ -221,7 +221,7 @@
               <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
                 <p style="font-weight:700;font-size:1.05rem;margin:0;color:#f1f1f1;line-height:1.4;">{{title}}</p>
                 {{#if (isNew createdAt)}}
-                  <span style="background:#f03e3e;color:white;font-size:0.62rem;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:0.6px;">NOVA</span>
+                  <span style="background:#e63946;color:white;font-size:0.62rem;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:0.6px;">NOVA</span>
                 {{/if}}
                 {{#if empresaResponsiva}}
                   <span style="background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);color:#4caf50;font-size:0.62rem;padding:2px 8px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:3px;">
@@ -263,7 +263,7 @@
             </div>
           </div>
           <a href="/jobs/view/{{id}}"
-            style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:9px 22px;text-decoration:none;font-weight:600;font-size:0.88rem;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:opacity 0.2s;"
+            style="background:#e63946;border:none;color:white;border-radius:8px;padding:9px 22px;text-decoration:none;font-weight:600;font-size:0.88rem;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:opacity 0.2s;"
             onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
             Ver Vaga <i class="bi bi-arrow-right"></i>
           </a>
@@ -272,10 +272,10 @@
 
       {{#unless jobs.length}}
         <div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:12px;padding:60px;text-align:center;">
-          <i class="bi bi-search" style="font-size:3rem;color:#f03e3e;"></i>
+          <i class="bi bi-search" style="font-size:3rem;color:#e63946;"></i>
           <h5 class="mt-3">Nenhuma vaga encontrada</h5>
           <p class="text-muted">Tente buscar por outro termo ou limpar os filtros.</p>
-          <a href="/" style="background:#f03e3e;border:none;color:white;border-radius:8px;padding:8px 20px;text-decoration:none;">
+          <a href="/" style="background:#e63946;border:none;color:white;border-radius:8px;padding:8px 20px;text-decoration:none;">
             Limpar filtros
           </a>
         </div>
@@ -291,7 +291,7 @@
         </a>
       {{/if}}
       {{#each pages}}
-        <a href="{{this.url}}" style="border-radius:8px;padding:7px 13px;text-decoration:none;font-size:0.85rem;font-weight:600;{{#if this.active}}background:#f03e3e;color:white;border:1px solid #f03e3e;{{else}}background:#1e1e1e;color:#e0e0e0;border:1px solid #3a3a3a;{{/if}}">
+        <a href="{{this.url}}" style="border-radius:8px;padding:7px 13px;text-decoration:none;font-size:0.85rem;font-weight:600;{{#if this.active}}background:#e63946;color:white;border:1px solid #e63946;{{else}}background:#1e1e1e;color:#e0e0e0;border:1px solid #3a3a3a;{{/if}}">
           {{this.number}}
         </a>
       {{/each}}
@@ -343,7 +343,7 @@
   outline: none;
   transition: border-color 0.2s;
 }
-.sf-search-input:focus { border-color: #f03e3e; }
+.sf-search-input:focus { border-color: #e63946; }
 .sf-search-input::placeholder { color: #666; }
 
 .sf-filter-btn {
@@ -363,9 +363,9 @@
   flex-shrink: 0;
 }
 .sf-filter-btn:hover,
-.sf-filter-btn.active { border-color: #f03e3e; color: #f03e3e; }
+.sf-filter-btn.active { border-color: #e63946; color: #e63946; }
 .sf-badge {
-  background: #f03e3e;
+  background: #e63946;
   color: white;
   border-radius: 50%;
   min-width: 18px;
@@ -378,7 +378,7 @@
   padding: 0 4px;
 }
 .sf-submit-btn {
-  background: #f03e3e;
+  background: #e63946;
   border: none;
   color: white;
   border-radius: 10px;
@@ -444,11 +444,11 @@
   display: flex;
   align-items: center;
 }
-.sf-pill:hover { border-color: #f03e3e; color: #f03e3e; }
+.sf-pill:hover { border-color: #e63946; color: #e63946; }
 .sf-pill-active {
-  background: rgba(240,62,62,0.1);
-  border-color: #f03e3e;
-  color: #f03e3e;
+  background: rgba(230,57,70,0.1);
+  border-color: #e63946;
+  color: #e63946;
   font-weight: 600;
 }
 
@@ -467,7 +467,7 @@
 }
 .sf-option input[type="radio"] { display: none; }
 .sf-option:hover { background: #1e1e1e; color: #e0e0e0; }
-.sf-option-active { color: #f03e3e; font-weight: 600; background: rgba(240,62,62,0.08); }
+.sf-option-active { color: #e63946; font-weight: 600; background: rgba(230,57,70,0.08); }
 .sf-option::before {
   content: '';
   width: 14px;
@@ -477,7 +477,7 @@
   flex-shrink: 0;
   transition: all 0.15s;
 }
-.sf-option-active::before { border-color: #f03e3e; background: #f03e3e; }
+.sf-option-active::before { border-color: #e63946; background: #e63946; }
 
 /* Input de cidade */
 .sf-city-input {
@@ -491,7 +491,7 @@
   outline: none;
   transition: border-color 0.2s;
 }
-.sf-city-input:focus { border-color: #f03e3e; }
+.sf-city-input:focus { border-color: #e63946; }
 .sf-city-icon {
   position: absolute;
   left: 10px;
@@ -533,9 +533,9 @@
   border-radius: 8px;
   transition: color 0.2s;
 }
-.sf-clear-btn:hover { color: #f03e3e; }
+.sf-clear-btn:hover { color: #e63946; }
 .sf-apply-btn {
-  background: #f03e3e;
+  background: #e63946;
   border: none;
   color: white;
   border-radius: 8px;
@@ -559,9 +559,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(240,62,62,0.1);
-  border: 1px solid rgba(240,62,62,0.3);
-  color: #f03e3e;
+  background: rgba(230,57,70,0.1);
+  border: 1px solid rgba(230,57,70,0.3);
+  color: #e63946;
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 0.82rem;
@@ -569,7 +569,7 @@
   cursor: pointer;
   transition: all 0.15s;
 }
-.sf-chip:hover { background: rgba(240,62,62,0.2); }
+.sf-chip:hover { background: rgba(230,57,70,0.2); }
 .sf-chip-x { opacity: 0.7; font-size: 0.75rem; }
 
 /* ── DROPDOWN CIDADES (barra antiga) ── */
@@ -609,7 +609,7 @@ function renderATSBadges() {
     document.querySelectorAll('[data-ats]').forEach(el => {
         const score = calcATS(el.dataset.title || '', el.dataset.description || '', el.dataset.requirements || '');
         if (score === null) { el.style.display = 'none'; return; }
-        const color = score >= 70 ? '#4caf50' : score >= 40 ? '#f59e0b' : '#f03e3e';
+        const color = score >= 70 ? '#4caf50' : score >= 40 ? '#f59e0b' : '#e63946';
         const fill  = Math.round(score / 10);
         el.innerHTML = '<span style="font-size:0.7rem;color:' + color + ';font-weight:700;">' + score + '% ATS</span><span style="display:inline-flex;gap:2px;margin-left:4px;">' + Array.from({length:10},(_,i) => '<span style="width:4px;height:10px;border-radius:2px;background:' + (i < fill ? color : '#2a2a2a') + ';display:inline-block;"></span>').join('') + '</span>';
         el.style.display = 'inline-flex';
