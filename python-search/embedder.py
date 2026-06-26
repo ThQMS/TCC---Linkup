@@ -1,4 +1,7 @@
 import re
+import os
+import hashlib
+from collections import OrderedDict
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
@@ -9,8 +12,28 @@ print(f'[EMBEDDER] Carregando modelo {MODEL_NAME}...')
 model = SentenceTransformer(MODEL_NAME)
 print('[EMBEDDER] Modelo carregado.')
 
-# Cache em memória: { job_id: embedding_vector }
-_cache = {}
+# Cache em memória LRU: { job_id: (content_hash, embedding_vector) }.
+# A chave inclui um hash do conteúdo: se a vaga é editada, o hash muda e o
+# embedding é recalculado automaticamente — não depende só do /invalidate.
+_cache = OrderedDict()
+_CACHE_MAX = int(os.environ.get('EMBED_CACHE_MAX', '5000'))
+
+def _content_hash(job: dict) -> str:
+    return hashlib.md5(build_job_text(job).encode('utf-8')).hexdigest()
+
+def _cache_get(job: dict) -> np.ndarray:
+    job_id = job.get('id')
+    h = _content_hash(job)
+    cached = _cache.get(job_id)
+    if cached and cached[0] == h:
+        _cache.move_to_end(job_id)
+        return cached[1]
+    vec = embed_job(job)
+    _cache[job_id] = (h, vec)
+    _cache.move_to_end(job_id)
+    while len(_cache) > _CACHE_MAX:
+        _cache.popitem(last=False)  # remove o menos recentemente usado
+    return vec
 
 # Expansões semânticas para queries comuns em pt-BR
 QUERY_EXPANSIONS = {
@@ -47,7 +70,9 @@ def expand_query(query: str) -> str:
     q = query.lower().strip()
     expansions = []
     for key, expansion in QUERY_EXPANSIONS.items():
-        if key.strip() in q:
+        k = key.strip()
+        # Match por palavra inteira (evita 'ia' casar em 'midia', 'dev' em 'develop').
+        if re.search(r'\b' + re.escape(k) + r'\b', q):
             expansions.append(expansion)
     if expansions:
         return q + ' ' + ' '.join(expansions)
@@ -120,9 +145,8 @@ def rank_jobs(query: str, jobs: list, top_k: int = 20) -> list:
     semantic_raw = []
     for job in jobs:
         job_id = job.get('id')
-        if job_id not in _cache:
-            _cache[job_id] = embed_job(job)
-        sim = float(np.dot(query_vec, _cache[job_id]))
+        job_vec = _cache_get(job)
+        sim = float(np.dot(query_vec, job_vec))
         semantic_raw.append((job_id, sim))
 
     semantic_sorted = sorted(semantic_raw, key=lambda x: x[1], reverse=True)
@@ -151,8 +175,8 @@ def rank_jobs(query: str, jobs: list, top_k: int = 20) -> list:
 
     # ── 4. Threshold semântico + retorno ────────────────────────────────────
     # 0.25 calibrado para o modelo paraphrase-multilingual-MiniLM-L12-v2.
-    # Esse modelo separa bem domínios diferentes (RH vs Frontend ~ 0.15-0.20).
-    THRESHOLD = 0.25
+    # Configurável via env EMBED_THRESHOLD para recalibrar sem mexer no código.
+    THRESHOLD = float(os.environ.get('EMBED_THRESHOLD', '0.25'))
 
     results = []
     for jid, score in sorted(rrf.items(), key=lambda x: x[1], reverse=True):

@@ -1,13 +1,28 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from embedder import rank_jobs, invalidate_cache, clear_cache
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000'])
+# Origem do CORS configurável (default localhost p/ dev). Em produção a chamada é
+# server-to-server e não passa pelo browser, então CORS é irrelevante nesse caminho.
+CORS(app, origins=os.environ.get('CORS_ORIGIN', 'http://localhost:3000').split(','))
+
+# Token compartilhado opcional: se SEARCH_TOKEN estiver definido, exige o header
+# x-search-token em todas as rotas exceto /health. Protege o serviço de chamadas
+# não autorizadas na rede interna (ex.: clear_cache como DoS).
+SEARCH_TOKEN = os.environ.get('SEARCH_TOKEN')
+
+@app.before_request
+def _check_token():
+    if not SEARCH_TOKEN or request.path == '/health':
+        return None
+    if request.headers.get('x-search-token') != SEARCH_TOKEN:
+        return jsonify({ 'error': 'unauthorized' }), 401
 
 @app.route('/health', methods=['GET'])
 def health():
-    return jsonify({ 'status': 'ok', 'service': 'linkup-semantic-search' })
+    return jsonify({ 'status': 'ok', 'service': 'linkup-semantic-search', 'model': 'paraphrase-multilingual-MiniLM-L12-v2' })
 
 @app.route('/search', methods=['POST'])
 def search():

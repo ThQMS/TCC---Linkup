@@ -1,5 +1,5 @@
 const { Job, Resume }  = require('../models');
-const { chatComplete } = require('../helpers/aiService');
+const { chatComplete, parseJsonLoose } = require('../helpers/aiService');
 const logAi            = require('../helpers/aiLog');
 const parseResume      = require('../helpers/parseResume');
 
@@ -23,7 +23,7 @@ exports.tailor = async (req, res) => {
             education.length   ? 'Formação:\n'     + education.map(e => `- ${e.course} em ${e.institution}`).join('\n') : ''
         ].filter(Boolean).join('\n\n');
 
-        const raw = (await chatComplete([{
+        const raw = await chatComplete([{
             role: 'user',
             content: `Você é um especialista em RH e reescrita de currículos. Adapte o currículo abaixo para maximizar a compatibilidade com a vaga informada.
 
@@ -47,16 +47,15 @@ Retorne APENAS este JSON sem markdown:
   "score_antes": 0-100,
   "score_depois": 0-100
 }`
-        }], { max_tokens: 1200, temperature: 0.5 }
-        )).replace(/```json|```/g, '');
+        }], { max_tokens: 1200, temperature: 0.5, response_format: { type: 'json_object' } });
 
-        const match = raw.match(/\{[\s\S]*\}/);
-        if (!match) return res.status(500).json({ error: 'Erro ao processar.' });
+        const parsed = parseJsonLoose(raw);
+        if (!parsed) return res.status(500).json({ error: 'Erro ao processar.' });
 
-        await logAi(req.user.id, 'resume-tailoring', start, true);
-        res.json(JSON.parse(match[0]));
+        await logAi(req.user.id, 'tailoring', start, true);
+        res.json(parsed);
     } catch (err) {
-        await logAi(req.user?.id, 'resume-tailoring', start, false);
+        await logAi(req.user?.id, 'tailoring', start, false);
         res.status(500).json({ error: 'Erro ao adaptar currículo.' });
     }
 };

@@ -1,4 +1,4 @@
-const { chatComplete } = require('../helpers/aiService');
+const { chatComplete, parseJsonLoose } = require('../helpers/aiService');
 const logAi            = require('../helpers/aiLog');
 
 exports.audit = async (req, res) => {
@@ -11,7 +11,7 @@ exports.audit = async (req, res) => {
             return res.status(400).json({ error: 'Conteúdo insuficiente para análise.' });
         }
 
-        const raw = (await chatComplete([{
+        const raw = await chatComplete([{
             role: 'user',
             content: `Você é um especialista em diversidade e inclusão no mercado de trabalho. Analise o texto da vaga abaixo e identifique possíveis vieses de linguagem.
 
@@ -35,13 +35,13 @@ Retorne APENAS este JSON sem markdown:
   "pontos_positivos": ["ponto1", "ponto2"],
   "resumo": "texto de 2 linhas sobre a vaga"
 }`
-        }], { max_tokens: 800, temperature: 0.2 })).replace(/```json|```/g, '');
+        }], { max_tokens: 800, temperature: 0.2, response_format: { type: 'json_object' } });
 
-        const match = raw.match(/\{[\s\S]*\}/);
-        if (!match) return res.status(500).json({ error: 'Erro ao processar análise.' });
+        const parsed = parseJsonLoose(raw);
+        if (!parsed) return res.status(500).json({ error: 'Erro ao processar análise.' });
 
         await logAi(req.user.id, 'bias-audit', start, true);
-        res.json(JSON.parse(match[0]));
+        res.json(parsed);
     } catch (err) {
         await logAi(req.user?.id, 'bias-audit', start, false);
         res.status(500).json({ error: 'Erro ao analisar bias.' });

@@ -10,24 +10,41 @@ const FEATURE_LABELS = {
     'cover-letter':       'Carta de Apresentação',
     'compatibility':      'Compatibilidade',
     'improve-job':        'Melhorar Vaga',
+    'suggest-stages':     'Sugerir Etapas',
     'ranking':            'Ranking de Candidatos',
     'compare-candidates': 'Comparação de Candidatos',
     'interview':          'Entrevista Simulada',
+    'interview-score':    'Avaliação de Entrevista',
     'tailoring':          'Adaptar Currículo',
+    'import-resume':      'Importar Currículo',
+    'improve-resume':     'Melhorar Currículo',
     'bias-audit':         'Bias Auditor',
-    'chat':               'Chat com IA'
+    'chat':               'Chat com IA',
+    // Chaves legadas (dados antigos) — mantêm rótulo amigável no histórico
+    'chat-vaga':          'Chat com IA',
+    'ai-interview':       'Entrevista Simulada',
+    'ai-interview-score': 'Avaliação de Entrevista',
+    'resume-tailoring':   'Adaptar Currículo'
 };
 
 const FEATURE_ICONS = {
     'cover-letter':       'bi-envelope-paper',
     'compatibility':      'bi-cpu',
     'improve-job':        'bi-stars',
+    'suggest-stages':     'bi-diagram-3',
     'ranking':            'bi-trophy',
     'compare-candidates': 'bi-people',
     'interview':          'bi-mic',
+    'interview-score':    'bi-clipboard-check',
     'tailoring':          'bi-scissors',
+    'import-resume':      'bi-upload',
+    'improve-resume':     'bi-magic',
     'bias-audit':         'bi-shield-check',
-    'chat':               'bi-chat-dots'
+    'chat':               'bi-chat-dots',
+    'chat-vaga':          'bi-chat-dots',
+    'ai-interview':       'bi-mic',
+    'ai-interview-score': 'bi-clipboard-check',
+    'resume-tailoring':   'bi-scissors'
 };
 
 const GROQ_RPM_LIMIT   = 30;
@@ -71,7 +88,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
         const rpmUsagePct     = Math.min(100, Math.round((usedLastMinute / GROQ_RPM_LIMIT) * 100));
 
         let capacityStatus, capacityColor;
-        if (dailyUsagePct >= 90)      { capacityStatus = 'Crítico';  capacityColor = '#f03e3e'; }
+        if (dailyUsagePct >= 90)      { capacityStatus = 'Crítico';  capacityColor = '#e63946'; }
         else if (dailyUsagePct >= 70) { capacityStatus = 'Atenção';  capacityColor = '#f59e0b'; }
         else                          { capacityStatus = 'Seguro';   capacityColor = '#4caf50'; }
 

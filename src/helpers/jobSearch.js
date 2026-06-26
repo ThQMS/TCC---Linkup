@@ -3,11 +3,20 @@ const { Job } = require('../models');
 const parseResume = require('./parseResume');
 const logger = require('./logger');
 
+const SEARCH_URL = process.env.SEARCH_SERVICE_URL || 'http://localhost:5001';
+
+// Header de autenticação compartilhada Node↔Python (opcional — só envia se configurado)
+function searchHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (process.env.SEARCH_TOKEN) h['x-search-token'] = process.env.SEARCH_TOKEN;
+    return h;
+}
+
 async function semanticSearch(query, jobs) {
     try {
-        const response = await fetch((process.env.SEARCH_SERVICE_URL || 'http://localhost:5001') + '/search', {
+        const response = await fetch(SEARCH_URL + '/search', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: searchHeaders(),
             body: JSON.stringify({
                 query,
                 jobs: jobs.map(j => ({
@@ -91,4 +100,21 @@ async function getSuggestedJobs(resume, appliedJobIds = [], candidateIsPcd = fal
     }
 }
 
-module.exports = { semanticSearch, getSuggestedJobs };
+/**
+ * Invalida o embedding em cache de uma vaga no microserviço Python.
+ * Fire-and-forget: chamado ao editar/excluir vaga para o ranking semântico não
+ * servir conteúdo obsoleto. Falha silenciosamente se o serviço estiver fora.
+ */
+async function invalidateJobCache(jobId) {
+    try {
+        await fetch(`${SEARCH_URL}/invalidate/${parseInt(jobId, 10)}`, {
+            method: 'POST',
+            headers: searchHeaders(),
+            signal: AbortSignal.timeout(2000)
+        });
+    } catch {
+        logger.debug('jobSearch', 'Falha ao invalidar cache de embedding (serviço offline?)', { jobId });
+    }
+}
+
+module.exports = { semanticSearch, getSuggestedJobs, invalidateJobCache };

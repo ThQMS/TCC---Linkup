@@ -1,7 +1,9 @@
 const { Job, Resume }  = require('../models');
-const groq             = require('../helpers/groq');
+const { streamComplete } = require('../helpers/aiService');
 const logAi            = require('../helpers/aiLog');
 const parseResume      = require('../helpers/parseResume');
+
+const CHAT_TIMEOUT_MS = 45000;
 
 async function buildSystemPrompt(job, userId) {
     let resumeContext = 'Candidato não possui currículo cadastrado na plataforma.';
@@ -72,25 +74,34 @@ exports.chat = async (req, res) => {
         res.setHeader('X-Accel-Buffering', 'no');
         res.flushHeaders();
 
-        const stream = await groq.chat.completions.create({
-            model:       'llama-3.3-70b-versatile',
-            messages:    [{ role: 'system', content: systemPrompt }, ...history],
-            max_tokens:  800,
-            temperature: 0.7,
-            stream:      true
-        });
+        // Aborta o stream se o cliente desconectar (não consome tokens/custo à toa)
+        // ou se estourar o timeout (evita socket pendurado se a Groq travar).
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS);
+        req.on('close', () => controller.abort());
 
-        for await (const chunk of stream) {
-            const token = chunk.choices[0]?.delta?.content || '';
-            if (token) res.write(`data: ${JSON.stringify({ token })}\n\n`);
+        try {
+            const stream = await streamComplete(
+                [{ role: 'system', content: systemPrompt }, ...history],
+                { max_tokens: 800, temperature: 0.7, signal: controller.signal }
+            );
+
+            for await (const chunk of stream) {
+                const token = chunk.choices[0]?.delta?.content || '';
+                if (token) res.write(`data: ${JSON.stringify({ token })}\n\n`);
+            }
+
+            res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+            res.end();
+        } finally {
+            clearTimeout(timer);
         }
 
-        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-        res.end();
-
-        await logAi(req.user.id, 'chat-vaga', start, true);
+        await logAi(req.user.id, 'chat', start, true);
     } catch (err) {
-        await logAi(req.user?.id, 'chat-vaga', start, false);
+        // Abort por desconexão do cliente não é falha real da IA.
+        if (err?.name === 'AbortError' && req.destroyed) return;
+        await logAi(req.user?.id, 'chat', start, false);
         if (res.headersSent) {
             res.write(`data: ${JSON.stringify({ error: 'Erro ao conectar com a IA.' })}\n\n`);
             res.end();
