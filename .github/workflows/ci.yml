@@ -37,3 +37,44 @@ jobs:
           DB_NAME: linkup_db
           DB_USER: postgres
           DB_PASS: ci-placeholder
+
+  migrations:
+    name: Migrations no Postgres
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: linkup_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-placeholder
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # Roda TODAS as migrations contra um Postgres real — pega drift entre
+      # models e migrations que os testes em SQLite não detectam.
+      - name: Rodar migrations
+        run: npx sequelize-cli db:migrate
+        env:
+          NODE_ENV: production
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: linkup_db
+          DB_USER: postgres
+          DB_PASS: ci-placeholder

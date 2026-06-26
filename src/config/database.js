@@ -18,13 +18,11 @@ module.exports = {
     port:     parseInt(process.env.DB_PORT) || 5432,
     dialect:  'postgres',
     logging:  false,
-    dialectOptions: {
-      // DB_SSL_REJECT_UNAUTHORIZED=false apenas quando o provedor usa certificado self-signed
-      // (ex: Railway interno). Em produção com TLS próprio, manter true (padrão).
-      ssl: {
-        require:             true,
-        rejectUnauthorized:  process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
-      }
-    }
+    // SSL é OPT-IN: ative com DB_SSL=true em provedores gerenciados (Railway/Render/Heroku).
+    // Em Docker self-hosted o Postgres interno não usa SSL, então o padrão é desligado —
+    // do contrário as migrations falhariam ao conectar no banco interno.
+    dialectOptions: process.env.DB_SSL === 'true'
+      ? { ssl: { require: true, rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false' } }
+      : {}
   }
 };

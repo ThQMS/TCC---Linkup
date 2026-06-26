@@ -23,8 +23,15 @@ async function connect() {
     const logger = require('../helpers/logger');
     await sequelize.authenticate();
     logger.info('db', 'Conectado ao banco com sucesso');
-    await sequelize.sync({ alter: process.env.NODE_ENV !== 'production' });
-    logger.info('db', 'Modelos sincronizados');
+    // Em produção o schema é gerido EXCLUSIVAMENTE por migrations (sequelize-cli).
+    // sync({alter}) só roda em dev/teste — evita o app reescrever o schema em prod
+    // e diverge das migrations (fonte única da verdade).
+    if (process.env.NODE_ENV !== 'production') {
+        await sequelize.sync({ alter: true });
+        logger.info('db', 'Modelos sincronizados (dev)');
+    } else {
+        logger.info('db', 'Produção: schema gerido por migrations (sync desativado)');
+    }
 }
 
 module.exports = sequelize;

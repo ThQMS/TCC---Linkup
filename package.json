@@ -28,10 +28,8 @@
   },
   "dependencies": {
     "@socket.io/redis-adapter": "^8.3.0",
-    "alpinejs": "^3.14.8",
     "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
     "connect-flash": "^0.1.1",
     "connect-pg-simple": "^10.0.0",
     "cookie-parser": "^1.4.7",
