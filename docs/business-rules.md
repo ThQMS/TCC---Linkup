@@ -80,7 +80,7 @@ Cada regra segue o formato:
 **RN-107 — Bloqueio temporário de conta após tentativas de login consecutivas**
 **Descrição:** Após 5 tentativas de login falhas consecutivas com o mesmo e-mail, a conta é bloqueada por 15 minutos. Após esse período, as tentativas são resetadas automaticamente. Um login bem-sucedido limpa o contador imediatamente.
 **Justificativa:** Mitiga ataques de força bruta por dicionário que conseguem contornar rate limits baseados em IP (ex: botnets distribuídas).
-**Impacto:** Lógica em `authController` via Map in-memory (`loginFailures`). Resposta: redirect para `/login` com mensagem de bloqueio.
+**Impacto:** Lógica em `helpers/loginLockout.js`, com estado compartilhado em **Redis** (chave `login:fail:<email>`, TTL de 15 min) — funciona em ambiente multi-instância e sobrevive a restart. Se o Redis estiver indisponível, degrada para um `Map` em memória (best-effort). Resposta: redirect para `/login` com mensagem de bloqueio.
 
 ---
 
@@ -471,7 +471,7 @@ Transições de status e ações automáticas:
 **RN-610 — Algoritmo de fit score usa apenas skills e cargos**
 **Descrição:** O `calcFitScore` calcula compatibilidade entre currículo e vaga usando exclusivamente habilidades (`skills`) e títulos de cargo das experiências (`role`). Nomes de empresa, nomes de instituição de ensino e texto do sumário são excluídos do cálculo. O texto da vaga considerado é título, requisitos e descrição — benefícios e diferenciais são excluídos.
 **Justificativa:** Incluir nomes de empresa/educação gera ruído que infla ou deflate artificialmente o score — um candidato com muitas experiências em empresas com nomes comuns teria denominador grande sem sinal real de fit. Benefícios e diferenciais da vaga não são indicadores de fit técnico.
-**Impacto:** `calcFitScore` em `talentRediscoveryService.js`. Usa `Set` para lookup O(1) contra palavras da vaga. Aplicado em todas as features que calculam fit: redescoberta de talentos, candidatos similares e candidatos sugeridos.
+**Impacto:** `calcFitScore` em `talentRediscoveryService.js`. Usa `Set` para lookup O(1) contra palavras da vaga. O denominador é limitado por `FIT_DENOM_CAP` (12): a cobertura é medida contra no máximo 12 keywords-chave, evitando penalizar perfis amplos (um sênior com 30 skills não precisa casar 88% de todas). O threshold de acionamento das features é `FIT_THRESHOLD` (env, padrão **60**; antes era 88 fixo, que quase nunca disparava). Aplicado em todas as features que calculam fit: redescoberta de talentos, candidatos similares e candidatos sugeridos.
 
 ---
 
@@ -649,7 +649,7 @@ Retorna até 3 perfis com `combinedScore ≥ 20`, ordenados de forma decrescente
 ---
 
 **RN-1101 — CSRF obrigatório em todos os formulários POST**
-**Descrição:** Todo formulário que envia dados via POST deve incluir o token CSRF gerado por `csrf-csrf`. Requisições sem token ou com token inválido são rejeitadas com HTTP 403. O handler de erro CSRF diferencia requisições AJAX de requisições de formulário: AJAX recebe `{ "error": "Token de segurança expirado. Recarregue a página." }` com status 403; formulários recebem flash `error_msg` e redirect para `back`.
+**Descrição:** Todo formulário que envia dados via POST deve incluir o token CSRF gerado por `csrf-csrf`. Requisições sem token ou com token inválido são rejeitadas com HTTP 403. O handler de erro CSRF diferencia requisições AJAX de requisições de formulário: AJAX recebe `{ "error": "Token de segurança expirado. Recarregue a página." }` com status 403; formulários recebem flash `error_msg` e redirect para a página de origem (`Referrer`, com fallback para `/`).
 **Justificativa:** Protege contra Cross-Site Request Forgery, onde um site malicioso forjaria ações em nome de um usuário autenticado. A diferenciação AJAX/formulário evita que o browser siga silenciosamente um redirect 302 em chamadas `fetch`, o que causaria o token de flash a aparecer em páginas não relacionadas.
 **Impacto:** `csrf-csrf` configurado em `app.js`. Token injetado em `res.locals.csrfToken` via `globalLocals` middleware em 100% das respostas. Handler de erro em `app.js` detecta AJAX por `req.xhr`, `Accept: application/json` ou `Content-Type: application/json`.
 

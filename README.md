@@ -196,7 +196,7 @@ O microserviço Python é a exceção deliberada: roda workloads de ML (inferên
 Escolhido pelas garantias ACID em dados relacionais (candidaturas, transições de pipeline, contas) combinadas com suporte nativo a colunas JSON para dados semi-estruturados (arrays de habilidades do currículo, histórico de etapas, respostas de triagem). O histórico de 30 migrações reflete evolução iterativa de schema gerenciada via Sequelize CLI.
 
 ### Groq / LLaMA 3.3 70B
-Latência de inferência abaixo de 1 segundo — crítica para features interativas como entrevista simulada e chat. A restrição do plano gratuito (30 RPM, 1.000 req/dia) é monitorada em tempo real via Dashboard de Métricas de IA. Trocar de provedor requer mudar apenas `src/helpers/groq.js`.
+Latência de inferência abaixo de 1 segundo — crítica para features interativas como entrevista simulada e chat. A restrição do plano gratuito (30 RPM, 1.000 req/dia) é monitorada em tempo real via Dashboard de Métricas de IA **e aplicada** por um limitador global em Redis (`GROQ_DAILY_LIMIT`), que bloqueia novas chamadas ao atingir o teto. O modelo é configurável por `GROQ_MODEL` (env) — trocar de modelo não exige mudança de código; trocar de provedor requer apenas `src/helpers/groq.js`.
 
 ### Reciprocal Rank Fusion para Busca
 O microserviço combina similaridade semântica (distância cosseno em embeddings multilíngues) com relevância de keywords BM25 via RRF. BM25 puro perde matches semânticos; semântico puro retorna resultados topicamente similares mas irrelevantes. RRF funde listas ranqueadas sem exigir normalização de scores.
@@ -226,7 +226,7 @@ Veja [`docs/architecture.md`](docs/architecture.md) e [`docs/engineering-princip
 
 **Restrições atuais:** processo Node.js único; PostgreSQL no mesmo host; microserviço Python como processo separado; Socket.io in-process.
 
-**Principal gargalo — plano gratuito Groq:** 30 RPM / 1.000 req/dia. Mitigado por `src/utils/aiCache.js` com cache em memória para prompts determinísticos (mesma entrada = resposta em cache, zero chamada de API).
+**Principal gargalo — plano gratuito Groq:** 30 RPM / 1.000 req/dia. Mitigado por `src/utils/aiCache.js` com cache em memória para prompts determinísticos (mesma entrada = resposta em cache, zero chamada de API), por um limitador por usuário (`aiLimiter`) e por um teto global diário em Redis (`aiGlobalLimiter`) que protege a conta de estourar o limite real.
 
 **Caminho para escalonamento horizontal:**
 

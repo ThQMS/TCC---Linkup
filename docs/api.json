@@ -636,9 +636,11 @@
                     "type": "string",
                     "enum": [
                       "pendente",
-                      "aceito",
-                      "recusado",
-                      "cancelado"
+                      "em análise",
+                      "aprovado",
+                      "rejeitado",
+                      "expirado",
+                      "contratado"
                     ]
                   },
                   "jobId": {

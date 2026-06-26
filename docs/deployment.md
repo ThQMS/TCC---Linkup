@@ -43,10 +43,18 @@ cp .env.example .env
 |---|---|---|
 | `PORT` | `3000` | Porta do servidor HTTP |
 | `BASE_URL` | `http://localhost:3000` | URL base para links em e-mails transacionais |
-| `REDIS_URL` | `redis://localhost:6379` | URL do Redis — habilita Socket.io adapter para multi-instância; **obrigatória em produção** |
+| `APP_URL` | host da requisição | URL pública usada no link de reset de senha (use atrás de proxy) |
+| `GROQ_MODEL` | `llama-3.3-70b-versatile` | Modelo da Groq (centralizado). **Verifique a deprecação em console.groq.com/docs/models antes do deploy.** |
+| `CSRF_SECRET` | usa `SESSION_SECRET` | Segredo dedicado ao CSRF (recomendado em produção) |
+| `GROQ_DAILY_LIMIT` | `1000` | Teto **global** diário de chamadas à IA (protege a conta Groq) |
+| `REDIS_URL` | `redis://localhost:6379` | URL do Redis — Socket.io adapter, lockout de login e limitador global de IA; **obrigatória em produção** |
 | `SEARCH_SERVICE_URL` | `http://localhost:5001` | URL do microserviço Python (sobrescrito pelo Docker) |
-| `VALIDATE_COMPANY` | `false` | Habilita verificação de CNPJ e domínio corporativo |
-| `DB_SSL_REJECT_UNAUTHORIZED` | `true` | Definir `false` apenas em provedores com certificado PostgreSQL self-signed (ex: Railway interno) |
+| `SEARCH_TOKEN` | — | Token compartilhado Node↔Python. Se definido, o serviço de busca exige o header `x-search-token`. Recomendado em produção. |
+| `FIT_THRESHOLD` | `60` | Threshold (0-100) do fit de redescoberta de talentos |
+| `EMBED_THRESHOLD` | `0.25` | Threshold de similaridade semântica no serviço Python |
+| `VALIDATE_COMPANY` | `false` | Habilita verificação de CNPJ e domínio corporativo (fail-closed em produção) |
+| `DB_SSL` | `false` (off) | Ative com `true` em provedores gerenciados (Railway/Render/Heroku). Em Docker self-hosted o Postgres interno não usa SSL. |
+| `DB_SSL_REJECT_UNAUTHORIZED` | `true` | Com `DB_SSL=true`, definir `false` apenas em provedores com certificado self-signed |
 | `LOG_LEVEL` | `info` | Nível de log: `error` \| `warn` \| `info` \| `debug` |
 | `SEED_PASSWORD` | — | Senha padrão dos usuários criados pelo seed |
 
@@ -237,8 +245,10 @@ docker compose up --build -d
 Ordem de inicialização garantida por `healthcheck`:
 1. `db` (PostgreSQL 16) — aguarda `pg_isready`
 2. `redis` (Redis 7) — aguarda `redis-cli ping`
-3. `search` (Python Flask) — aguarda `/health`
-4. `app` (Node.js 20) — executa `db:migrate` e inicia `server.js`
+3. `search` (Python + gunicorn, 2 workers) — aguarda `/health`
+4. `app` (Node.js 20) — executa `db:migrate` e inicia `server.js`; tem healthcheck próprio em `/health`
+
+> Em produção o schema é gerido **exclusivamente por migrations** (`db:migrate`). O `sequelize.sync()` é desativado quando `NODE_ENV=production` — não há reescrita automática do schema a partir dos models.
 
 ### 3. Popular banco com dados de teste (opcional)
 
@@ -268,11 +278,13 @@ docker compose down -v
 | Serviço  | Imagem              | Porta host |
 |----------|---------------------|------------|
 | `app`    | build local         | 3000       |
-| `db`     | postgres:16-alpine  | 5432       |
-| `search` | build local (Python)| 5001       |
-| `redis`  | redis:7-alpine      | —          |
+| `db`     | postgres:16-alpine  | — (interna)|
+| `search` | build local (Python)| — (interna)|
+| `redis`  | redis:7-alpine      | — (interna)|
 
-> Redis não expõe porta ao host por segurança — é acessível apenas internamente via `redis://redis:6379`.
+> Apenas o `app` publica porta ao host (3000). `db`, `redis` e `search` ficam **acessíveis somente pela rede interna** do compose (`db:5432`, `redis:6379`, `search:5001`) — não ficam expostos à internet. Para depurar o banco localmente, descomente o mapeamento `127.0.0.1:5432:5432` no `docker-compose.yml`.
+
+> **Uploads** (avatares/currículos) são persistidos no volume nomeado `uploads_data` montado em `/app/public/uploads` — não são perdidos em redeploy.
 
 ### Variáveis injetadas automaticamente pelo Docker
 
@@ -291,14 +303,26 @@ docker compose down -v
 ```env
 NODE_ENV=production
 SESSION_SECRET=<string aleatória de 64+ caracteres>
+CSRF_SECRET=<string aleatória de 32+ caracteres>
 VALIDATE_COMPANY=true
 BASE_URL=https://seudominio.com.br
+APP_URL=https://seudominio.com.br
+SEARCH_TOKEN=<string aleatória — protege o serviço Python>
+GROQ_MODEL=<modelo suportado — confirme em console.groq.com/docs/models>
+# Em provedor gerenciado (Railway/Render/Heroku):
+# DB_SSL=true
 ```
 
 Com `NODE_ENV=production`:
 - Cookies de sessão ficam com `secure: true` (apenas HTTPS)
+- `app.set('trust proxy', 1)` é ativado (necessário atrás de proxy para cookies `secure` e rate-limit por IP)
 - Helmet habilita HSTS
 - Logs de SQL do Sequelize são desabilitados
+- O schema é gerido só por migrations (`sync` desativado)
+
+> **HTTPS / reverse proxy.** O app serve HTTP na porta 3000 — coloque um reverse proxy (Caddy resolve TLS automaticamente, ou Nginx) terminando HTTPS e fazendo proxy para `app:3000`. Sem TLS na frente, os cookies `secure` não trafegam.
+
+> **Segredos.** Rotacione `GMAIL_PASS`, `GROQ_API_KEY` e `SESSION_SECRET` antes de tornar o repositório público — qualquer valor que já esteve em um `.env` versionado/compartilhado deve ser tratado como vazado.
 - Mensagens de erro genéricas são retornadas (sem stack traces)
 - `REDIS_URL` se torna obrigatória (validada na inicialização)
 

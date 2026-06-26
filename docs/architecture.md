@@ -567,11 +567,14 @@ Inicializado em `server.js`, compartilhado com `src/config/socket.js`. `userId` 
 **Contexto:** auditoria de segurança identificou session fixation, ausência de account lockout, CSRF secret hardcoded e e-mails em texto plano nos logs.
 **Decisão:** todas as correções foram implementadas na camada de aplicação, sem adicionar pacotes externos:
 - **Session fixation:** `req.session.regenerate()` chamado antes de `req.login()` — novo ID de sessão a cada autenticação bem-sucedida.
-- **Account lockout:** Map in-memory em `authController` — 5 falhas consecutivas por e-mail bloqueiam por 15 minutos.
-- **CSRF secret:** fallback hardcoded removido — `SESSION_SECRET` (obrigatória) é a única fonte.
-- **SSL:** `rejectUnauthorized` habilitado por padrão em produção; desabilitável via `DB_SSL_REJECT_UNAUTHORIZED=false` para provedores com certificado self-signed.
+- **Account lockout:** `helpers/loginLockout.js` com backend **Redis** (chave por e-mail, TTL 15 min) — 5 falhas consecutivas bloqueiam por 15 minutos. _(revisão jun/2026: migrado do Map in-memory original para Redis, válido em multi-instância; com fallback em memória se o Redis cair.)_
+- **CSRF secret:** segredo dedicado `CSRF_SECRET` (com fallback para `SESSION_SECRET` por compatibilidade).
+- **SSL:** opt-in via `DB_SSL=true` (provedores gerenciados); em Docker self-hosted o Postgres interno não usa SSL. `DB_SSL_REJECT_UNAUTHORIZED=false` para certificados self-signed.
 - **Audit log:** e-mails mascarados (`maskEmail()`) — nunca persistidos em texto plano.
-**Consequências:** zero dependências adicionadas; account lockout in-memory é resetado ao reiniciar o servidor (aceitável para deployment single-instance; em multi-instância, migrar para Redis). Migration `20260412000001` adiciona `passwordChangedAt` ao modelo `User`.
+- **Reset de senha:** token aleatório de 256 bits via link, hasheado no banco (campo dedicado `resetToken`), uso único — substitui o código numérico que reusava `verificationCode`.
+- **bcrypt:** custo 12 centralizado em hook do model `User` (antes 10, repetido em 3 lugares).
+- **trust proxy:** `app.set('trust proxy', 1)` em produção — cookies `secure` e rate-limit por IP corretos atrás de proxy.
+**Consequências:** account lockout e limites agora compartilhados via Redis (obrigatório em produção). Migration `20260412000001` adiciona `passwordChangedAt` ao modelo `User`.
 
 ### ADR-008 — Alpine.js v3 para Interatividade Leve
 **Contexto:** interações específicas (confirmação de cancelamento, modais de ação) necessitam de feedback instantâneo sem recarregar a página, mas não justificam a adoção de um framework SPA completo.

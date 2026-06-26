@@ -101,7 +101,7 @@ Conclui a redefinição de senha.
 **Body (form-encoded)**
 ```
 token     string  obrigatório  do link enviado por e-mail
-password  string  obrigatório  mínimo 6 caracteres
+password  string  obrigatório  mínimo 8 caracteres
 _csrf     string  obrigatório
 ```
 
